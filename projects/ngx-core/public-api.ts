@@ -36,6 +36,10 @@ export * from './src/store/store.service';
  *	Translate
  */
 export * from './src/translate/provide-translate';
+export * from './src/translate/provide-language';
+export * from './src/translate/language.const';
+export * from './src/translate/language.interface';
+export * from './src/translate/language.service';
 export * from './src/translate/translate.directive';
 export * from './src/translate/translate.interface';
 export * from './src/translate/translate.pipe';

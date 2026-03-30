@@ -1,3 +1,5 @@
+import { ProvideLanguageConfig } from './language.interface';
+
 export interface Translate {
 	sourceText: string;
 	text: string;
@@ -9,9 +11,6 @@ export interface TranslateFileLoaderConfig {
 	folder?: string;
 }
 
-export interface ProvideTranslateConfig extends TranslateFileLoaderConfig {
-	language?: string;
-	defaultLanguage?: string;
+export interface ProvideTranslateConfig extends TranslateFileLoaderConfig, ProvideLanguageConfig {
 	translations?: TranslateConfigTranslations;
-	persistLanguage?: boolean;
 }

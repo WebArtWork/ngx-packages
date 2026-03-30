@@ -2,20 +2,17 @@ import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, PLATFORM_ID, signal, WritableSignal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { StoreService } from '../store/store.service';
+import { LanguageService } from './language.service';
 import { ProvideTranslateConfig, Translate } from './translate.interface';
 import { Translates } from './translate.type';
 
 @Injectable({ providedIn: 'root' })
 export class TranslateService {
-	private static readonly _LANGUAGE_STORE_KEY = 'translate.language';
 	private static readonly _DEFAULT_FOLDER = '/i18n/';
 
 	private _http = inject(HttpClient);
 	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
-	private _storeService = inject(StoreService);
-	private _language = signal('');
-	private _defaultLanguage = signal('');
+	private _languageService = inject(LanguageService);
 	private _config: Required<Pick<ProvideTranslateConfig, 'folder' | 'persistLanguage'>> &
 		Omit<ProvideTranslateConfig, 'folder' | 'persistLanguage'> = {
 		folder: TranslateService._DEFAULT_FOLDER,
@@ -48,16 +45,14 @@ export class TranslateService {
 			persistLanguage: config.persistLanguage ?? this._config.persistLanguage,
 		};
 
-		if (this._config.defaultLanguage) {
-			this._defaultLanguage.set(this._config.defaultLanguage);
-		}
+		await this._languageService.init({
+			language: this._config.language,
+			defaultLanguage: this._config.defaultLanguage,
+			languages: this._config.languages,
+			persistLanguage: this._config.persistLanguage,
+		});
 
-		const storedLanguage = this._config.persistLanguage
-			? await this._storeService.get(TranslateService._LANGUAGE_STORE_KEY)
-			: null;
-
-		const initialLanguage =
-			this._config.language || storedLanguage || this._config.defaultLanguage || '';
+		const initialLanguage = this._languageService.language();
 
 		if (initialLanguage) {
 			await this.setLanguage(initialLanguage);
@@ -65,25 +60,21 @@ export class TranslateService {
 	}
 
 	language() {
-		return this._language();
+		return this._languageService.language();
 	}
 
 	defaultLanguage() {
-		return this._defaultLanguage();
+		return this._languageService.defaultLanguage();
 	}
 
 	async setLanguage(language: string): Promise<void> {
-		const nextLanguage = (language || '').trim();
+		const hasBeenSet = await this._languageService.setLanguage(language);
 
-		if (!nextLanguage) {
+		if (!hasBeenSet) {
 			return;
 		}
 
-		this._language.set(nextLanguage);
-
-		if (this._config.persistLanguage) {
-			void this._storeService.set(TranslateService._LANGUAGE_STORE_KEY, nextLanguage);
-		}
+		const nextLanguage = this._languageService.language();
 
 		const translations = await this.loadTranslations(nextLanguage);
 
@@ -133,7 +124,14 @@ export class TranslateService {
 	 */
 	translate(text: string): WritableSignal<string> {
 		if (!this._signalTranslates[text]) {
-			this._signalTranslates[text] = signal(text);
+			const language = this._languageService.language();
+			const currentTranslation = language
+				? this._translationsByLanguage
+						.get(language)
+						?.find(translation => translation.sourceText === text)?.text
+				: undefined;
+
+			this._signalTranslates[text] = signal(currentTranslation || text);
 		}
 
 		return this._signalTranslates[text];
@@ -159,7 +157,7 @@ export class TranslateService {
 	setMany(translations: Translate[]) {
 		this._applyTranslations(translations);
 
-		const language = this._language();
+		const language = this._languageService.language();
 
 		if (language) {
 			this._translationsByLanguage.set(
@@ -185,7 +183,7 @@ export class TranslateService {
 	setOne(translation: Translate) {
 		this._setTranslation(translation.sourceText, translation.text);
 
-		const language = this._language();
+		const language = this._languageService.language();
 
 		if (!language) {
 			return;
