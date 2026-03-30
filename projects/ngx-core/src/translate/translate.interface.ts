@@ -1,4 +1,4 @@
-import { ProvideLanguageConfig } from './language.interface';
+import { ProvideLanguageConfig } from '../language/language.interface';
 
 export interface Translate {
 	sourceText: string;

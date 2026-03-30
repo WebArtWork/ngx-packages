@@ -7,4 +7,5 @@
 /services/emitter-service
 /services/network-service
 /services/theme-service
+/services/languages
 /services/translate-service

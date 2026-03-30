@@ -106,28 +106,27 @@ h1 {
 	gap: 10px;
 }
 
-.menu-link {
-	display: grid;
-	gap: 4px;
-	width: 100%;
-	padding: 14px 16px;
-	border: 1px solid var(--panel-border);
-	border-radius: var(--radius-md);
-	background: var(--panel-subtle);
-	color: inherit;
-	font: inherit;
-	text-align: left;
-	text-decoration: none;
-	cursor: pointer;
-	transition:
-		border-color 150ms ease,
-		transform 150ms ease,
-		background 150ms ease;
+.menu-link-arrow,
+.file-toggle-arrow {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	width: 18px;
+	height: 18px;
+	color: var(--accent-strong);
+	transition: transform 180ms ease;
 }
 
-.menu-link:hover {
-	border-color: color-mix(in srgb, var(--accent-strong) 40%, var(--panel-border));
-	transform: translateY(-1px);
+.menu-link-arrow svg,
+.file-toggle-arrow svg {
+	width: 100%;
+	height: 100%;
+}
+
+.menu-link-arrow.is-open,
+.file-toggle-arrow.is-open {
+	transform: rotate(90deg);
 }
 
 .menu-link-name {
@@ -153,6 +152,77 @@ h1 {
 	display: grid;
 	gap: 18px;
 	min-width: 0;
+}
+
+.file-sections {
+	display: grid;
+	gap: 16px;
+}
+
+.file-section {
+	border: 1px solid var(--panel-border);
+	border-radius: var(--radius-lg);
+	background: var(--panel-bg);
+	box-shadow: var(--shadow);
+	overflow: clip;
+	scroll-margin-top: 110px;
+}
+
+.file-toggle {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 18px;
+	width: 100%;
+	padding: 22px 24px;
+	border: 0;
+	background:
+		linear-gradient(135deg, color-mix(in srgb, var(--surface-intro-start) 82%, var(--panel-bg)), var(--panel-bg));
+	color: inherit;
+	font: inherit;
+	text-align: left;
+	cursor: pointer;
+}
+
+.file-toggle-copy {
+	display: grid;
+	gap: 6px;
+}
+
+.file-toggle-copy .label {
+	margin-bottom: 0;
+}
+
+.file-toggle-meta {
+	margin: 0;
+	color: var(--text-muted);
+	font-size: 0.92rem;
+}
+
+.file-section-body {
+	display: grid;
+	gap: 18px;
+	padding: 0 18px 18px;
+	border-top: 1px solid var(--panel-border);
+	background: color-mix(in srgb, var(--panel-bg) 92%, var(--surface-overlay-strong));
+}
+
+.file-section-body .reference-row {
+	padding-top: 18px;
+}
+
+.file-section-body .reference-row + .reference-row {
+	border-top: 1px solid color-mix(in srgb, var(--panel-border) 75%, transparent);
+}
+
+.empty-file-state {
+	padding: 20px 6px 4px;
+	color: var(--text-muted);
+	line-height: 1.7;
+}
+
+.empty-file-state p {
+	margin: 0;
 }
 
 .service-intro {
@@ -236,6 +306,11 @@ h2,
 
 .code-card h2 {
 	font-size: 1.3rem;
+}
+
+.code-card h3,
+.info-card h3 {
+	font-size: 1.15rem;
 }
 
 .copy-button {

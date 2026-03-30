@@ -2,7 +2,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, PLATFORM_ID, signal, WritableSignal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { LanguageService } from './language.service';
+import { LanguageService } from '../language/language.service';
 import { ProvideTranslateConfig, Translate } from './translate.interface';
 import { Translates } from './translate.type';
 

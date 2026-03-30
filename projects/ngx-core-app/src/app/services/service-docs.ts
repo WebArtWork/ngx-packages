@@ -5,7 +5,8 @@ export interface ServiceMethodDoc {
 	details?: string[];
 	example?: string;
 	category?: string;
-	docType?: 'Service' | 'Component' | 'Interface';
+	docType?: 'Service' | 'Component' | 'Interface' | 'Type' | 'Const';
+	sourceFile?: string;
 }
 
 export interface ServiceSectionDoc {
@@ -21,6 +22,7 @@ export interface ServiceDoc {
 	summary: string;
 	highlights: string[];
 	config?: string[];
+	availableItems?: string[];
 	properties?: ServiceMethodDoc[];
 	methods: ServiceMethodDoc[];
 	sections?: ServiceSectionDoc[];
@@ -1170,22 +1172,191 @@ toggleTheme() {
 }`,
 	},
 	{
+		slug: 'languages',
+		name: 'Languages',
+		description:
+			'Standalone language selection, registry, and persistence feature used by translate.',
+		summary:
+			'Languages owns available language definitions, default and current language resolution, validation, and optional persistence. Translate depends on it for language state instead of embedding that logic directly.',
+		highlights: [
+			'Keeps language bootstrap separate from translation loading and signal updates.',
+			'Resolves defaults, validates available codes, and persists the current language when enabled.',
+			'Can be configured directly through provideLanguage() or indirectly through provideTranslate().',
+		],
+		config: [
+			'Use provideLanguage({ language, defaultLanguage, languages, persistLanguage }) for standalone setup.',
+			'provideTranslate() accepts the same language config and forwards it to LanguageService.',
+			'Language persistence is stored through StoreService under the translate.language key.',
+		],
+		availableItems: [
+			'provide-language.ts',
+			'language.service.ts',
+			'language.interface.ts',
+			'language.const.ts',
+		],
+		methods: [
+			{
+				name: 'provideLanguage / provideLanguages',
+				signature:
+					'provideLanguage(config?: ProvideLanguageConfig): EnvironmentProviders',
+				description:
+					'Registers LanguageService initialization during app bootstrap.',
+				category: 'Providers',
+				sourceFile: 'provide-language.ts',
+				example: `import { provideLanguage } from 'ngx-core';
+
+export const appConfig = {
+\tproviders: [
+\t\tprovideLanguage({
+\t\t\tdefaultLanguage: 'en',
+\t\t\tlanguages: ['en', 'de', 'fr'],
+\t\t}),
+\t],
+};`,
+			},
+			{
+				name: 'init',
+				signature: 'init(config?: ProvideLanguageConfig): Promise<void>',
+				description:
+					'Resolves available languages, default language, stored language, and the initial active language.',
+				category: 'Lifecycle',
+				sourceFile: 'language.service.ts',
+			},
+			{
+				name: 'language / defaultLanguage',
+				signature: 'language(): string / defaultLanguage(): string',
+				description: 'Returns the current and fallback language codes.',
+				category: 'State',
+				sourceFile: 'language.service.ts',
+			},
+			{
+				name: 'languages / allLanguages',
+				signature: 'languages(): Language[] / allLanguages(): Language[]',
+				description:
+					'Returns configured languages or the built-in defaults catalogue.',
+				category: 'State',
+				sourceFile: 'language.service.ts',
+			},
+			{
+				name: 'getLanguage / hasLanguage',
+				signature: 'lookup helpers',
+				description:
+					'Reads one configured language by code and validates whether a language is available.',
+				category: 'Lookup',
+				sourceFile: 'language.service.ts',
+			},
+			{
+				name: 'setLanguages',
+				signature:
+					'setLanguages(languages: readonly LanguageInput[], syncCurrentLanguage = true): void',
+				description:
+					'Replaces the configured language list and optionally syncs the active language to a valid fallback.',
+				category: 'State',
+				sourceFile: 'language.service.ts',
+			},
+			{
+				name: 'setLanguage',
+				signature: 'setLanguage(code: string): Promise<boolean>',
+				description:
+					'Validates and applies the active language, then persists it when enabled.',
+				category: 'State',
+				sourceFile: 'language.service.ts',
+				example: `import { LanguageService } from 'ngx-core';
+
+private readonly languages = inject(LanguageService);
+
+async switchLanguage(code: string) {
+\tconst changed = await this.languages.setLanguage(code);
+\tif (changed) {
+\t\tconsole.log('language updated', this.languages.language());
+\t}
+}`,
+			},
+			{
+				name: 'Language',
+				signature: 'interface Language { code: string; name: string; nativeName?: string; }',
+				description:
+					'Represents one normalized language definition used by the feature and translation runtime.',
+				category: 'Contracts',
+				docType: 'Interface',
+				sourceFile: 'language.interface.ts',
+			},
+			{
+				name: 'LanguageInput',
+				signature: 'type LanguageInput = string | Language',
+				description:
+					'Allows configuration to use either a language code string or a full language object.',
+				category: 'Contracts',
+				docType: 'Type',
+				sourceFile: 'language.interface.ts',
+			},
+			{
+				name: 'ProvideLanguageConfig',
+				signature:
+					'interface ProvideLanguageConfig { language?; defaultLanguage?; languages?; persistLanguage?; }',
+				description:
+					'Bootstrap options consumed by provideLanguage() and LanguageService.init().',
+				category: 'Contracts',
+				docType: 'Interface',
+				sourceFile: 'language.interface.ts',
+			},
+			{
+				name: 'DEFAULT_LANGUAGES',
+				signature: 'const DEFAULT_LANGUAGES: Language[]',
+				description:
+					'Built-in language catalogue used as the default fallback and for resolving known language metadata.',
+				category: 'Defaults',
+				docType: 'Const',
+				sourceFile: 'language.const.ts',
+			},
+		],
+		sections: [
+			{
+				title: 'Feature role',
+				items: [
+					'LanguageService owns current language state and valid language definitions.',
+					'provideLanguage() bootstraps the feature without requiring TranslateService.',
+					'TranslateService injects LanguageService and reacts to language changes to load translation payloads.',
+				],
+			},
+		],
+		code: `import { LanguageService, provideLanguage } from 'ngx-core';
+
+export const appConfig = {
+\tproviders: [provideLanguage({ defaultLanguage: 'en' })],
+};
+
+readonly languages = inject(LanguageService);
+
+async setGerman() {
+\tawait this.languages.setLanguage('de');
+}`,
+	},
+	{
 		slug: 'translate-service',
 		name: 'TranslateService',
 		description:
-			'Runtime translation registry backed by signals with config-based language bootstrapping.',
+			'Runtime translation registry backed by signals and integrated with the separate Languages feature.',
 		summary:
-			'TranslateService is the library’s runtime i18n layer. It exposes a signal per source text, supports per-language loading (inline or file-based), updates the UI reactively, and optionally persists the selected language.',
+			'TranslateService is the library runtime i18n layer. It exposes a signal per source text, loads language-specific translation payloads, and updates the UI reactively while delegating current-language state to LanguageService.',
 		highlights: [
 			'translate(text) lazily creates a signal that falls back to the source text.',
 			'setMany() resets missing translations back to source text and updates the provided ones.',
-			'setLanguage() lazy-loads and applies a language without stale cross-language state.',
+			'setLanguage() switches through LanguageService, lazy-loads payloads, and applies them without stale cross-language state.',
 		],
 		config: [
 			'Register translation bootstrap with provideTranslate({ language, defaultLanguage, translations?, folder? }).',
 			'With folder mode, language files are loaded as /i18n/{lang}.json by default.',
-			'Language persistence uses StoreService under the translate.language key when enabled.',
+			'Language selection is handled by the Languages feature and reused here.',
 			'This service manages runtime translation state; the translate pipe and directive build on top of it.',
+		],
+		availableItems: [
+			'provide-translate.ts',
+			'translate.service.ts',
+			'translate.interface.ts',
+			'translate.type.ts',
+			'translate.directive.ts',
+			'translate.pipe.ts',
 		],
 		methods: [
 			{
