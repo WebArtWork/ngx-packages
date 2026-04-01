@@ -29,7 +29,28 @@ export interface ServiceDoc {
 	code: string;
 }
 
-export const serviceDocs: ServiceDoc[] = [
+const _SERVICE_DOC_ORDER = [
+	'core-service',
+	'dom-service',
+	'emitter-service',
+	'store-service',
+	'theme-service',
+	'meta-service',
+	'network-service',
+	'http-service',
+	'rtc-service',
+	'socket-service',
+	'crud-service',
+	'translate-service',
+	'language',
+	'datetime',
+] as const;
+
+const _serviceDocOrderMap: ReadonlyMap<string, number> = new Map(
+	_SERVICE_DOC_ORDER.map((slug, index) => [slug, index] as const),
+);
+
+const _serviceDocs: ServiceDoc[] = [
 	{
 		slug: 'core-service',
 		name: 'CoreService',
@@ -42,23 +63,86 @@ export const serviceDocs: ServiceDoc[] = [
 			'Detects device type and responsive viewport using guarded browser APIs.',
 			'Provides object copying, debounce-like afterWhile(), lock management, and signal helpers.',
 		],
+		availableItems: [
+			'core.prototype.ts',
+			'core.service.ts',
+			'core.type.ts',
+			'config.interface.ts',
+			'click-outside.directive.ts',
+			'arr.pipe.ts',
+			'mongodate.pipe.ts',
+			'number.pipe.ts',
+			'pagination.pipe.ts',
+			'safe.pipe.ts',
+			'search.pipe.ts',
+			'splice.pipe.ts',
+			'split.pipe.ts',
+			'util.service.ts',
+		],
 		config: [
-			'No explicit provideWacom() config is required.',
+			'No explicit provideNgxCore() config is required.',
 			'Browser-only features such as device detection and viewport listeners run only on the client.',
 		],
 		properties: [
+			{
+				name: 'Config',
+				signature: 'interface Config',
+				description:
+					'Root configuration contract used by provideNgxCore() for store, meta, http, network, socket, and io settings.',
+				category: 'Configuration',
+				docType: 'Interface',
+				sourceFile: 'config.interface.ts',
+				example: `import { provideNgxCore, type Config } from 'ngx-core';
+
+const config: Config = {
+\thttp: { url: '/api', headers: { 'X-App': 'docs' } },
+\tmeta: { applyFromRoutes: true },
+};
+
+export const appConfig = {
+\tproviders: [provideNgxCore(config)],
+};`,
+			},
+			{
+				name: 'CONFIG_TOKEN',
+				signature: 'InjectionToken<Config>',
+				description:
+					'Injection token used internally and by advanced consumers to read the resolved ngx-core configuration.',
+				category: 'Configuration',
+				docType: 'Const',
+				sourceFile: 'config.interface.ts',
+			},
+			{
+				name: 'DEFAULT_CONFIG',
+				signature: 'const DEFAULT_CONFIG: Config',
+				description:
+					'Default library configuration used when provideNgxCore() is called without overrides.',
+				category: 'Configuration',
+				docType: 'Const',
+				sourceFile: 'config.interface.ts',
+			},
+			{
+				name: 'Viewport',
+				signature: "type Viewport = 'mobile' | 'tablet' | 'desktop'",
+				description:
+					'Responsive breakpoint union used by CoreService viewport signals and related helpers.',
+				category: 'Types',
+				docType: 'Type',
+				sourceFile: 'core.type.ts',
+			},
 			{
 				name: 'deviceID',
 				signature: 'deviceID: string',
 				description:
 					'Stable per-device identifier persisted to localStorage when available.',
 				category: 'Device and viewport',
+				sourceFile: 'core.service.ts',
 				example: `import { CoreService } from 'ngx-core';
 
-constructor(private core: CoreService) {}
+constructor(private _coreService: CoreService) {}
 
 ngOnInit() {
-\tconsole.log('device id', this.core.deviceID);
+\tconsole.log('device id', this._coreService.deviceID);
 }`,
 			},
 			{
@@ -66,13 +150,14 @@ ngOnInit() {
 				signature: "device: '' | 'Windows Phone' | 'Android' | 'iOS' | 'Web'",
 				description: 'Detected platform classification after detectDevice().',
 				category: 'Device and viewport',
+				sourceFile: 'core.service.ts',
 				example: `import { CoreService } from 'ngx-core';
 
-constructor(private core: CoreService) {}
+constructor(private _coreService: CoreService) {}
 
 ngOnInit() {
-\tthis.core.detectDevice();
-\tconsole.log('platform', this.core.device);
+\tthis._coreService.detectDevice();
+\tconsole.log('platform', this._coreService.device);
 }`,
 			},
 			{
@@ -80,16 +165,17 @@ ngOnInit() {
 				signature: "viewport: Signal<'mobile' | 'tablet' | 'desktop'>",
 				description: 'Responsive breakpoint signal driven by matchMedia listeners.',
 				category: 'Device and viewport',
+				sourceFile: 'core.service.ts',
 				example: `import { CoreService } from 'ngx-core';
 
-readonly core = inject(CoreService);
+readonly coreService = inject(CoreService);
 
 ngOnInit() {
-\tthis.core.detectViewport();
+\tthis.coreService.detectViewport();
 }
 
 viewportLabel() {
-\treturn this.core.viewport();
+\treturn this.coreService.viewport();
 }`,
 			},
 			{
@@ -97,12 +183,13 @@ viewportLabel() {
 				signature: 'computed signals',
 				description: 'Convenience computed signals derived from viewport().',
 				category: 'Device and viewport',
+				sourceFile: 'core.service.ts',
 				example: `import { CoreService } from 'ngx-core';
 
-readonly core = inject(CoreService);
+readonly coreService = inject(CoreService);
 
 isCompactLayout() {
-\treturn this.core.isViewportMobile() || this.core.isViewportTablet();
+\treturn this.coreService.isViewportMobile() || this.coreService.isViewportTablet();
 }`,
 			},
 			{
@@ -110,18 +197,32 @@ isCompactLayout() {
 				signature: 'string fields',
 				description: 'Simple version state for combining app and date versions.',
 				category: 'Versioning',
+				sourceFile: 'core.service.ts',
 				example: `import { CoreService } from 'ngx-core';
 
-constructor(private core: CoreService) {}
+constructor(private _coreService: CoreService) {}
 
 setBuildInfo() {
-\tthis.core.setAppVersion('1.4.0');
-\tthis.core.setDateVersion('2026-03-21');
-\tconsole.log(this.core.version);
+\tthis._coreService.setAppVersion('1.4.0');
+\tthis._coreService.setDateVersion('2026-03-21');
+\tconsole.log(this._coreService.version);
 }`,
 			},
 		],
 		methods: [
+			{
+				name: 'capitalize',
+				signature: 'String.prototype.capitalize(): string',
+				description:
+					'Prototype augmentation that uppercases the first character and lowercases the remainder of a string.',
+				category: 'Prototype helpers',
+				docType: 'Const',
+				sourceFile: 'core.prototype.ts',
+				example: `import 'ngx-core';
+
+const label = 'hELLo'.capitalize();
+console.log(label); // Hello`,
+			},
 			{
 				name: 'UUID',
 				signature: 'UUID(): string',
@@ -130,12 +231,13 @@ setBuildInfo() {
 					'Good for local ids and general runtime identifiers, not for cryptographic use.',
 				],
 				category: 'Data helpers',
+				sourceFile: 'core.service.ts',
 				example: `import { CoreService } from 'ngx-core';
 
-constructor(private core: CoreService) {}
+constructor(private _coreService: CoreService) {}
 
 createDraft() {
-\treturn { _id: this.core.UUID(), title: 'Untitled' };
+\treturn { _id: this._coreService.UUID(), title: 'Untitled' };
 }`,
 			},
 			{
@@ -146,6 +248,7 @@ createDraft() {
 					'Returns the input unchanged for arrays and an empty array for non-objects.',
 				],
 				category: 'Data helpers',
+				sourceFile: 'core.service.ts',
 			},
 			{
 				name: 'splice',
@@ -154,12 +257,29 @@ createDraft() {
 				description:
 					'Removes items from one array when their compareField exists in another array.',
 				category: 'Data helpers',
+				sourceFile: 'core.service.ts',
 			},
 			{
 				name: 'ids2id',
 				signature: 'ids2id(...args: string[]): string',
 				description: 'Creates a deterministic combined id by sorting ids and joining them.',
 				category: 'Data helpers',
+				sourceFile: 'core.service.ts',
+			},
+			{
+				name: 'ClickOutsideDirective',
+				signature: "directive [clickOutside] => output<MouseEvent>('clickOutside')",
+				description:
+					'Standalone directive that emits when a pointer event happens outside the host element.',
+				details: [
+					'Uses a document-level pointerdown listener and marks the view for check to stay safe with OnPush and zoneless apps.',
+				],
+				category: 'Directives',
+				docType: 'Const',
+				sourceFile: 'click-outside.directive.ts',
+				example: `<section class="panel" (clickOutside)="closePanel()">
+  <p>Click anywhere outside this panel to close it.</p>
+</section>`,
 			},
 			{
 				name: 'afterWhile',
@@ -171,14 +291,37 @@ createDraft() {
 					'Can key the timer by string, store it on an object, or default to a shared "common" key.',
 				],
 				category: 'Flow control',
+				sourceFile: 'core.service.ts',
 				example: `import { CoreService } from 'ngx-core';
 
-constructor(private core: CoreService) {}
+constructor(private _coreService: CoreService) {}
 
 queueSave(doc: { _id: string }) {
-\tthis.core.afterWhile(doc._id, () => {
+\tthis._coreService.afterWhile(doc._id, () => {
 \t\tconsole.log('save once user stops typing');
 \t}, 400);
+}`,
+			},
+			{
+				name: 'UtilService',
+				signature: 'class UtilService',
+				description:
+					'General-purpose utility service for validation, generated data, CSS variable persistence, and shared form signals.',
+				details: [
+					'Persists local CSS custom properties and reapplies them on startup.',
+					'Exposes formSignal() for shared mutable form state without adding a separate store.',
+				],
+				category: 'Utilities',
+				docType: 'Service',
+				sourceFile: 'util.service.ts',
+				example: `import { UtilService } from 'ngx-core';
+
+private readonly _utilService = inject(UtilService);
+
+themeForm = this._utilService.formSignal<{ accent?: string }>('theme');
+
+applyTheme() {
+\tthis._utilService.setCss({ '--accent': '#14532d' }, { local: true });
 }`,
 			},
 			{
@@ -187,20 +330,22 @@ queueSave(doc: { _id: string }) {
 				description:
 					'Recursively copies plain object data while preserving arrays, dates, and null values.',
 				category: 'Data helpers',
+				sourceFile: 'core.service.ts',
 			},
 			{
 				name: 'detectDevice',
 				signature: 'detectDevice(): void',
 				description: 'Updates device based on the current user agent.',
 				category: 'Device and viewport',
+				sourceFile: 'core.service.ts',
 				example: `import { CoreService } from 'ngx-core';
 
-constructor(private core: CoreService) {}
+constructor(private _coreService: CoreService) {}
 
 ngOnInit() {
-\tthis.core.detectDevice();
+\tthis._coreService.detectDevice();
 
-\tif (this.core.isIos()) {
+\tif (this._coreService.isIos()) {
 \t\tconsole.log('show iOS-specific hint');
 \t}
 }`,
@@ -210,6 +355,7 @@ ngOnInit() {
 				signature: 'boolean helpers',
 				description: 'Convenience methods for checking the detected device classification.',
 				category: 'Device and viewport',
+				sourceFile: 'core.service.ts',
 			},
 			{
 				name: 'detectViewport',
@@ -217,12 +363,13 @@ ngOnInit() {
 				description:
 					'Starts responsive breakpoint tracking with automatic cleanup on service destroy.',
 				category: 'Device and viewport',
+				sourceFile: 'core.service.ts',
 				example: `import { CoreService } from 'ngx-core';
 
-readonly core = inject(CoreService);
+readonly coreService = inject(CoreService);
 
 ngOnInit() {
-\tthis.core.detectViewport();
+\tthis.coreService.detectViewport();
 }`,
 			},
 			{
@@ -231,6 +378,7 @@ ngOnInit() {
 				description:
 					'Build and update a combined version string from appVersion and dateVersion.',
 				category: 'Versioning',
+				sourceFile: 'core.service.ts',
 			},
 			{
 				name: 'lock / unlock / onUnlock / locked',
@@ -238,24 +386,28 @@ ngOnInit() {
 				description:
 					'Coordinate async workflows by locking named resources and awaiting their release.',
 				category: 'Flow control',
+				sourceFile: 'core.service.ts',
 			},
 			{
 				name: 'toSignal / toSignalsArray',
-				signature: 'signal conversion helpers',
+				signature: 'toSignal(document, signalFields?) / toSignalsArray(arr, signalFields?)',
 				description:
-					'Wrap plain objects or arrays into Angular signals, optionally making selected fields signals too.',
+					'Wrap plain objects or arrays into Angular signals, optionally using a field-mapper object to expose selected properties as nested signals.',
 				category: 'Signals',
+				sourceFile: 'core.service.ts',
 				example: `import { CoreService } from 'ngx-core';
 
-constructor(private core: CoreService) {}
+constructor(private _coreService: CoreService) {}
 
-user = this.core.toSignal({
+user = this._coreService.toSignal({
 \tname: 'Anna',
 \tstatus: 'active',
-}, ['status']);
+}, {
+\tstatus: doc => doc.status,
+});
 
 updateStatus() {
-\tthis.user.status.set('invited');
+\tthis.user().status.set('invited');
 }`,
 			},
 			{
@@ -264,16 +416,204 @@ updateStatus() {
 				description:
 					'Manage arrays of document signals without re-implementing common lookup and update logic.',
 				category: 'Signals',
+				sourceFile: 'core.service.ts',
+			},
+			{
+				name: 'ArrPipe',
+				signature: 'arr: string | object | array -> any[]',
+				description:
+					'Converts strings or objects into arrays for template iteration, optionally returning keys or values only.',
+				category: 'Pipes',
+				docType: 'Const',
+				sourceFile: 'arr.pipe.ts',
+				example: `@for (entry of settings | arr; track entry.prop) {
+  <dt>{{ entry.prop }}</dt>
+  <dd>{{ entry.value }}</dd>
+}`,
+			},
+			{
+				name: 'MongodatePipe',
+				signature: 'mongodate(_id: unknown): Date',
+				description:
+					'Builds a JavaScript Date from the timestamp portion of a MongoDB ObjectId-like value.',
+				category: 'Pipes',
+				docType: 'Const',
+				sourceFile: 'mongodate.pipe.ts',
+			},
+			{
+				name: 'NumberPipe',
+				signature: 'number(value: unknown): number',
+				description:
+					'Coerces arbitrary input to a number and falls back to 0 when conversion fails.',
+				category: 'Pipes',
+				docType: 'Const',
+				sourceFile: 'number.pipe.ts',
+			},
+			{
+				name: 'PaginationPipe',
+				signature: 'page(arr, config, sort, search?): any[]',
+				description:
+					'Slices an array for the active page and optionally sorts it before returning the page window.',
+				details: [
+					'Mutates copied entries by adding a num field with the 1-based row index.',
+				],
+				category: 'Pipes',
+				docType: 'Const',
+				sourceFile: 'pagination.pipe.ts',
+			},
+			{
+				name: 'SafePipe',
+				signature: 'safe(value: unknown): SafeResourceUrl',
+				description:
+					'Wraps a value with DomSanitizer.bypassSecurityTrustResourceUrl for trusted resource URLs.',
+				category: 'Pipes',
+				docType: 'Const',
+				sourceFile: 'safe.pipe.ts',
+			},
+			{
+				name: 'SearchPipe',
+				signature: 'search(items, query?, fields?, limit?, ignore?): T[]',
+				description:
+					'Filters arrays or object maps by text query, field paths, or signal-backed query input.',
+				details: [
+					'Supports nested paths like status.name and can treat a numeric fields argument as the result limit.',
+				],
+				category: 'Pipes',
+				docType: 'Const',
+				sourceFile: 'search.pipe.ts',
+				example: `<article *ngFor="let project of projects | search: query() : 'name owner.name' : 10">
+  {{ project.name }}
+</article>`,
+			},
+			{
+				name: 'SplicePipe',
+				signature: 'splice(from, which, refresh?): any[]',
+				description:
+					'Removes or keeps matching records between two collections, usually comparing by _id.',
+				category: 'Pipes',
+				docType: 'Const',
+				sourceFile: 'splice.pipe.ts',
+			},
+			{
+				name: 'SplitPipe',
+				signature: "split(value: string, index = 0, divider = ':'): string",
+				description:
+					'Splits a string by a delimiter and returns the requested segment or an empty string.',
+				category: 'Pipes',
+				docType: 'Const',
+				sourceFile: 'split.pipe.ts',
 			},
 		],
 		code: `import { CoreService } from 'ngx-core';
 
-constructor(private core: CoreService) {}
+constructor(private _coreService: CoreService) {}
 
 queueSave(doc: { _id: string }) {
-\tthis.core.afterWhile(doc._id, () => {
+\tthis._coreService.afterWhile(doc._id, () => {
 \t\tconsole.log('save once user stops typing');
 \t}, 400);
+}`,
+	},
+	{
+		slug: 'dom-service',
+		name: 'DomService',
+		description:
+			'Dynamically creates Angular components and attaches them to the DOM in an SSR-safe way.',
+		summary:
+			'DomService is the library feature for runtime component mounting. It creates component instances with Angular createComponent(), projects inputs onto them, attaches their views to the application, and only appends DOM nodes when running in the browser.',
+		highlights: [
+			'Supports attaching a component by target element id or directly to a supplied HTMLElement.',
+			'Returns both the native element and ComponentRef so the caller can manage the mounted instance.',
+			'Guards browser-only DOM appends so the service stays safe during SSR.',
+		],
+		config: [
+			'No provideNgxCore() configuration is required.',
+			'DOM insertion happens only in the browser; on the server the component can still be created and referenced.',
+			'appendComponent() supports a providedIn key to ensure only one mounted instance exists for a given logical slot.',
+		],
+		availableItems: ['dom.service.ts', 'dom.interface.ts'],
+		methods: [
+			{
+				name: 'appendById',
+				signature:
+					'appendById<T>(component: Type<T>, options: Partial<T> = {}, id: string): DomComponent<T>',
+				description:
+					'Creates a component, applies input values, and appends it to the element with the given id.',
+				category: 'Mounting',
+				sourceFile: 'dom.service.ts',
+				example: `import { DomService } from 'ngx-core';
+
+private readonly _domService = inject(DomService);
+
+openBanner() {
+\tthis._domService.appendById(NotificationComponent, {
+\t\tmessage: 'Saved',
+\t}, 'page-banner');
+}`,
+			},
+			{
+				name: 'appendComponent',
+				signature:
+					'appendComponent<T>(component: Type<T>, options: Partial<T & { providedIn?: string }> = {}, element?: HTMLElement): DomComponent<T> | void',
+				description:
+					'Creates and appends a component to a supplied element or to document.body by default.',
+				details: [
+					'When options.providedIn is set, only one active component with that key can exist at a time.',
+					'Returns void when the providedIn slot is already occupied.',
+				],
+				category: 'Mounting',
+				sourceFile: 'dom.service.ts',
+			},
+			{
+				name: 'getComponentRef',
+				signature:
+					'getComponentRef<T>(component: Type<T>, options: Partial<T> = {}): ComponentRef<T>',
+				description:
+					'Creates a component instance, applies inputs, attaches its view, and returns only the ComponentRef.',
+				category: 'Creation',
+				sourceFile: 'dom.service.ts',
+			},
+			{
+				name: 'removeComponent',
+				signature:
+					'removeComponent<T>(componentRef: ComponentRef<T>, providedIn?: string): void',
+				description:
+					'Detaches a previously attached view, destroys the component, and clears any providedIn lock.',
+				category: 'Cleanup',
+				sourceFile: 'dom.service.ts',
+			},
+			{
+				name: 'DomComponent',
+				signature:
+					'interface DomComponent<T> { nativeElement: HTMLElement; componentRef: ComponentRef<T>; remove: () => void; }',
+				description:
+					'Return contract used by appendById() and appendComponent() for mounted components.',
+				category: 'Contracts',
+				docType: 'Interface',
+				sourceFile: 'dom.interface.ts',
+			},
+		],
+		sections: [
+			{
+				title: 'Feature role',
+				items: [
+					'Use DomService when a feature needs runtime-mounted Angular UI such as toasts, overlays, dialogs, or page-level banners.',
+					'The service handles component creation, application view attachment, and cleanup in one place.',
+					'SSR safety comes from guarding browser-only appendChild calls behind platform checks.',
+				],
+			},
+		],
+		code: `import { DomService } from 'ngx-core';
+
+private readonly _domService = inject(DomService);
+
+showToast() {
+\tconst mounted = this._domService.appendComponent(ToastComponent, {
+\t\tmessage: 'Profile updated',
+\t\tprovidedIn: 'profile-toast',
+\t});
+
+\tmounted?.remove();
 }`,
 	},
 	{
@@ -289,27 +629,52 @@ queueSave(doc: { _id: string }) {
 			'Can reject responses through acceptance(), reshape payloads through replace(), and extract only specific fields.',
 		],
 		config: [
-			'Configure defaults with provideWacom({ http: { url, headers } }).',
+			'Configure defaults with provideNgxCore({ http: { url, headers } }).',
 			'Client-side overrides persist in localStorage under ngx-core-http.url and ngx-core-http.headers.',
 			'errors is a global array of callbacks invoked for every request failure.',
 		],
+		availableItems: ['http.service.ts', 'http.interface.ts'],
 		properties: [
 			{
 				name: 'url',
 				signature: 'url: string',
 				description: 'Current base URL prepended to relative request paths.',
+				category: 'State',
+				sourceFile: 'http.service.ts',
 			},
 			{
 				name: 'locked',
 				signature: 'locked: boolean',
 				description:
 					'When true, requests queue until unlock() unless opts.skipLock is set.',
+				category: 'State',
+				sourceFile: 'http.service.ts',
 			},
 			{
 				name: 'errors',
 				signature: '((err: HttpErrorResponse, retry?: () => void) => {})[]',
 				description:
 					'Global error hooks triggered in addition to per-request opts.err callbacks.',
+				category: 'State',
+				sourceFile: 'http.service.ts',
+			},
+			{
+				name: 'HttpConfig',
+				signature: 'interface HttpConfig',
+				description:
+					'Configuration contract used by provideNgxCore({ http }) for the default base URL and shared headers.',
+				category: 'Contracts',
+				docType: 'Interface',
+				sourceFile: 'http.interface.ts',
+			},
+			{
+				name: 'HttpHeaderType / DEFAULT_HTTP_CONFIG',
+				signature: 'HTTP header type alias and default config const',
+				description:
+					'Exported HTTP helper types and defaults used by HttpService configuration.',
+				category: 'Contracts',
+				docType: 'Type',
+				sourceFile: 'http.interface.ts',
 			},
 		],
 		methods: [
@@ -317,27 +682,37 @@ queueSave(doc: { _id: string }) {
 				name: 'setUrl',
 				signature: 'setUrl(url: string): void',
 				description: 'Sets the base URL and persists it in the browser.',
+				category: 'Configuration',
+				sourceFile: 'http.service.ts',
 			},
 			{
 				name: 'removeUrl',
 				signature: 'removeUrl(): void',
 				description: 'Clears the runtime override and falls back to configured url.',
+				category: 'Configuration',
+				sourceFile: 'http.service.ts',
 			},
 			{
 				name: 'set',
 				signature: 'set(key: any, value: any): void',
 				description: 'Adds or updates a shared HTTP header and persists it in the browser.',
+				category: 'Headers',
+				sourceFile: 'http.service.ts',
 			},
 			{
 				name: 'header',
 				signature: 'header(key: any): any',
 				description: 'Reads the current value for a shared header.',
+				category: 'Headers',
+				sourceFile: 'http.service.ts',
 			},
 			{
 				name: 'remove',
 				signature: 'remove(key: any): void',
 				description:
 					'Deletes a shared header and updates the in-memory HttpHeaders instance.',
+				category: 'Headers',
+				sourceFile: 'http.service.ts',
 			},
 			{
 				name: 'post / put / patch / delete / get',
@@ -353,16 +728,22 @@ queueSave(doc: { _id: string }) {
 					'opts.replace(item) mutates the payload or nested payload at opts.data.',
 					'opts.fields limits the response payload to selected fields.',
 				],
+				category: 'Requests',
+				sourceFile: 'http.service.ts',
 			},
 			{
 				name: 'clearLocked',
 				signature: 'clearLocked(): void',
 				description: 'Cancels queued retry timers created while the service was locked.',
+				category: 'Locking',
+				sourceFile: 'http.service.ts',
 			},
 			{
 				name: 'lock / unlock',
 				signature: 'lock(): void / unlock(): void',
 				description: 'Pause or resume requests globally within this service instance.',
+				category: 'Locking',
+				sourceFile: 'http.service.ts',
 			},
 		],
 		sections: [
@@ -381,13 +762,233 @@ queueSave(doc: { _id: string }) {
 		],
 		code: `import { HttpService } from 'ngx-core';
 
-constructor(private http: HttpService) {}
+constructor(private _httpService: HttpService) {}
 
 loadProjects() {
-\tthis.http.set('Authorization', 'Bearer token');
-\treturn this.http.get('/projects', (resp) => console.log(resp), {
+\tthis._httpService.set('Authorization', 'Bearer token');
+\treturn this._httpService.get('/projects', (resp) => console.log(resp), {
 \t\tacceptance: (resp) => Array.isArray(resp),
 \t});
+}`,
+	},
+	{
+		slug: 'rtc-service',
+		name: 'RtcService',
+		description:
+			'SSR-guarded WebRTC helper for local media, peer creation, and offer/answer negotiation.',
+		summary:
+			'RtcService centralizes common WebRTC setup in one injectable feature. It initializes local camera and microphone access, keeps peer connections keyed by caller-defined ids, and wraps the core offer/answer flow without exposing browser-only APIs directly to every component.',
+		highlights: [
+			'Guards browser-only WebRTC access and throws clearly during SSR.',
+			'Stores one local MediaStream and reuses its tracks across created peers.',
+			'Covers the basic signaling lifecycle: peer creation, offers, answers, remote answers, ICE candidates, and cleanup.',
+		],
+		config: [
+			'No provideNgxCore() configuration is required.',
+			'This service does not implement signaling transport; pair it with HttpService, SocketService, or another channel to exchange offers, answers, and ICE candidates.',
+			'Browser permissions for camera and microphone are requested when initLocalStream() runs.',
+		],
+		availableItems: ['rtc.service.ts'],
+		methods: [
+			{
+				name: 'initLocalStream',
+				signature: 'initLocalStream(): Promise<MediaStream>',
+				description:
+					'Requests camera and microphone access once and caches the local stream for later peer setup.',
+				details: [
+					'Throws during SSR because navigator.mediaDevices is browser-only.',
+					'Subsequent calls return the existing stream instead of prompting again.',
+				],
+				category: 'Media',
+				sourceFile: 'rtc.service.ts',
+				example: `import { RtcService } from 'ngx-core';
+
+private readonly _rtcService = inject(RtcService);
+
+async startPreview() {
+\tconst stream = await this._rtcService.initLocalStream();
+\tthis.localVideo.nativeElement.srcObject = stream;
+}`,
+			},
+			{
+				name: 'createPeer',
+				signature: 'createPeer(id: string): Promise<RTCPeerConnection>',
+				description:
+					'Creates a peer connection for the supplied id and attaches any initialized local tracks.',
+				details: [
+					'Call initLocalStream() first when the peer should publish local audio/video.',
+				],
+				category: 'Peers',
+				sourceFile: 'rtc.service.ts',
+			},
+			{
+				name: 'getPeer',
+				signature: 'getPeer(id: string): RTCPeerConnection | undefined',
+				description: 'Returns the stored peer connection for an id when it exists.',
+				category: 'Peers',
+				sourceFile: 'rtc.service.ts',
+			},
+			{
+				name: 'createOffer',
+				signature: 'createOffer(id: string): Promise<RTCSessionDescriptionInit>',
+				description:
+					'Builds an SDP offer for an existing peer and stores it as the local description.',
+				category: 'Signaling',
+				sourceFile: 'rtc.service.ts',
+			},
+			{
+				name: 'createAnswer',
+				signature:
+					'createAnswer(id: string, offer: RTCSessionDescriptionInit): Promise<RTCSessionDescriptionInit>',
+				description:
+					'Applies a remote offer to an existing peer, generates an SDP answer, and stores it as the local description.',
+				category: 'Signaling',
+				sourceFile: 'rtc.service.ts',
+			},
+			{
+				name: 'setRemoteAnswer',
+				signature:
+					'setRemoteAnswer(id: string, answer: RTCSessionDescriptionInit): Promise<void>',
+				description:
+					'Applies the remote SDP answer to the matching peer connection after offer creation.',
+				category: 'Signaling',
+				sourceFile: 'rtc.service.ts',
+			},
+			{
+				name: 'addIceCandidate',
+				signature: 'addIceCandidate(id: string, candidate: RTCIceCandidateInit): void',
+				description: 'Adds a remote ICE candidate to the matching peer when available.',
+				category: 'Signaling',
+				sourceFile: 'rtc.service.ts',
+			},
+			{
+				name: 'getLocalStream',
+				signature: 'getLocalStream(): MediaStream | null',
+				description: 'Returns the cached local media stream or null when not initialized.',
+				category: 'Media',
+				sourceFile: 'rtc.service.ts',
+			},
+			{
+				name: 'closePeer',
+				signature: 'closePeer(id: string): void',
+				description:
+					'Closes one peer connection and removes it from the internal peer map.',
+				category: 'Cleanup',
+				sourceFile: 'rtc.service.ts',
+			},
+			{
+				name: 'closeAll',
+				signature: 'closeAll(): void',
+				description:
+					'Closes every tracked peer and stops all tracks on the local media stream.',
+				category: 'Cleanup',
+				sourceFile: 'rtc.service.ts',
+			},
+		],
+		sections: [
+			{
+				title: 'Feature role',
+				items: [
+					'Use RtcService to keep WebRTC browser APIs behind one SSR-safe Angular service.',
+					'The service handles peer/media primitives only; your app still needs a signaling path to exchange SDP and ICE payloads.',
+					'SocketService is a common signaling companion when peers need real-time negotiation events.',
+				],
+			},
+		],
+		code: `import { RtcService } from 'ngx-core';
+
+private readonly _rtcService = inject(RtcService);
+
+async connect(id: string) {
+\tawait this._rtcService.initLocalStream();
+\tawait this._rtcService.createPeer(id);
+
+\tconst offer = await this._rtcService.createOffer(id);
+\t// send offer through your signaling channel
+\tconsole.log(offer);
+}`,
+	},
+	{
+		slug: 'socket-service',
+		name: 'SocketService',
+		description:
+			'Socket.IO client wrapper for SSR-safe connection setup, event binding, and realtime emits.',
+		summary:
+			'SocketService centralizes client-side realtime connection logic around `config.socket` and `config.io`. It resolves the target URL from app config, opens the client only in the browser, coordinates connection state, and forwards lifecycle events through EmitterService.',
+		highlights: [
+			'Reads `socket` and `io` from provideNgxCore() configuration instead of hardcoding client setup in components.',
+			'Completes the `socket` task on connect and emits `socket_disconnect` and `socket_error` events through EmitterService.',
+			'Queues `on()` and `emit()` calls until the socket is connected.',
+		],
+		config: [
+			'Configure with provideNgxCore({ socket, io }).',
+			'`io` should be the Socket.IO client factory or module export.',
+			'`socket` can be `true` for default origin connection or an object with `url`, `port`, and `opts`.',
+		],
+		availableItems: ['socket.service.ts'],
+		methods: [
+			{
+				name: 'setUrl',
+				signature: 'setUrl(url: string): void',
+				description:
+					'Sets the socket endpoint URL, enables socket config if needed, and reconnects in the browser.',
+				category: 'Configuration',
+				sourceFile: 'socket.service.ts',
+			},
+			{
+				name: 'disconnect',
+				signature: 'disconnect(): void',
+				description:
+					'Disconnects the active socket client and resets internal connection state.',
+				category: 'Lifecycle',
+				sourceFile: 'socket.service.ts',
+			},
+			{
+				name: 'on',
+				signature: 'on(to: string, cb?: (message: any) => void): void',
+				description:
+					'Subscribes to a socket event once the client is available and connected.',
+				details: [
+					'When called before connect, it retries until the socket is ready.',
+					'Logs a warning and returns when socket support is not configured.',
+				],
+				category: 'Events',
+				sourceFile: 'socket.service.ts',
+				example: `import { SocketService } from 'ngx-core';
+
+private readonly _socketService = inject(SocketService);
+
+ngOnInit() {
+\tthis._socketService.on('project:updated', project => {
+\t\tconsole.log('project updated', project);
+\t});
+}`,
+			},
+			{
+				name: 'emit',
+				signature: 'emit(to: string, message: any, room = false): void',
+				description: 'Emits a payload to a socket event after the client is connected.',
+				details: ['When called before connect, it retries until the socket is ready.'],
+				category: 'Events',
+				sourceFile: 'socket.service.ts',
+			},
+		],
+		sections: [
+			{
+				title: 'Feature role',
+				items: [
+					'Use SocketService when the app already depends on Socket.IO and wants connection setup centralized under provideNgxCore().',
+					'NetworkService measures connectivity; SocketService handles realtime transport only.',
+					'RtcService can use SocketService as its signaling transport for WebRTC offer, answer, and ICE exchange.',
+				],
+			},
+		],
+		code: `import { SocketService } from 'ngx-core';
+
+private readonly _socketService = inject(SocketService);
+
+sendTyping() {
+\tthis._socketService.emit('chat:typing', { room: 'project-42' });
 }`,
 	},
 	{
@@ -403,15 +1004,39 @@ loadProjects() {
 			'Can auto-clear broken JSON payloads and return a default fallback.',
 		],
 		config: [
-			'Set a global prefix with provideWacom({ store: { prefix: "waStore" } }).',
+			'Set a global prefix with provideNgxCore({ store: { prefix: "waStore" } }).',
 			'Provide custom store.set/get/remove/clear handlers to back the service with another persistence layer.',
 			'setPrefix() adds an additional runtime prefix on top of the configured prefix.',
+		],
+		availableItems: ['store.service.ts', 'store.interface.ts'],
+		properties: [
+			{
+				name: 'StoreOptions',
+				signature: 'interface StoreOptions<T = unknown>',
+				description:
+					'Shared options contract for store reads and writes, including callbacks and JSON fallback behavior.',
+				details: ['Supports onSuccess, onError, defaultValue, and clearOnError.'],
+				category: 'Contracts',
+				docType: 'Interface',
+				sourceFile: 'store.interface.ts',
+			},
+			{
+				name: 'StoreConfig',
+				signature: 'interface StoreConfig',
+				description:
+					'Configuration contract passed through provideNgxCore() for storage prefixing and custom persistence handlers.',
+				category: 'Contracts',
+				docType: 'Interface',
+				sourceFile: 'store.interface.ts',
+			},
 		],
 		methods: [
 			{
 				name: 'setPrefix',
 				signature: 'setPrefix(prefix: string): void',
 				description: 'Adds a runtime prefix applied after any configured prefix.',
+				category: 'Configuration',
+				sourceFile: 'store.service.ts',
 			},
 			{
 				name: 'set',
@@ -421,18 +1046,24 @@ loadProjects() {
 				details: [
 					'Returns true on success, false on failure, and is SSR-safe when no browser storage exists.',
 				],
+				category: 'Storage',
+				sourceFile: 'store.service.ts',
 			},
 			{
 				name: 'get',
 				signature:
 					'get(key: string, options?: StoreOptions<string>): Promise<string | null>',
 				description: 'Reads a raw string value and returns null when it does not exist.',
+				category: 'Storage',
+				sourceFile: 'store.service.ts',
 			},
 			{
 				name: 'setJson',
 				signature:
 					'setJson<T>(key: string, value: T, options?: StoreOptions): Promise<boolean>',
 				description: 'Serializes and stores structured JSON data.',
+				category: 'JSON',
+				sourceFile: 'store.service.ts',
 			},
 			{
 				name: 'getJson',
@@ -442,16 +1073,22 @@ loadProjects() {
 					'clearOnError defaults to true and removes malformed JSON automatically.',
 					'defaultValue is returned when storage is missing or parsing fails.',
 				],
+				category: 'JSON',
+				sourceFile: 'store.service.ts',
 			},
 			{
 				name: 'remove',
 				signature: 'remove(key: string, options?: StoreOptions): Promise<boolean>',
 				description: 'Deletes one storage key.',
+				category: 'Storage',
+				sourceFile: 'store.service.ts',
 			},
 			{
 				name: 'clear',
 				signature: 'clear(options?: StoreOptions): Promise<boolean>',
 				description: 'Clears the entire storage provider.',
+				category: 'Storage',
+				sourceFile: 'store.service.ts',
 			},
 		],
 		sections: [
@@ -467,11 +1104,11 @@ loadProjects() {
 		],
 		code: `import { StoreService } from 'ngx-core';
 
-constructor(private store: StoreService) {}
+constructor(private _storeService: StoreService) {}
 
 async saveSettings() {
-\tawait this.store.setJson('settings', { compact: true, mode: 'dark' });
-\treturn this.store.getJson('settings', { defaultValue: {} });
+\tawait this._storeService.setJson('settings', { compact: true, mode: 'dark' });
+\treturn this._storeService.getJson('settings', { defaultValue: {} });
 }`,
 	},
 	{
@@ -486,15 +1123,71 @@ async saveSettings() {
 			'Manages canonical and other link tags without duplicates.',
 		],
 		config: [
-			'Recommended setup: provideWacom({ meta: { applyFromRoutes: true, defaults: { ... } } }).',
+			'Recommended setup: provideNgxCore({ meta: { applyFromRoutes: true, defaults: { ... } } }).',
 			'useTitleSuffix appends defaults.titleSuffix or page.titleSuffix to page titles.',
 			'defaults.links are stored in config, but link tags are intentionally managed separately through setLink().',
+		],
+		availableItems: [
+			'meta.service.ts',
+			'meta.interface.ts',
+			'meta.type.ts',
+			'meta.const.ts',
+			'meta.guard.ts',
+		],
+		properties: [
+			{
+				name: 'MetaPage',
+				signature: 'interface MetaPage',
+				description:
+					'Per-page metadata input for titles, descriptions, robots, images, and update controls.',
+				category: 'Contracts',
+				docType: 'Interface',
+				sourceFile: 'meta.interface.ts',
+			},
+			{
+				name: 'MetaDefaults',
+				signature: 'interface MetaDefaults',
+				description:
+					'Default metadata values applied by MetaService when individual page fields are missing.',
+				category: 'Contracts',
+				docType: 'Interface',
+				sourceFile: 'meta.interface.ts',
+			},
+			{
+				name: 'MetaConfig',
+				signature: 'interface MetaConfig',
+				description:
+					'Configuration contract used by provideNgxCore({ meta }) for route-driven updates and default SEO values.',
+				category: 'Contracts',
+				docType: 'Interface',
+				sourceFile: 'meta.interface.ts',
+			},
+			{
+				name: 'TagAttr',
+				signature: "type TagAttr = 'name' | 'property' | 'itemprop'",
+				description:
+					'Type alias describing the supported meta-tag attribute families generated by MetaService.',
+				category: 'Contracts',
+				docType: 'Type',
+				sourceFile: 'meta.type.ts',
+			},
+			{
+				name: 'isDefined',
+				signature: 'const isDefined(val: unknown): val is Exclude<unknown, undefined>',
+				description:
+					'Helper const used by the meta feature to distinguish missing values from intentionally provided empty values.',
+				category: 'Helpers',
+				docType: 'Const',
+				sourceFile: 'meta.const.ts',
+			},
 		],
 		methods: [
 			{
 				name: 'setDefaults',
 				signature: 'setDefaults(defaults: MetaDefaults): void',
 				description: 'Merges new defaults into the existing meta configuration.',
+				category: 'Configuration',
+				sourceFile: 'meta.service.ts',
 			},
 			{
 				name: 'applyMeta',
@@ -506,22 +1199,39 @@ async saveSettings() {
 					'Uses defaults as fallbacks for missing page values.',
 					'Skips all work when page.disableUpdate is true.',
 				],
+				category: 'Updates',
+				sourceFile: 'meta.service.ts',
 			},
 			{
 				name: 'reset',
 				signature: 'reset(): void',
 				description: 'Clears managed tags and reapplies defaults-only metadata.',
+				category: 'Updates',
+				sourceFile: 'meta.service.ts',
 			},
 			{
 				name: 'setLink',
 				signature: 'setLink(links: Record<string, string>): void',
 				description:
 					'Creates or updates canonical and other link rel tags without duplication.',
+				category: 'Links',
+				sourceFile: 'meta.service.ts',
 			},
 			{
 				name: 'resetLinks',
 				signature: 'resetLinks(): void',
 				description: 'Removes only the link tags previously managed via setLink().',
+				category: 'Links',
+				sourceFile: 'meta.service.ts',
+			},
+			{
+				name: 'MetaGuard',
+				signature: 'class MetaGuard',
+				description:
+					'Route guard variant that applies metadata during navigation for apps that still prefer guard-driven SEO updates.',
+				category: 'Routing',
+				docType: 'Service',
+				sourceFile: 'meta.guard.ts',
 			},
 		],
 		sections: [
@@ -544,7 +1254,7 @@ async saveSettings() {
 				],
 			},
 		],
-		code: `provideWacom({
+		code: `provideNgxCore({
 \tmeta: {
 \t\tapplyFromRoutes: true,
 \t\tuseTitleSuffix: true,
@@ -573,6 +1283,7 @@ async saveSettings() {
 			'By default the collection URL is /api/<name> with get/create/fetch/update/unique/delete endpoints.',
 			'When unauthorized is false, cache restore is tied to the current waw_user id in localStorage.',
 		],
+		availableItems: ['crud.service.ts', 'crud.interface.ts', 'crud.component.ts'],
 		properties: [
 			{
 				name: 'loaded',
@@ -580,6 +1291,7 @@ async saveSettings() {
 				description: 'Completes when cached documents are restored from storage.',
 				category: 'Lifecycle',
 				docType: 'Service',
+				sourceFile: 'crud.service.ts',
 			},
 			{
 				name: 'getted',
@@ -587,6 +1299,7 @@ async saveSettings() {
 				description: 'Completes after the first full get() without page pagination.',
 				category: 'Lifecycle',
 				docType: 'Service',
+				sourceFile: 'crud.service.ts',
 			},
 			{
 				name: 'documents',
@@ -595,6 +1308,7 @@ async saveSettings() {
 					'CrudComponent stores the currently displayed document signals here for table and list rendering.',
 				category: 'Component state',
 				docType: 'Component',
+				sourceFile: 'crud.component.ts',
 			},
 			{
 				name: 'page / perPage / configType',
@@ -603,6 +1317,7 @@ async saveSettings() {
 					'CrudComponent tracks pagination state and whether it loads from the server or local memory.',
 				category: 'Component state',
 				docType: 'Component',
+				sourceFile: 'crud.component.ts',
 			},
 			{
 				name: 'CrudDocument',
@@ -615,6 +1330,7 @@ async saveSettings() {
 				],
 				category: 'Interfaces',
 				docType: 'Interface',
+				sourceFile: 'crud.interface.ts',
 			},
 			{
 				name: 'CrudOptions',
@@ -624,6 +1340,7 @@ async saveSettings() {
 				details: ['Supports name, callback, and errCallback.'],
 				category: 'Interfaces',
 				docType: 'Interface',
+				sourceFile: 'crud.interface.ts',
 			},
 			{
 				name: 'CrudServiceInterface',
@@ -631,6 +1348,7 @@ async saveSettings() {
 				description: 'Contract that CrudComponent expects from a CRUD-backed data service.',
 				category: 'Interfaces',
 				docType: 'Interface',
+				sourceFile: 'crud.interface.ts',
 			},
 			{
 				name: 'TableConfig / TableConfigButton',
@@ -639,6 +1357,7 @@ async saveSettings() {
 					'Describe row actions, header buttons, pagination handlers, and CRUD callbacks used by CrudComponent UIs.',
 				category: 'Interfaces',
 				docType: 'Interface',
+				sourceFile: 'crud.interface.ts',
 			},
 			{
 				name: 'CrudConfig / GetConfig',
@@ -647,6 +1366,7 @@ async saveSettings() {
 					'Define the CrudService constructor config and read-query options for collection requests.',
 				category: 'Interfaces',
 				docType: 'Interface',
+				sourceFile: 'crud.interface.ts',
 			},
 		],
 		methods: [
@@ -657,6 +1377,7 @@ async saveSettings() {
 					'Loads cached docs, hydrates memory, and replays pending create/update/unique/delete work.',
 				category: 'Lifecycle',
 				docType: 'Service',
+				sourceFile: 'crud.service.ts',
 			},
 			{
 				name: 'setDocs / getDocs / getDoc / clearDocs',
@@ -664,6 +1385,7 @@ async saveSettings() {
 				description: 'Persist, retrieve, or reset the local in-memory document cache.',
 				category: 'Cache',
 				docType: 'Service',
+				sourceFile: 'crud.service.ts',
 			},
 			{
 				name: 'addDoc / addDocs',
@@ -671,6 +1393,7 @@ async saveSettings() {
 				description: 'Insert or merge documents into the cache and keep signals in sync.',
 				category: 'Cache',
 				docType: 'Service',
+				sourceFile: 'crud.service.ts',
 			},
 			{
 				name: 'new',
@@ -678,6 +1401,7 @@ async saveSettings() {
 				description: 'Creates a local-first document with _localId and mutation flags.',
 				category: 'Documents',
 				docType: 'Service',
+				sourceFile: 'crud.service.ts',
 			},
 			{
 				name: 'doc',
@@ -686,6 +1410,7 @@ async saveSettings() {
 					'Returns a cached document, creates a placeholder if missing, and fetches the server copy in the background.',
 				category: 'Documents',
 				docType: 'Service',
+				sourceFile: 'crud.service.ts',
 			},
 			{
 				name: 'setPerPage',
@@ -693,6 +1418,7 @@ async saveSettings() {
 				description: 'Controls skip/limit generation for paginated get() calls.',
 				category: 'Pagination',
 				docType: 'Service',
+				sourceFile: 'crud.service.ts',
 			},
 			{
 				name: 'get',
@@ -702,6 +1428,7 @@ async saveSettings() {
 					'Fetches collection documents, fills the cache, emits collection events, and supports pagination.',
 				category: 'Requests',
 				docType: 'Service',
+				sourceFile: 'crud.service.ts',
 			},
 			{
 				name: 'create',
@@ -711,6 +1438,7 @@ async saveSettings() {
 					'Creates a document, stores local intent first, and retries automatically when offline.',
 				category: 'Requests',
 				docType: 'Service',
+				sourceFile: 'crud.service.ts',
 			},
 			{
 				name: 'fetch',
@@ -719,6 +1447,7 @@ async saveSettings() {
 				description: 'Fetches one document by query and merges it into the cache.',
 				category: 'Requests',
 				docType: 'Service',
+				sourceFile: 'crud.service.ts',
 			},
 			{
 				name: 'updateAfterWhile',
@@ -728,6 +1457,7 @@ async saveSettings() {
 					'Debounces update() through CoreService.afterWhile() for typing-heavy flows.',
 				category: 'Requests',
 				docType: 'Service',
+				sourceFile: 'crud.service.ts',
 			},
 			{
 				name: 'update',
@@ -737,6 +1467,7 @@ async saveSettings() {
 					'Marks the document modified, posts to /update, clears the modification mark on success, and syncs signals.',
 				category: 'Requests',
 				docType: 'Service',
+				sourceFile: 'crud.service.ts',
 			},
 			{
 				name: 'unique',
@@ -746,6 +1477,7 @@ async saveSettings() {
 					'Runs a unique-field style update through /unique and stores the returned field value on the document.',
 				category: 'Requests',
 				docType: 'Service',
+				sourceFile: 'crud.service.ts',
 			},
 			{
 				name: 'delete',
@@ -755,6 +1487,7 @@ async saveSettings() {
 					'Marks the document deleted, queues offline if needed, and removes it from the cache on success.',
 				category: 'Requests',
 				docType: 'Service',
+				sourceFile: 'crud.service.ts',
 			},
 			{
 				name: 'getSignal / getSignals / getFieldSignals / removeSignals',
@@ -763,6 +1496,7 @@ async saveSettings() {
 					'Expose per-document signals, field/value grouped signals, and cache cleanup for signal instances.',
 				category: 'Signals',
 				docType: 'Service',
+				sourceFile: 'crud.service.ts',
 			},
 			{
 				name: 'filteredDocuments',
@@ -776,6 +1510,7 @@ async saveSettings() {
 				],
 				category: 'Signals',
 				docType: 'Service',
+				sourceFile: 'crud.service.ts',
 			},
 			{
 				name: 'before*/after* hooks',
@@ -785,6 +1520,7 @@ async saveSettings() {
 					'Override these in child services to normalize input, inject context, or react after server success.',
 				category: 'Extensibility',
 				docType: 'Service',
+				sourceFile: 'crud.service.ts',
 			},
 			{
 				name: 'setDocuments',
@@ -793,6 +1529,7 @@ async saveSettings() {
 					'CrudComponent loads rows for the current page and updates its internal documents signal.',
 				category: 'Loading and pagination',
 				docType: 'Component',
+				sourceFile: 'crud.component.ts',
 			},
 			{
 				name: 'setDocumentsQuery / localDocumentsFilter / getOptions',
@@ -801,6 +1538,7 @@ async saveSettings() {
 					'CrudComponent lets feature components customize list queries, local filtering, and CRUD request options.',
 				category: 'Customization hooks',
 				docType: 'Component',
+				sourceFile: 'crud.component.ts',
 			},
 			{
 				name: 'create / update / delete / mutateUrl',
@@ -809,6 +1547,7 @@ async saveSettings() {
 					'CrudComponent wires modal workflows to create, update, delete, and unique-url actions.',
 				category: 'Mutations',
 				docType: 'Component',
+				sourceFile: 'crud.component.ts',
 			},
 			{
 				name: 'bulkManagement',
@@ -817,6 +1556,7 @@ async saveSettings() {
 					'Handles batch create and batch update flows through modalDocs() and the CRUD service.',
 				category: 'Mutations',
 				docType: 'Component',
+				sourceFile: 'crud.component.ts',
 			},
 			{
 				name: 'moveUp / allowSort',
@@ -825,6 +1565,7 @@ async saveSettings() {
 					'Provide optional manual ordering controls for list views backed by an `order` field.',
 				category: 'List controls',
 				docType: 'Component',
+				sourceFile: 'crud.component.ts',
 			},
 			{
 				name: 'getConfig',
@@ -833,6 +1574,7 @@ async saveSettings() {
 					'Builds the action and pagination configuration consumed by CRUD table UIs.',
 				category: 'List controls',
 				docType: 'Component',
+				sourceFile: 'crud.component.ts',
 			},
 		],
 		sections: [
@@ -880,38 +1622,51 @@ export class ProjectService extends CrudService<Project> {
 			'complete()/onComplete() tracks one-off tasks separately from event channels.',
 			'Supports waiting for all or any of several tasks, plus timeout and AbortSignal cancellation.',
 		],
+		availableItems: ['emitter.service.ts'],
 		methods: [
 			{
 				name: 'emit',
 				signature: 'emit<T>(id: string, data?: T): void',
 				description: 'Publishes an event on a named hot channel.',
+				category: 'Events',
+				sourceFile: 'emitter.service.ts',
 			},
 			{
 				name: 'on',
 				signature: 'on<T>(id: string): Observable<T>',
 				description:
 					'Subscribes to a named channel. Existing value is not replayed to new subscribers.',
+				category: 'Events',
+				sourceFile: 'emitter.service.ts',
 			},
 			{
 				name: 'off / offAll',
 				signature: 'off(id: string): void / offAll(): void',
 				description:
 					'Completes channels and removes their internal signal, closer, and stream state.',
+				category: 'Events',
+				sourceFile: 'emitter.service.ts',
 			},
 			{
 				name: 'has',
 				signature: 'has(id: string): boolean',
 				description: 'Checks whether an event channel has been created.',
+				category: 'Events',
+				sourceFile: 'emitter.service.ts',
 			},
 			{
 				name: 'complete',
 				signature: 'complete<T>(task: string, value: T = true): void',
 				description: 'Marks a named task as completed with a payload.',
+				category: 'Completions',
+				sourceFile: 'emitter.service.ts',
 			},
 			{
 				name: 'clearCompleted / completed / isCompleted',
 				signature: 'task completion helpers',
 				description: 'Reset and inspect the current completion state for a task.',
+				category: 'Completions',
+				sourceFile: 'emitter.service.ts',
 			},
 			{
 				name: 'onComplete',
@@ -923,18 +1678,20 @@ export class ProjectService extends CrudService<Project> {
 					'mode: "any" resolves on the first completed task from the list.',
 					'Default mode waits for all tasks and returns combineLatest-style payloads.',
 				],
+				category: 'Completions',
+				sourceFile: 'emitter.service.ts',
 			},
 		],
 		code: `import { EmitterService } from 'ngx-core';
 
-constructor(private emitter: EmitterService) {}
+constructor(private _emitterService: EmitterService) {}
 
 ngOnInit() {
-\tthis.emitter.on('user:login').subscribe((user) => console.log(user));
+\tthis._emitterService.on('user:login').subscribe((user) => console.log(user));
 }
 
 markReady() {
-\tthis.emitter.complete('bootstrap:ready');
+\tthis._emitterService.complete('bootstrap:ready');
 }`,
 	},
 	{
@@ -949,28 +1706,53 @@ markReady() {
 			'Emits wacom_online and wacom_offline through EmitterService when classification changes.',
 		],
 		config: [
-			'Configure with provideWacom({ network: { endpoints, timeoutMs, intervalMs, goodLatencyMs, maxConsecutiveFails } }).',
+			'Configure with provideNgxCore({ network: { endpoints, timeoutMs, intervalMs, goodLatencyMs, maxConsecutiveFails } }).',
 			'endpoints are checked in order until one responds successfully.',
 			'Public fallback endpoints use no-cors mode unless the URL contains api.webart.work.',
 		],
+		availableItems: ['network.service.ts', 'network.interface.ts'],
 		properties: [
 			{
 				name: 'status',
 				signature: "readonly Signal<'good' | 'poor' | 'none'>",
 				description:
 					'Connectivity classification based on browser state and measured latency.',
+				category: 'State',
+				sourceFile: 'network.service.ts',
 			},
 			{
 				name: 'latencyMs',
 				signature: 'readonly Signal<number | null>',
 				description:
 					'Measured latency for the first reachable endpoint or null when no check succeeded.',
+				category: 'State',
+				sourceFile: 'network.service.ts',
 			},
 			{
 				name: 'isOnline',
 				signature: 'readonly Signal<boolean>',
 				description:
 					'Current online state, influenced by browser online/offline events and successful checks.',
+				category: 'State',
+				sourceFile: 'network.service.ts',
+			},
+			{
+				name: 'NetworkConfig',
+				signature: 'interface NetworkConfig',
+				description:
+					'Configuration contract for endpoint probing cadence, timeouts, and classification thresholds.',
+				category: 'Contracts',
+				docType: 'Interface',
+				sourceFile: 'network.interface.ts',
+			},
+			{
+				name: 'NetworkStatus / DEFAULT_NETWORK_CONFIG / NETWORK_CONFIG',
+				signature: 'status type, defaults const, and injection token',
+				description:
+					'Exports that define network status values and the default/injectable network configuration.',
+				category: 'Contracts',
+				docType: 'Const',
+				sourceFile: 'network.interface.ts',
 			},
 		],
 		methods: [
@@ -979,6 +1761,8 @@ markReady() {
 				signature: 'recheckNow(): Promise<void>',
 				description:
 					'Immediately probes endpoints, updates latency, and recalculates the connectivity classification.',
+				category: 'Checks',
+				sourceFile: 'network.service.ts',
 			},
 		],
 		sections: [
@@ -999,7 +1783,7 @@ markReady() {
 				],
 			},
 		],
-		code: `provideWacom({
+		code: `provideNgxCore({
 \tnetwork: {
 \t\tintervalMs: 15000,
 \t\tgoodLatencyMs: 250,
@@ -1025,24 +1809,40 @@ markReady() {
 			"Styles should be driven by CSS variables under html[data-mode='light'] and html[data-mode='dark'].",
 			'Density and radius are still managed by ThemeService for UIs that need those controls.',
 		],
+		availableItems: ['provide-theme.ts', 'theme.service.ts', 'theme.type.ts'],
 		properties: [
 			{
 				name: 'mode / density / radius',
 				signature: 'Writable signals',
 				description:
 					'Current appearance selections mirrored to html[data-mode|density|radius] and persisted on the client.',
+				category: 'State',
+				sourceFile: 'theme.service.ts',
 			},
 			{
 				name: 'modes / densities / radiuses',
 				signature: 'Writable signals of option arrays',
 				description:
 					'Available values used by setMode(), setDensity(), setRadius(), and nextTheme().',
+				category: 'State',
+				sourceFile: 'theme.service.ts',
 			},
 			{
 				name: 'themeIndex',
 				signature: 'signal<number>',
 				description:
 					'Linear index for the current mode/density/radius combination used by nextTheme().',
+				category: 'State',
+				sourceFile: 'theme.service.ts',
+			},
+			{
+				name: 'ThemeMode / ThemeDensity / ThemeRadius',
+				signature: 'theme option types',
+				description:
+					'Type aliases that constrain valid theme mode, density, and radius values.',
+				category: 'Contracts',
+				docType: 'Type',
+				sourceFile: 'theme.type.ts',
 			},
 		],
 		methods: [
@@ -1055,16 +1855,18 @@ markReady() {
 					'Use this in app config providers instead of calling theme.init() from components.',
 					'Keeps initialization centralized, minimal, and consistent with standalone bootstrap patterns.',
 				],
+				category: 'Providers',
+				sourceFile: 'provide-theme.ts',
 				example: `import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideTheme, provideWacom } from 'ngx-core';
+import { provideNgxCore, provideTheme } from 'ngx-core';
 
 export const appConfig: ApplicationConfig = {
 	providers: [
 		provideZonelessChangeDetection(),
 		provideRouter([]),
 		provideTheme(),
-		provideWacom(),
+		provideNgxCore(),
 	],
 };`,
 			},
@@ -1076,6 +1878,8 @@ export const appConfig: ApplicationConfig = {
 				details: [
 					'In docs UI, light/dark toggle should switch by calling setMode() directly.',
 				],
+				category: 'State',
+				sourceFile: 'theme.service.ts',
 				example: `import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ThemeService } from 'ngx-core';
 
@@ -1085,11 +1889,11 @@ import { ThemeService } from 'ngx-core';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ThemeToggleComponent {
-	readonly theme = inject(ThemeService);
+	readonly themeService = inject(ThemeService);
 
 	toggleTheme() {
-		const nextMode = this.theme.mode() === 'light' ? 'dark' : 'light';
-		this.theme.setMode(nextMode);
+		const nextMode = this.themeService.mode() === 'light' ? 'dark' : 'light';
+		this.themeService.setMode(nextMode);
 	}
 }`,
 			},
@@ -1098,18 +1902,24 @@ export class ThemeToggleComponent {
 				signature: "setDensity(density: 'comfortable' | 'compact'): void",
 				description:
 					'Updates the density signal, data-density attribute, and localStorage value.',
+				category: 'State',
+				sourceFile: 'theme.service.ts',
 			},
 			{
 				name: 'setRadius',
 				signature: "setRadius(radius: 'rounded' | 'square'): void",
 				description:
 					'Updates the radius signal, data-radius attribute, and localStorage value.',
+				category: 'State',
+				sourceFile: 'theme.service.ts',
 			},
 			{
 				name: 'nextTheme',
 				signature: 'nextTheme(): void',
 				description:
 					'Cycles through every mode/density/radius combination and persists the resulting themeIndex.',
+				category: 'State',
+				sourceFile: 'theme.service.ts',
 			},
 			{
 				name: 'init',
@@ -1120,6 +1930,8 @@ export class ThemeToggleComponent {
 					'Default mode fallback is dark when theme.mode is missing.',
 					'In app code, prefer provideTheme() so init() runs automatically at bootstrap.',
 				],
+				category: 'Lifecycle',
+				sourceFile: 'theme.service.ts',
 			},
 			{
 				name: 'Early mode script (index.html)',
@@ -1164,20 +1976,20 @@ html[data-mode='dark'] {
 providers: [provideTheme()]
 
 // component
-readonly theme = inject(ThemeService);
+readonly themeService = inject(ThemeService);
 
 toggleTheme() {
-	const nextMode = this.theme.mode() === 'light' ? 'dark' : 'light';
-	this.theme.setMode(nextMode);
+	const nextMode = this.themeService.mode() === 'light' ? 'dark' : 'light';
+	this.themeService.setMode(nextMode);
 }`,
 	},
 	{
-		slug: 'languages',
-		name: 'Languages',
+		slug: 'language',
+		name: 'Language',
 		description:
 			'Standalone language selection, registry, and persistence feature used by translate.',
 		summary:
-			'Languages owns available language definitions, default and current language resolution, validation, and optional persistence. Translate depends on it for language state instead of embedding that logic directly.',
+			'Language owns available language definitions, default and current language resolution, validation, and optional persistence. Translate depends on it for language state instead of embedding that logic directly.',
 		highlights: [
 			'Keeps language bootstrap separate from translation loading and signal updates.',
 			'Resolves defaults, validates available codes, and persists the current language when enabled.',
@@ -1197,10 +2009,8 @@ toggleTheme() {
 		methods: [
 			{
 				name: 'provideLanguage / provideLanguages',
-				signature:
-					'provideLanguage(config?: ProvideLanguageConfig): EnvironmentProviders',
-				description:
-					'Registers LanguageService initialization during app bootstrap.',
+				signature: 'provideLanguage(config?: ProvideLanguageConfig): EnvironmentProviders',
+				description: 'Registers LanguageService initialization during app bootstrap.',
 				category: 'Providers',
 				sourceFile: 'provide-language.ts',
 				example: `import { provideLanguage } from 'ngx-core';
@@ -1232,8 +2042,7 @@ export const appConfig = {
 			{
 				name: 'languages / allLanguages',
 				signature: 'languages(): Language[] / allLanguages(): Language[]',
-				description:
-					'Returns configured languages or the built-in defaults catalogue.',
+				description: 'Returns configured languages or the built-in defaults catalogue.',
 				category: 'State',
 				sourceFile: 'language.service.ts',
 			},
@@ -1263,18 +2072,19 @@ export const appConfig = {
 				sourceFile: 'language.service.ts',
 				example: `import { LanguageService } from 'ngx-core';
 
-private readonly languages = inject(LanguageService);
+private readonly _languageService = inject(LanguageService);
 
 async switchLanguage(code: string) {
-\tconst changed = await this.languages.setLanguage(code);
+\tconst changed = await this._languageService.setLanguage(code);
 \tif (changed) {
-\t\tconsole.log('language updated', this.languages.language());
+\t\tconsole.log('language updated', this._languageService.language());
 \t}
 }`,
 			},
 			{
 				name: 'Language',
-				signature: 'interface Language { code: string; name: string; nativeName?: string; }',
+				signature:
+					'interface Language { code: string; name: string; nativeName?: string; }',
 				description:
 					'Represents one normalized language definition used by the feature and translation runtime.',
 				category: 'Contracts',
@@ -1326,17 +2136,181 @@ export const appConfig = {
 \tproviders: [provideLanguage({ defaultLanguage: 'en' })],
 };
 
-readonly languages = inject(LanguageService);
+readonly languageService = inject(LanguageService);
 
 async setGerman() {
-\tawait this.languages.setLanguage('de');
+\tawait this.languageService.setLanguage('de');
+}`,
+	},
+	{
+		slug: 'datetime',
+		name: 'Datetime',
+		description:
+			'Date and time utility feature built around TimeService for formatting, ranges, arithmetic, and comparisons.',
+		summary:
+			'Datetime exposes TimeService as a lightweight helper for common date handling in Angular apps. It centralizes naming, formatting, timezone conversion, period boundaries, date arithmetic, differences, and calendar helpers instead of scattering ad hoc date logic across components.',
+		highlights: [
+			'Provides day/month naming plus DatePipe-based formatting through one injectable service.',
+			'Includes start/end helpers for day, week, month, and year ranges.',
+			'Covers add/subtract operations, differences, same-day checks, ISO week numbers, and month week counts.',
+		],
+		config: [
+			'No provideNgxCore() configuration is required.',
+			'TimeService is provided in root and uses Angular DatePipe internally for formatting.',
+			'Week boundaries depend on locale when using startOfWeek() and endOfWeek().',
+		],
+		availableItems: ['time.service.ts'],
+		methods: [
+			{
+				name: 'getDayName',
+				signature: "getDayName(date: Date, format: 'short' | 'long' = 'long'): string",
+				description: 'Returns the weekday name for a date in short or long form.',
+				category: 'Naming',
+				sourceFile: 'time.service.ts',
+				example: `import { TimeService } from 'ngx-core';
+
+private readonly _timeService = inject(TimeService);
+
+labelFor(date: Date) {
+\treturn this._timeService.getDayName(date, 'short');
+}`,
+			},
+			{
+				name: 'getMonthName',
+				signature:
+					"getMonthName(monthIndex: number, format: 'short' | 'long' = 'long'): string",
+				description:
+					'Returns the month name for a zero-based month index and throws for invalid indexes.',
+				category: 'Naming',
+				sourceFile: 'time.service.ts',
+			},
+			{
+				name: 'formatDate',
+				signature:
+					"formatDate(date: Date, format = 'mediumDate', timezone = 'UTC'): string",
+				description:
+					'Formats a date through Angular DatePipe with optional format and timezone overrides.',
+				category: 'Formatting',
+				sourceFile: 'time.service.ts',
+			},
+			{
+				name: 'convertToTimezone',
+				signature: 'convertToTimezone(date: Date, timezone: string): Date',
+				description: 'Creates a Date adjusted to the target IANA timezone.',
+				category: 'Formatting',
+				sourceFile: 'time.service.ts',
+			},
+			{
+				name: 'startOfDay / endOfDay',
+				signature: 'day boundary helpers',
+				description: 'Returns the local start or end timestamp for the supplied day.',
+				category: 'Ranges',
+				sourceFile: 'time.service.ts',
+			},
+			{
+				name: 'startOfWeek / endOfWeek',
+				signature: 'week boundary helpers with optional locale',
+				description: 'Builds locale-aware week boundaries using runtime locale resolution.',
+				details: [
+					'Sunday-first regions include US, CA, AU, NZ, PH, and BR.',
+					'Other locales default to Monday-first week boundaries.',
+				],
+				category: 'Ranges',
+				sourceFile: 'time.service.ts',
+			},
+			{
+				name: 'startOfMonth / endOfMonth',
+				signature: 'month boundary helpers',
+				description: 'Returns the first or last moment of the month for a given date.',
+				category: 'Ranges',
+				sourceFile: 'time.service.ts',
+			},
+			{
+				name: 'startOfYear / endOfYear',
+				signature: 'year boundary helpers',
+				description: 'Returns the first or last moment of the year for a given date.',
+				category: 'Ranges',
+				sourceFile: 'time.service.ts',
+			},
+			{
+				name: 'getDaysInMonth / isLeapYear',
+				signature: 'calendar helpers',
+				description:
+					'Returns month lengths and leap-year status for calendar calculations.',
+				category: 'Calendar',
+				sourceFile: 'time.service.ts',
+			},
+			{
+				name: 'addDays / addMonths / addYears / addHours / addMinutes / addSeconds',
+				signature: 'date arithmetic helpers',
+				description: 'Returns new dates shifted forward by the requested amount.',
+				category: 'Arithmetic',
+				sourceFile: 'time.service.ts',
+				example: `import { TimeService } from 'ngx-core';
+
+private readonly _timeService = inject(TimeService);
+
+buildReminder(date: Date) {
+\treturn this._timeService.addDays(date, 7);
+}`,
+			},
+			{
+				name: 'subtractDays / subtractMonths / subtractYears / subtractHours / subtractMinutes / subtractSeconds',
+				signature: 'date arithmetic helpers',
+				description: 'Returns new dates shifted backward by the requested amount.',
+				category: 'Arithmetic',
+				sourceFile: 'time.service.ts',
+			},
+			{
+				name: 'differenceInDays / differenceInHours / differenceInMinutes',
+				signature: 'difference helpers',
+				description: 'Calculates elapsed time between two dates in the requested unit.',
+				category: 'Comparison',
+				sourceFile: 'time.service.ts',
+			},
+			{
+				name: 'isSameDay',
+				signature: 'isSameDay(date1: Date, date2: Date): boolean',
+				description: 'Checks whether two dates share the same calendar day.',
+				category: 'Comparison',
+				sourceFile: 'time.service.ts',
+			},
+			{
+				name: 'getWeekNumber / getWeeksInMonth',
+				signature: 'ISO week helpers',
+				description:
+					'Returns ISO week numbers and the number of ISO weeks touched by a month.',
+				category: 'Calendar',
+				sourceFile: 'time.service.ts',
+			},
+		],
+		sections: [
+			{
+				title: 'Feature role',
+				items: [
+					'Use TimeService when features need shared date formatting, ranges, or calendar math without introducing another date library.',
+					'The service returns new Date instances for transformations so callers can keep inputs immutable.',
+					'Formatting uses Angular DatePipe while other helpers rely on built-in Date and Intl APIs.',
+				],
+			},
+		],
+		code: `import { TimeService } from 'ngx-core';
+
+private readonly _timeService = inject(TimeService);
+
+formatDueDate(date: Date) {
+\treturn this._timeService.formatDate(
+\t\tthis._timeService.endOfWeek(date, 'en-GB'),
+\t\t'medium',
+\t\t'UTC',
+\t);
 }`,
 	},
 	{
 		slug: 'translate-service',
 		name: 'TranslateService',
 		description:
-			'Runtime translation registry backed by signals and integrated with the separate Languages feature.',
+			'Runtime translation registry backed by signals and integrated with the separate Language feature.',
 		summary:
 			'TranslateService is the library runtime i18n layer. It exposes a signal per source text, loads language-specific translation payloads, and updates the UI reactively while delegating current-language state to LanguageService.',
 		highlights: [
@@ -1347,7 +2321,7 @@ async setGerman() {
 		config: [
 			'Register translation bootstrap with provideTranslate({ language, defaultLanguage, translations?, folder? }).',
 			'With folder mode, language files are loaded as /i18n/{lang}.json by default.',
-			'Language selection is handled by the Languages feature and reused here.',
+			'Language selection is handled by the Language feature and reused here.',
 			'This service manages runtime translation state; the translate pipe and directive build on top of it.',
 		],
 		availableItems: [
@@ -1410,15 +2384,20 @@ async setGerman() {
 		],
 		code: `import { TranslateService } from 'ngx-core';
 
-private readonly t = inject(TranslateService);
+private readonly _translateService = inject(TranslateService);
 
-title = this.t.translate('Create project');
+title = this._translateService.translate('Create project');
 
 switchLanguage() {
-	void this.t.setLanguage('es');
+	void this._translateService.setLanguage('es');
 }`,
 	},
 ];
 
-export const serviceDocMap = new Map(serviceDocs.map(doc => [doc.slug, doc]));
+export const serviceDocs: ServiceDoc[] = [..._serviceDocs].sort((a, b) => {
+	const aIndex = _serviceDocOrderMap.get(a.slug) ?? Number.MAX_SAFE_INTEGER;
+	const bIndex = _serviceDocOrderMap.get(b.slug) ?? Number.MAX_SAFE_INTEGER;
+	return aIndex - bIndex;
+});
 
+export const serviceDocMap = new Map(serviceDocs.map(doc => [doc.slug, doc]));

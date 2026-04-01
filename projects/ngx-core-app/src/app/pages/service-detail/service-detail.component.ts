@@ -10,15 +10,15 @@ import {
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { map } from 'rxjs';
 import { MetaService } from 'ngx-core';
+import { map } from 'rxjs';
 import { serviceDocMap, type ServiceDoc, type ServiceMethodDoc } from '../../services/service-docs';
-import { ServiceDetailFeatureFilesComponent } from './service-detail-feature-files.component';
+import { ServiceDetailFeatureFilesComponent } from './service-detail-feature-files/service-detail-feature-files.component';
+import { ServiceDetailSectionComponent } from './service-detail-section/service-detail-section.component';
 
 interface ServiceReferenceItem {
 	id: string;
 	name: string;
-	group: string;
 	category: string;
 	docType: string;
 	sourceFile: string | null;
@@ -26,11 +26,6 @@ interface ServiceReferenceItem {
 	description: string;
 	details: string[];
 	example: string | null;
-}
-
-interface ServiceReferenceGroup {
-	name: string;
-	items: ServiceReferenceItem[];
 }
 
 interface AvailableItemLabel {
@@ -46,7 +41,7 @@ interface ServiceReferenceFileSection {
 }
 
 @Component({
-	imports: [RouterLink, ServiceDetailFeatureFilesComponent],
+	imports: [RouterLink, ServiceDetailFeatureFilesComponent, ServiceDetailSectionComponent],
 	templateUrl: './service-detail.component.html',
 	styleUrl: './service-detail.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -74,9 +69,16 @@ export class ServiceDetailComponent {
 		{ initialValue: this._route.snapshot.paramMap.get('slug') || '' },
 	);
 	protected readonly doc = computed(() => serviceDocMap.get(this._slug()) || null);
-	protected readonly pageTitle = computed(() => this.doc()?.name.replace(/Service$/, '') || '');
+	protected readonly pageTitle = computed(() => {
+		const name = this.doc()?.name || '';
+
+		if (name === 'RtcService') {
+			return 'RTC';
+		}
+
+		return name.replace(/Service$/, '');
+	});
 	protected readonly items = computed(() => this._buildItems(this.doc()));
-	protected readonly groups = computed(() => this._buildGroups(this.items()));
 	protected readonly availableItems = computed(() =>
 		this._sortAvailableItems(this.doc()?.availableItems || []),
 	);
@@ -179,7 +181,6 @@ export class ServiceDetailComponent {
 		return {
 			id: this._toId(item.name),
 			name: item.name,
-			group,
 			category: item.category || group,
 			docType: item.docType || 'Service',
 			sourceFile: item.sourceFile || null,
@@ -192,22 +193,6 @@ export class ServiceDetailComponent {
 					? this.formatExample(fallbackExample)
 					: null,
 		};
-	}
-
-	private _buildGroups(items: ServiceReferenceItem[]): ServiceReferenceGroup[] {
-		const groups = new Map<string, ServiceReferenceItem[]>();
-
-		for (const item of items) {
-			const key = `${item.docType}: ${item.category}`;
-			const bucket = groups.get(key) || [];
-			bucket.push(item);
-			groups.set(key, bucket);
-		}
-
-		return Array.from(groups.entries()).map(([name, groupedItems]) => ({
-			name,
-			items: groupedItems,
-		}));
 	}
 
 	private _buildFileSections(
@@ -285,4 +270,3 @@ export class ServiceDetailComponent {
 		return example.replace(/\t/g, '  ');
 	}
 }
-

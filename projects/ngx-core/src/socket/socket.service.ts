@@ -1,30 +1,24 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Inject, inject, Injectable, Optional, PLATFORM_ID } from '@angular/core';
-import { Config, CONFIG_TOKEN, DEFAULT_CONFIG } from '../interfaces/config.interface';
-import { EmitterService } from './emitter.service';
+import { Config, CONFIG_TOKEN, DEFAULT_CONFIG } from '../core/config.interface';
+import { EmitterService } from '../emitter/emitter.service';
 
 @Injectable({
 	providedIn: 'root',
 })
 export class SocketService {
 	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+	private readonly _emitterService = inject(EmitterService);
 
 	private _url = '';
-
 	private _io: any;
-
 	private _connected = false;
-
 	private _opts: any = {};
 
 	constructor(@Inject(CONFIG_TOKEN) @Optional() private _config: Config) {
 		this._config = { ...DEFAULT_CONFIG, ...(this._config || {}) };
 
-		if (!this._isBrowser) {
-			return;
-		}
-
-		if (!this._config.io) {
+		if (!this._isBrowser || !this._config.io) {
 			return;
 		}
 
@@ -49,10 +43,6 @@ export class SocketService {
 		}
 	}
 
-	/**
-	 * Sets the URL for the WebSocket connection and reloads the socket.
-	 * @param url - The URL of the WebSocket server.
-	 */
 	setUrl(url: string): void {
 		this._url = url;
 
@@ -65,44 +55,33 @@ export class SocketService {
 		}
 	}
 
-	/**
-	 * Loads and initializes the WebSocket connection.
-	 */
 	private load(): void {
-		if (!this._isBrowser) return;
-
-		if (this._config.io) {
-			const ioFunc = this._config.io.default ? this._config.io.default : this._config.io;
-
-			this._io = ioFunc(this._url, this._opts);
-
-			this._io.on('connect', () => {
-				this._connected = true;
-
-				this._emitterService.complete('socket');
-			});
-
-			this._io.on('disconnect', (reason: any) => {
-				this._connected = false;
-
-				this._emitterService.emit('socket_disconnect', reason);
-
-				console.warn('Socket disconnected', reason);
-			});
-
-			this._io.on('error', (err: any) => {
-				this._connected = false;
-
-				this._emitterService.emit('socket_error', err);
-
-				console.warn('Socket error', err);
-			});
+		if (!this._isBrowser || !this._config.io) {
+			return;
 		}
+
+		const ioFunc = this._config.io.default ? this._config.io.default : this._config.io;
+
+		this._io = ioFunc(this._url, this._opts);
+
+		this._io.on('connect', () => {
+			this._connected = true;
+			this._emitterService.complete('socket');
+		});
+
+		this._io.on('disconnect', (reason: any) => {
+			this._connected = false;
+			this._emitterService.emit('socket_disconnect', reason);
+			console.warn('Socket disconnected', reason);
+		});
+
+		this._io.on('error', (err: any) => {
+			this._connected = false;
+			this._emitterService.emit('socket_error', err);
+			console.warn('Socket error', err);
+		});
 	}
 
-	/**
-	 * Disconnects the WebSocket connection and resets the connection state.
-	 */
 	disconnect(): void {
 		if (this._io) {
 			this._io.disconnect();
@@ -111,11 +90,6 @@ export class SocketService {
 		this._connected = false;
 	}
 
-	/**
-	 * Subscribes to a WebSocket event.
-	 * @param to - The event to subscribe to.
-	 * @param cb - The callback function to execute when the event is received.
-	 */
 	on(to: string, cb: (message: any) => void = () => {}): void {
 		if (!this._config.socket) {
 			return;
@@ -136,12 +110,6 @@ export class SocketService {
 		this._io.on(to, cb);
 	}
 
-	/**
-	 * Emits a message to a WebSocket event.
-	 * @param to - The event to emit the message to.
-	 * @param message - The message to emit.
-	 * @param room - Optional room to emit the message to.
-	 */
 	emit(to: string, message: any, room: any = false): void {
 		if (!this._config.socket) {
 			return;
@@ -161,6 +129,4 @@ export class SocketService {
 
 		this._io.emit(to, message, room);
 	}
-
-	private _emitterService = inject(EmitterService);
 }

@@ -1,11 +1,15 @@
 /
 /services/core-service
+/services/dom-service
 /services/http-service
+/services/rtc-service
+/services/socket-service
 /services/store-service
 /services/meta-service
 /services/crud-service
 /services/emitter-service
 /services/network-service
 /services/theme-service
-/services/languages
+/services/language
+/services/datetime
 /services/translate-service

@@ -1,6 +1,6 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Inject, Injectable, Optional, PLATFORM_ID, inject } from '@angular/core';
-import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../interfaces/config.interface';
+import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../core/config.interface';
 import { StoreConfig, StoreOptions } from './store.interface';
 
 @Injectable({

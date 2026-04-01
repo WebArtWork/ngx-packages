@@ -10,7 +10,7 @@ import {
 	createComponent,
 	inject,
 } from '@angular/core';
-import { DomComponent } from '../interfaces/dom.interface';
+import { DomComponent } from './dom.interface';
 
 @Injectable({
 	providedIn: 'root',

@@ -2,9 +2,9 @@ import { isPlatformBrowser } from '@angular/common';
 import { inject, PLATFORM_ID, signal, WritableSignal } from '@angular/core';
 import { defer, from, Observable, switchMap } from 'rxjs';
 import { CoreService } from '../core/core.service';
-import { EmitterService } from '../services/emitter.service';
-import { HttpService } from '../services/http.service';
-import { NetworkService } from '../services/network.service';
+import { EmitterService } from '../emitter/emitter.service';
+import { HttpService } from '../http/http.service';
+import { NetworkService } from '../network/network.service';
 import { StoreService } from '../store/store.service';
 import { CrudConfig, CrudDocument, CrudOptions, GetConfig } from './crud.interface';
 

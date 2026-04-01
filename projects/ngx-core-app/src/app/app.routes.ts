@@ -9,7 +9,7 @@ export const routes: Routes = [
 			meta: {
 				title: 'ngx-core',
 				description:
-					'Angular utility library from Web Art Work for shared services, directives, pipes, and app-level configuration.',
+					'Angular utility library from Web Art Work for feature-oriented services, translation helpers, UI primitives, and app-level configuration.',
 			},
 		},
 	},
@@ -25,4 +25,3 @@ export const routes: Routes = [
 		redirectTo: '',
 	},
 ];
-

@@ -1,8 +1,8 @@
 import { InjectionToken } from '@angular/core';
+import { HttpConfig } from '../http/http.interface';
 import { MetaConfig } from '../meta/meta.interface';
+import { NetworkConfig } from '../network/network.interface';
 import { StoreConfig } from '../store/store.interface';
-import { HttpConfig } from './http.interface';
-import { NetworkConfig } from './network.interface';
 
 /**
  * Root configuration object used to initialize the library.

@@ -1,10 +1,10 @@
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Inject, Injectable, Optional, PLATFORM_ID, inject } from '@angular/core';
+import { Inject, inject, Injectable, Optional, PLATFORM_ID } from '@angular/core';
 import { EMPTY, Observable, ReplaySubject } from 'rxjs';
 import { catchError, first } from 'rxjs/operators';
-import { CONFIG_TOKEN, Config } from '../interfaces/config.interface';
-import { DEFAULT_HTTP_CONFIG, HttpConfig, HttpHeaderType } from '../interfaces/http.interface';
+import { Config, CONFIG_TOKEN } from '../core/config.interface';
+import { DEFAULT_HTTP_CONFIG, HttpConfig, HttpHeaderType } from './http.interface';
 
 @Injectable({
 	providedIn: 'root',

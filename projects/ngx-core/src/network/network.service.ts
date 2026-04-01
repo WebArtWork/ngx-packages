@@ -1,13 +1,9 @@
-// network.service.ts — Angular 20+ (zoneless) signal-based connectivity checker
+// network.service.ts â€” Angular 20+ (zoneless) signal-based connectivity checker
 import { isPlatformBrowser } from '@angular/common';
 import { Inject, inject, Injectable, Optional, PLATFORM_ID, signal } from '@angular/core';
-import { Config, CONFIG_TOKEN } from '../interfaces/config.interface';
-import {
-	DEFAULT_NETWORK_CONFIG,
-	NetworkConfig,
-	NetworkStatus,
-} from '../interfaces/network.interface';
-import { EmitterService } from './emitter.service';
+import { Config, CONFIG_TOKEN } from '../core/config.interface';
+import { EmitterService } from '../emitter/emitter.service';
+import { DEFAULT_NETWORK_CONFIG, NetworkConfig, NetworkStatus } from './network.interface';
 
 @Injectable({ providedIn: 'root' })
 export class NetworkService {
@@ -71,12 +67,12 @@ export class NetworkService {
 		this._updateClassification();
 	}
 
-	// ─────────────────────────── Internals ───────────────────────────
+	// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ Internals â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 	/**
 	 * Classifies current state into 'good' | 'poor' | 'none'.
 	 * - 'none' if offline or too many consecutive failures.
-	 * - 'good' if latency ≤ goodLatencyMs.
+	 * - 'good' if latency â‰¤ goodLatencyMs.
 	 * - otherwise 'poor'.
 	 */
 	private _updateClassification(): void {

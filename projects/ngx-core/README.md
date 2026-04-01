@@ -17,25 +17,25 @@ $ npm i --save ngx-core
 ## Usage
 
 ```typescript
-import { provideWacom } from 'ngx-core';
+import { provideNgxCore } from 'ngx-core';
 
 export const appConfig = {
-	providers: [provideWacom()],
+	providers: [provideNgxCore()],
 };
 ```
 
-`WacomModule` is still available for older applications but will be deprecated in future versions. Use `provideWacom` to configure the library when working with standalone APIs.
+`WacomModule` is still available for older applications but will be deprecated in future versions. Use `provideNgxCore` to configure the library when working with standalone APIs.
 
 ## Configuration
 
-You can pass an optional configuration object to `provideWacom` to override the library defaults.
+You can pass an optional configuration object to `provideNgxCore` to override the library defaults.
 
 ```typescript
-import { provideWacom } from 'ngx-core';
+import { provideNgxCore } from 'ngx-core';
 
 export const appConfig = {
 	providers: [
-		provideWacom({
+		provideNgxCore({
 			http: { url: 'https://api.example.com' },
 			store: { prefix: 'waStore' },
 			meta: {
@@ -57,18 +57,18 @@ export const appConfig = {
 | -------------------------------------------------------------------- | :-----------------------------------------------------------------: |
 | [**`Core`**](https://www.npmjs.com/package/ngx-core#core-service)       |     Common supportive function which can be used in any service     |
 | [**`Emitter`**](#emitter-service)                                    |            Lightweight app-wide event and task signaling            |
-| [**`Http`**](https://www.npmjs.com/package/ngx-core#http-service)       |                      Http layer for HttpClient                      |
 | [**`Store`**](https://www.npmjs.com/package/ngx-core#store-service)     |      Service responsible for keeping information on the device      |
+| [**`Theme`**](#theme-service)                                        |       Manages UI theme mode, density, and radius preferences        |
 | [**`Meta`**](https://www.npmjs.com/package/ngx-core#meta-service)       |             Website meta tags management within router              |
+| [**`Network`**](https://www.npmjs.com/package/ngx-core#network-service) |              Monitors network connectivity and latency              |
+| [**`Http`**](https://www.npmjs.com/package/ngx-core#http-service)       |                      Http layer for HttpClient                      |
 | [**`Crud`**](https://www.npmjs.com/package/ngx-core#crud-service)       | Provides basic CRUD operations for managing data with HTTP services |
+| [**`Translate`**](#translate-service)                                |         Lightweight, signal-based runtime translate engine          |
 | [**`Socket`**](https://www.npmjs.com/package/ngx-core#socket-service)   |   Manages WebSocket connections and real-time data communication    |
 | [**`Time`**](https://www.npmjs.com/package/ngx-core#time-service)       |  Provides utilities for date and time manipulation and formatting   |
 | [**`Dom`**](https://www.npmjs.com/package/ngx-core#dom-service)         |     Facilitates DOM manipulation and dynamic component loading      |
-| [**`Network`**](https://www.npmjs.com/package/ngx-core#network-service) |              Monitors network connectivity and latency              |
 | [**`RTC`**](https://www.npmjs.com/package/ngx-core#rtc-service)         |        Wraps WebRTC peer connections and local media streams        |
 | [**`Util`**](https://www.npmjs.com/package/ngx-core#util-service)       |      Utility methods for forms, validation, and CSS variables       |
-| [**`Theme`**](#theme-service)                                        |       Manages UI theme mode, density, and radius preferences        |
-| [**`Translate`**](#translate-service)                                |         Lightweight, signal-based runtime translate engine          |
 
 ## [Core Service](#core-service)
 
@@ -465,16 +465,16 @@ Example:
 ```ts
 import { EmitterService } from 'ngx-core';
 
-constructor(private emitter: EmitterService) {}
+constructor(private _emitterService: EmitterService) {}
 
 ngOnInit() {
-  this.emitter.on<string>('user:login').subscribe((uid) => {
+  this._emitterService.on<string>('user:login').subscribe((uid) => {
     console.log('Logged in:', uid);
   });
 }
 
 login(uid: string) {
-  this.emitter.emit('user:login', uid);
+  this._emitterService.emit('user:login', uid);
 }
 ```
 
@@ -1481,18 +1481,18 @@ import { SocketService } from 'ngx-core';
 	styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
-	constructor(private socketService: SocketService) {
-		this.socketService.setUrl('https://example.com');
-		this.socketService.on('connect', () => {
+	constructor(private _socketService: SocketService) {
+		this._socketService.setUrl('https://example.com');
+		this._socketService.on('connect', () => {
 			console.log('Connected to WebSocket');
 		});
-		this.socketService.on('message', msg => {
+		this._socketService.on('message', msg => {
 			console.log('Received message:', msg);
 		});
 	}
 
 	sendMessage() {
-		this.socketService.emit('message', { text: 'Hello, World!' });
+		this._socketService.emit('message', { text: 'Hello, World!' });
 	}
 }
 ```
@@ -2047,10 +2047,10 @@ import { DomService } from './dom.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  constructor(private domService: DomService) {}
+  constructor(private _domService: DomService) {}
 
   addComponent() {
-    const result = this.domService.appendById(MyComponent, { inputProp: 'value' }, 'elementId');
+    const result = this._domService.appendById(MyComponent, { inputProp: 'value' }, 'elementId');
     console.log(result.nativeElement); // Output: The native DOM element
     console.log(result.componentRef); // Output: The component reference
     result.remove(); // Cleanup when done
@@ -2103,12 +2103,12 @@ The `RtcService` wraps WebRTC peer connections and local media streams.
 ```Typescript
 import { RtcService } from 'ngx-core';
 
-constructor(private rtc: RtcService) {}
+constructor(private _rtcService: RtcService) {}
 
 async connect(id: string) {
-  await this.rtc.initLocalStream();
-  await this.rtc.createPeer(id);
-  const offer = await this.rtc.createOffer(id);
+  await this._rtcService.initLocalStream();
+  await this._rtcService.createPeer(id);
+  const offer = await this._rtcService.createOffer(id);
   // send offer to remote peer...
 }
 ```
@@ -2136,13 +2136,13 @@ document root, persisting them in `localStorage`, and exposing Angular signals.
 ```Typescript
 import { ThemeService } from "ngx-core";
 
-constructor(private theme: ThemeService) {}
+constructor(private _themeService: ThemeService) {}
 
 ngOnInit() {
-	this.theme.init();
-	this.theme.setMode("dark");
-	this.theme.setDensity("compact");
-	this.theme.setRadius("square");
+	this._themeService.init();
+	this._themeService.setMode("dark");
+	this._themeService.setDensity("compact");
+	this._themeService.setRadius("square");
 }
 ```
 
@@ -2386,8 +2386,8 @@ Copy below code into AGENTS.md file of your project while you are using our plug
 
 ```md
 - This project uses `ngx-core`, an Angular utility library for shared services, directives, pipes, and app-level configuration.
-- Prefer bootstrapping with `provideWacom({...})` in application providers. Use `WacomModule` / `WacomModule.forRoot()` only for legacy NgModule-based apps.
-- Put library-wide configuration in `provideWacom()` instead of scattering it across components. Available config areas include `http`, `store`, `meta`, `network`, and optional `socket` / `io`.
+- Prefer bootstrapping with `provideNgxCore({...})` in application providers. Use `WacomModule` / `WacomModule.forRoot()` only for legacy NgModule-based apps.
+- Put library-wide configuration in `provideNgxCore()` instead of scattering it across components. Available config areas include `http`, `store`, `meta`, `network`, and optional `socket` / `io`.
 - Prefer the library services before adding duplicate app utilities:
     - `HttpService` for API calls and shared headers/base URL handling.
     - `StoreService` for persisted local storage values.
@@ -2395,7 +2395,7 @@ Copy below code into AGENTS.md file of your project while you are using our plug
     - `CrudService` for data flows that need offline-aware syncing behavior.
     - `EmitterService`, `NetworkService`, `SocketService`, `RtcService`, `TimeService`, and `UtilService` when their built-in behavior matches the need.
 - Prefer importing the specific ngx-core directives, pipes, and translation helpers you need instead of wrapping the whole library again in another shared abstraction.
-- For metadata, prefer configuring defaults in `provideWacom({ meta: ... })` and using `MetaService` or route metadata. If route-driven updates are expected, prefer `meta.applyFromRoutes = true`; use `MetaGuard` only when that flow specifically needs a guard.
+- For metadata, prefer configuring defaults in `provideNgxCore({ meta: ... })` and using `MetaService` or route metadata. If route-driven updates are expected, prefer `meta.applyFromRoutes = true`; use `MetaGuard` only when that flow specifically needs a guard.
 - For translations, register app translations with `provideTranslate(...)` and use the exported translation pipe/directive rather than creating another parallel translation bootstrap path.
 - Keep SSR-safe behavior intact. Do not add unguarded direct access to browser-only globals such as `window`, `document`, storage, media devices, or WebRTC APIs when ngx-core already provides a guarded service for that area.
 - When changing app behavior, prefer configuring or composing ngx-core services first before modifying the library source.

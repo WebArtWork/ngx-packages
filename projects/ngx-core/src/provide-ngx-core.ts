@@ -1,8 +1,8 @@
 import { provideHttpClient, withFetch, withInterceptorsFromDi } from '@angular/common/http';
 import { EnvironmentProviders, makeEnvironmentProviders } from '@angular/core';
-import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from './interfaces/config.interface';
+import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from './core/config.interface';
 
-export function provideWacom(config: Config = DEFAULT_CONFIG): EnvironmentProviders {
+export function provideNgxCore(config: Config = DEFAULT_CONFIG): EnvironmentProviders {
 	return makeEnvironmentProviders([
 		{ provide: CONFIG_TOKEN, useValue: config },
 		provideHttpClient(withFetch(), withInterceptorsFromDi()),

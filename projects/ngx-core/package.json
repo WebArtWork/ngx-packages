@@ -34,7 +34,7 @@
 		"angular-library",
 		"ngx",
 		"typescript",
-		"providewacom",
+		"provide-ngx-core",
 		"ngx-core",
 		"waw",
 		"web-art-work",

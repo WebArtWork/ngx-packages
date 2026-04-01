@@ -3,7 +3,7 @@ import { Inject, Injectable, Optional, PLATFORM_ID, inject } from '@angular/core
 import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../interfaces/config.interface';
+import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../core/config.interface';
 import { isDefined } from './meta.const';
 import { MetaConfig, MetaDefaults, MetaPage } from './meta.interface';
 import { TagAttr } from './meta.type';

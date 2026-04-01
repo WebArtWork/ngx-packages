@@ -3,11 +3,12 @@
 		<p class="eyebrow">Angular Utility Library</p>
 		<h1>ngx-core</h1>
 		<p class="summary">
-			Shared services, directives, pipes, and app-level configuration for Angular apps.
+			Feature-oriented Angular building blocks for bootstrapping, state, connectivity,
+			theming, and translations.
 		</p>
 		<p class="subsummary">
-			SSR-safe defaults, standalone-first bootstrapping, and a single place to configure http,
-			store, meta, network, socket, and translation behavior.
+			SSR-safe defaults, standalone-first bootstrapping, and one package for core services,
+			language tooling, UI helpers, and app-level configuration.
 		</p>
 	</div>
 
@@ -71,13 +72,8 @@
 			<section class="doc-section">
 				<div class="section-heading">
 					<p class="label">Usage</p>
-					<h3>Bootstrap with <code>provideWacom()</code></h3>
+					<h3>Bootstrap with <code>provideNgxCore()</code></h3>
 				</div>
-				<p>
-					Use standalone providers by default. <code>WacomModule</code> remains available
-					for older NgModule apps, but the intended entry point is
-					<code>provideWacom</code>.
-				</p>
 				<div class="code-block">
 					<button
 						type="button"
@@ -94,10 +90,10 @@
 					</button>
 					<pre
 						class="readme-content"
-					><code><span class="code-keyword">import</span> <span class="code-punctuation">&#123;</span> <span class="code-symbol">provideWacom</span> <span class="code-punctuation">&#125;</span> <span class="code-keyword">from</span> <span class="code-string">'ngx-core'</span><span class="code-punctuation">;</span>
+					><code><span class="code-keyword">import</span> <span class="code-punctuation">&#123;</span> <span class="code-symbol">provideNgxCore</span> <span class="code-punctuation">&#125;</span> <span class="code-keyword">from</span> <span class="code-string">'ngx-core'</span><span class="code-punctuation">;</span>
 
 <span class="code-keyword">export const</span> <span class="code-symbol">appConfig</span> <span class="code-operator">=</span> <span class="code-punctuation">&#123;</span>
-  <span class="code-property">providers</span><span class="code-punctuation">:</span> <span class="code-punctuation">[</span><span class="code-function">provideWacom</span><span class="code-punctuation">()</span><span class="code-punctuation">]</span><span class="code-punctuation">,</span>
+  <span class="code-property">providers</span><span class="code-punctuation">:</span> <span class="code-punctuation">[</span><span class="code-function">provideNgxCore</span><span class="code-punctuation">()</span><span class="code-punctuation">]</span><span class="code-punctuation">,</span>
 <span class="code-punctuation">&#125;;</span></code></pre>
 				</div>
 			</section>
@@ -127,11 +123,11 @@
 					</button>
 					<pre
 						class="readme-content"
-					><code><span class="code-keyword">import</span> <span class="code-punctuation">&#123;</span> <span class="code-symbol">provideWacom</span> <span class="code-punctuation">&#125;</span> <span class="code-keyword">from</span> <span class="code-string">'ngx-core'</span><span class="code-punctuation">;</span>
+					><code><span class="code-keyword">import</span> <span class="code-punctuation">&#123;</span> <span class="code-symbol">provideNgxCore</span> <span class="code-punctuation">&#125;</span> <span class="code-keyword">from</span> <span class="code-string">'ngx-core'</span><span class="code-punctuation">;</span>
 
 <span class="code-keyword">export const</span> <span class="code-symbol">appConfig</span> <span class="code-operator">=</span> <span class="code-punctuation">&#123;</span>
   <span class="code-property">providers</span><span class="code-punctuation">:</span> <span class="code-punctuation">[</span>
-    <span class="code-function">provideWacom</span><span class="code-punctuation">(</span><span class="code-punctuation">&#123;</span>
+    <span class="code-function">provideNgxCore</span><span class="code-punctuation">(</span><span class="code-punctuation">&#123;</span>
       <span class="code-property">http</span><span class="code-punctuation">:</span> <span class="code-punctuation">&#123;</span> <span class="code-property">url</span><span class="code-punctuation">:</span> <span class="code-string">'https://api.example.com'</span> <span class="code-punctuation">&#125;</span><span class="code-punctuation">,</span>
       <span class="code-property">store</span><span class="code-punctuation">:</span> <span class="code-punctuation">&#123;</span> <span class="code-property">prefix</span><span class="code-punctuation">:</span> <span class="code-string">'waStore'</span> <span class="code-punctuation">&#125;</span><span class="code-punctuation">,</span>
       <span class="code-property">meta</span><span class="code-punctuation">:</span> <span class="code-punctuation">&#123;</span>
@@ -150,9 +146,29 @@
 
 			<section class="doc-section">
 				<div class="section-heading">
-					<p class="label">Services</p>
-					<h3>Core building blocks</h3>
+					<p class="label">Features</p>
+					<h3>What ngx-core includes</h3>
 				</div>
+				<div class="service-list">
+					@for (feature of featureGroups; track feature.title) {
+						<article class="service-item">
+							<h4>{{ feature.title }}</h4>
+							<p>{{ feature.description }}</p>
+							<p>{{ feature.items.join(' | ') }}</p>
+						</article>
+					}
+				</div>
+			</section>
+
+			<section class="doc-section">
+				<div class="section-heading">
+					<p class="label">Reference</p>
+					<h3>Documented feature pages</h3>
+				</div>
+				<p>
+					The detailed pages below cover the main service-backed features and their public
+					API surface.
+				</p>
 				<div class="service-list">
 					@for (service of services; track service.name) {
 						<a class="service-item" [routerLink]="['/services', service.slug]">
@@ -165,4 +181,3 @@
 		</div>
 	</article>
 </section>
-
