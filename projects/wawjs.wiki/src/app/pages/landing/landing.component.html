@@ -1,0 +1,130 @@
+<section class="landing-shell">
+	<div class="landing-hero">
+		<p class="eyebrow">Feature Workspace</p>
+		<h1>wawjs.wiki</h1>
+		<p class="summary">
+			Base project cloned from ngx-core-app and reshaped into a feature portal.
+		</p>
+		<p class="subsummary">
+			The first pass keeps four feature entries wired up with empty source files so the
+			details can be added later without rebuilding the app structure.
+		</p>
+	</div>
+
+	<article class="readme-card">
+		<header class="readme-header">
+			<div>
+				<p class="kicker">landing.ts</p>
+				<h2>Project Overview</h2>
+			</div>
+			<div class="window-actions" aria-hidden="true">
+				<span></span>
+				<span></span>
+				<span></span>
+			</div>
+		</header>
+
+		<div class="panel-content">
+			<section class="section-grid">
+				<div>
+					<p class="label">Project</p>
+					<h3>wawjs.wiki</h3>
+					<p>Standalone Angular app scaffolded from the existing docs shell.</p>
+				</div>
+				<div>
+					<p class="label">Status</p>
+					<h3>Placeholder Phase</h3>
+					<p>Feature pages exist now; implementation detail stays intentionally empty.</p>
+				</div>
+			</section>
+
+			<section class="doc-section">
+				<div class="section-heading">
+					<p class="label">Run</p>
+					<h3>Serve the project</h3>
+				</div>
+				<div class="code-block">
+					<button
+						type="button"
+						class="copy-button"
+						(click)="copy('install', installCommand)"
+						[attr.aria-label]="
+							copiedKey() === 'install' ? 'Copied' : 'Copy serve command'
+						"
+					>
+						<svg viewBox="0 0 24 24" aria-hidden="true">
+							<path d="M9 9h10v10H9zM5 5h10v2H7v8H5z" fill="currentColor" />
+						</svg>
+						<span>{{ copiedKey() === 'install' ? 'Copied' : 'Copy' }}</span>
+					</button>
+					<pre
+						class="readme-content"
+					><code><span class="code-prompt">$</span> {{ installCommand }}</code></pre>
+				</div>
+			</section>
+
+			<section class="doc-section">
+				<div class="section-heading">
+					<p class="label">Workspace</p>
+					<h3>Project path</h3>
+				</div>
+				<div class="code-block">
+					<button
+						type="button"
+						class="copy-button"
+						(click)="copy('repo', repoCopy)"
+						[attr.aria-label]="copiedKey() === 'repo' ? 'Copied' : 'Copy project path'"
+					>
+						<svg viewBox="0 0 24 24" aria-hidden="true">
+							<path d="M9 9h10v10H9zM5 5h10v2H7v8H5z" fill="currentColor" />
+						</svg>
+						<span>{{ copiedKey() === 'repo' ? 'Copied' : 'Copy' }}</span>
+					</button>
+					<pre class="readme-content"><code>{{ repoCopy }}</code></pre>
+				</div>
+			</section>
+
+			<section class="doc-section">
+				<div class="section-heading">
+					<p class="label">Next</p>
+					<h3>Queued feature work</h3>
+				</div>
+				<p>
+					The route structure, top navigation, and per-feature detail pages are in place.
+					What remains is filling each feature file with real content.
+				</p>
+				<div class="code-block">
+					<button
+						type="button"
+						class="copy-button"
+						(click)="copy('next', nextStepCopy)"
+						[attr.aria-label]="
+							copiedKey() === 'next' ? 'Copied' : 'Copy next step note'
+						"
+					>
+						<svg viewBox="0 0 24 24" aria-hidden="true">
+							<path d="M9 9h10v10H9zM5 5h10v2H7v8H5z" fill="currentColor" />
+						</svg>
+						<span>{{ copiedKey() === 'next' ? 'Copied' : 'Copy' }}</span>
+					</button>
+					<pre class="readme-content"><code>{{ nextStepCopy }}</code></pre>
+				</div>
+			</section>
+
+			<section class="doc-section">
+				<div class="section-heading">
+					<p class="label">Features</p>
+					<h3>Current placeholder entries</h3>
+				</div>
+				<div class="service-list">
+					@for (feature of features; track feature.name) {
+						<a class="service-item" [routerLink]="['/features', feature.slug]">
+							<h4>{{ feature.name }}</h4>
+							<p>{{ feature.summary }}</p>
+						</a>
+					}
+				</div>
+			</section>
+		</div>
+	</article>
+</section>

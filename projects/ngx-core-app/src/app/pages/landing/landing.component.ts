@@ -27,20 +27,16 @@ export class LandingComponent {
 			title: 'Bootstrap and configuration',
 			description:
 				'Standalone-first setup centered on provideNgxCore() and focused app-wide defaults.',
-			items: [
-				'provideNgxCore()',
-				'http / store / meta / network config',
-				'optional socket / io wiring',
-			],
+			items: ['provideNgxCore()', 'store / meta config', 'SSR-safe app-wide defaults'],
 		},
 		{
 			title: 'Application services',
 			description:
 				'Reusable services for common app behavior instead of duplicating infrastructure code.',
 			items: [
-				'CoreService, HttpService, RtcService, SocketService, StoreService, CrudService',
-				'EmitterService, MetaService, ThemeService',
-				'NetworkService, TimeService, UtilService',
+				'CoreService, StoreService, MetaService',
+				'EmitterService, MetaService, DomService',
+				'UtilService',
 			],
 		},
 		{
@@ -54,23 +50,13 @@ export class LandingComponent {
 			],
 		},
 		{
-			title: 'Language and translation',
-			description:
-				'Signal-based language state and runtime translations with Angular pipe/directive support.',
-			items: [
-				'provideLanguage() and LanguageService',
-				'provideTranslate() and TranslateService',
-				'TranslatePipe and TranslateDirective',
-			],
-		},
-		{
 			title: 'UI helpers',
 			description:
 				'Small reusable primitives that can be imported directly where they are needed.',
 			items: [
 				'clickOutside directive',
 				'arr, search, safe, pagination, split, splice pipes',
-				'number and mongodate pipes',
+				'number pipe',
 			],
 		},
 	];
@@ -86,16 +72,12 @@ export const appConfig = {
 export const appConfig = {
 \tproviders: [
 \t\tprovideNgxCore({
-\t\t\thttp: { url: 'https://api.example.com' },
 \t\t\tstore: { prefix: 'waStore' },
 \t\t\tmeta: {
 \t\t\t\tuseTitleSuffix: false,
 \t\t\t\tapplyFromRoutes: true,
 \t\t\t\tdefaults: { links: {} },
 \t\t\t},
-\t\t\tnetwork: {},
-\t\t\tsocket: false,
-\t\t\tio: undefined,
 \t\t}),
 \t],
 };`;

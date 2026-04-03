@@ -1,0 +1,179 @@
+<section class="landing-shell">
+	<div class="landing-hero">
+		<p class="eyebrow">Angular Ace Editor Package</p>
+		<h1>ngx-ace</h1>
+		<p class="summary">
+			A standalone-first Angular wrapper for Ace with signal inputs, lazy-loaded assets, and
+			SSR-safe runtime guards.
+		</p>
+		<p class="subsummary">
+			Use one focused package when you need embedded code editing without dragging the rest of
+			the workspace feature set into the same dependency.
+		</p>
+	</div>
+
+	<article class="readme-card">
+		<header class="readme-header">
+			<div>
+				<p class="kicker">landing.ts</p>
+				<h2>Project Overview</h2>
+			</div>
+			<div class="window-actions" aria-hidden="true">
+				<span></span>
+				<span></span>
+				<span></span>
+			</div>
+		</header>
+
+		<div class="panel-content">
+			<section class="section-grid">
+				<div>
+					<p class="label">Package</p>
+					<h3>ngx-ace</h3>
+					<p>
+						Ace editor building blocks for Angular, with browser-only setup guarded so
+						server rendering stays intact.
+					</p>
+				</div>
+				<div>
+					<p class="label">License</p>
+					<h3>MIT</h3>
+					<p>
+						Published as a public package and designed for reuse across multiple apps.
+					</p>
+				</div>
+			</section>
+
+			<section class="doc-section">
+				<div class="section-heading">
+					<p class="label">Installation</p>
+					<h3>Install the package</h3>
+				</div>
+				<div class="code-block">
+					<button
+						type="button"
+						class="copy-button"
+						(click)="copy('install', installCommand)"
+						[attr.aria-label]="
+							copiedKey() === 'install' ? 'Copied' : 'Copy installation command'
+						"
+					>
+						<svg viewBox="0 0 24 24" aria-hidden="true">
+							<path d="M9 9h10v10H9zM5 5h10v2H7v8H5z" fill="currentColor" />
+						</svg>
+						<span>{{ copiedKey() === 'install' ? 'Copied' : 'Copy' }}</span>
+					</button>
+					<pre
+						class="readme-content"
+					><code><span class="code-prompt">$</span> {{ installCommand }}</code></pre>
+				</div>
+			</section>
+
+			<section class="doc-section">
+				<div class="section-heading">
+					<p class="label">Usage</p>
+					<h3>Bootstrap with <code>provideNgxAce()</code></h3>
+				</div>
+				<div class="code-block">
+					<button
+						type="button"
+						class="copy-button"
+						(click)="copy('usage', usageCopy)"
+						[attr.aria-label]="
+							copiedKey() === 'usage' ? 'Copied' : 'Copy usage example'
+						"
+					>
+						<svg viewBox="0 0 24 24" aria-hidden="true">
+							<path d="M9 9h10v10H9zM5 5h10v2H7v8H5z" fill="currentColor" />
+						</svg>
+						<span>{{ copiedKey() === 'usage' ? 'Copied' : 'Copy' }}</span>
+					</button>
+					<pre
+						class="readme-content"
+					><code><span class="code-keyword">import</span> <span class="code-punctuation">&#123;</span> <span class="code-symbol">provideNgxAce</span> <span class="code-punctuation">&#125;</span> <span class="code-keyword">from</span> <span class="code-string">'ngx-ace'</span><span class="code-punctuation">;</span>
+
+<span class="code-keyword">export const</span> <span class="code-symbol">appConfig</span> <span class="code-operator">=</span> <span class="code-punctuation">&#123;</span>
+  <span class="code-property">providers</span><span class="code-punctuation">:</span> <span class="code-punctuation">[</span><span class="code-function">provideNgxAce</span><span class="code-punctuation">()</span><span class="code-punctuation">]</span><span class="code-punctuation">,</span>
+<span class="code-punctuation">&#125;;</span></code></pre>
+				</div>
+			</section>
+
+			<section class="doc-section">
+				<div class="section-heading">
+					<p class="label">Configuration</p>
+					<h3>Define editor defaults once</h3>
+				</div>
+				<p>
+					Register sensible editor defaults once instead of repeating the same mode,
+					theme, or renderer options in every component that mounts Ace.
+				</p>
+				<div class="code-block">
+					<button
+						type="button"
+						class="copy-button"
+						(click)="copy('config', configCopy)"
+						[attr.aria-label]="
+							copiedKey() === 'config' ? 'Copied' : 'Copy configuration example'
+						"
+					>
+						<svg viewBox="0 0 24 24" aria-hidden="true">
+							<path d="M9 9h10v10H9zM5 5h10v2H7v8H5z" fill="currentColor" />
+						</svg>
+						<span>{{ copiedKey() === 'config' ? 'Copied' : 'Copy' }}</span>
+					</button>
+					<pre
+						class="readme-content"
+					><code><span class="code-keyword">import</span> <span class="code-punctuation">&#123;</span> <span class="code-symbol">provideNgxAce</span> <span class="code-punctuation">&#125;</span> <span class="code-keyword">from</span> <span class="code-string">'ngx-ace'</span><span class="code-punctuation">;</span>
+
+<span class="code-keyword">export const</span> <span class="code-symbol">appConfig</span> <span class="code-operator">=</span> <span class="code-punctuation">&#123;</span>
+  <span class="code-property">providers</span><span class="code-punctuation">:</span> <span class="code-punctuation">[</span>
+    <span class="code-function">provideNgxAce</span><span class="code-punctuation">(</span><span class="code-punctuation">&#123;</span>
+      <span class="code-property">mode</span><span class="code-punctuation">:</span> <span class="code-string">'javascript'</span><span class="code-punctuation">,</span>
+      <span class="code-property">theme</span><span class="code-punctuation">:</span> <span class="code-string">'github'</span><span class="code-punctuation">,</span>
+      <span class="code-property">useWorker</span><span class="code-punctuation">:</span> <span class="code-boolean">false</span><span class="code-punctuation">,</span>
+      <span class="code-property">showPrintMargin</span><span class="code-punctuation">:</span> <span class="code-boolean">false</span><span class="code-punctuation">,</span>
+      <span class="code-property">fontSize</span><span class="code-punctuation">:</span> <span class="code-number">14</span><span class="code-punctuation">,</span>
+      <span class="code-property">minLines</span><span class="code-punctuation">:</span> <span class="code-number">12</span><span class="code-punctuation">,</span>
+    <span class="code-punctuation">&#125;</span><span class="code-punctuation">)</span><span class="code-punctuation">,</span>
+  <span class="code-punctuation">]</span><span class="code-punctuation">,</span>
+<span class="code-punctuation">&#125;;</span></code></pre>
+				</div>
+			</section>
+
+			<section class="doc-section">
+				<div class="section-heading">
+					<p class="label">Features</p>
+					<h3>What ngx-ace includes</h3>
+				</div>
+				<div class="service-list">
+					@for (feature of featureGroups; track feature.title) {
+						<article class="service-item">
+							<h4>{{ feature.title }}</h4>
+							<p>{{ feature.description }}</p>
+							<p>{{ feature.items.join(' | ') }}</p>
+						</article>
+					}
+				</div>
+			</section>
+
+			<section class="doc-section">
+				<div class="section-heading">
+					<p class="label">Reference</p>
+					<h3>Documented feature pages</h3>
+				</div>
+				<p>
+					The detailed page below documents the Ace package public API and the files that
+					make up the feature.
+				</p>
+				<div class="service-list">
+					@for (service of services; track service.name) {
+						<a class="service-item" [routerLink]="['/services', service.slug]">
+							<h4>{{ service.name }}</h4>
+							<p>{{ service.description }}</p>
+						</a>
+					}
+				</div>
+			</section>
+		</div>
+	</article>
+</section>

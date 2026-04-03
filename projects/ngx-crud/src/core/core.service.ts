@@ -1,0 +1,534 @@
+// Core utilities and helpers for the ngx-core app
+import { isPlatformBrowser } from '@angular/common';
+import {
+	DestroyRef,
+	Injectable,
+	PLATFORM_ID,
+	Signal,
+	WritableSignal,
+	computed,
+	inject,
+	signal,
+} from '@angular/core';
+import { Viewport } from './core.type';
+
+@Injectable({
+	providedIn: 'root',
+})
+export class CoreService {
+	private readonly _platformId = inject(PLATFORM_ID);
+	private readonly _isBrowser = isPlatformBrowser(this._platformId);
+	private readonly _destroyRef = inject(DestroyRef);
+
+	deviceID = '';
+
+	constructor() {
+		if (this._isBrowser) {
+			const stored = localStorage.getItem('deviceID');
+			this.deviceID =
+				stored ||
+				(typeof crypto?.randomUUID === 'function' ? crypto.randomUUID() : this.UUID());
+
+			localStorage.setItem('deviceID', this.deviceID);
+
+			this.detectDevice();
+			this.detectViewport();
+		} else {
+			this.deviceID = this.UUID();
+		}
+	}
+
+	/**
+	 * Generates a UUID (Universally Unique Identifier) version 4.
+	 *
+	 * This implementation uses `Math.random()` to generate random values,
+	 * making it suitable for general-purpose identifiers, but **not** for
+	 * cryptographic or security-sensitive use cases.
+	 *
+	 * The format follows the UUID v4 standard: `xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx`
+	 * where:
+	 * - `x` is a random hexadecimal digit (0–f)
+	 * - `4` indicates UUID version 4
+	 * - `y` is one of 8, 9, A, or B
+	 *
+	 * Example: `f47ac10b-58cc-4372-a567-0e02b2c3d479`
+	 *
+	 * @returns A string containing a UUID v4.
+	 */
+	UUID(): string {
+		return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c: string) => {
+			const r = (Math.random() * 16) | 0;
+			const v = c === 'x' ? r : (r & 0x3) | 0x8;
+			return v.toString(16);
+		});
+	}
+
+	/**
+	 * Converts an object to an array. Optionally holds keys instead of values.
+	 *
+	 * @param {any} obj - The object to be converted.
+	 * @param {boolean} [holder=false] - If true, the keys will be held in the array; otherwise, the values will be held.
+	 * @returns {any[]} The resulting array.
+	 */
+	ota(obj: any, holder: boolean = false): any[] {
+		if (Array.isArray(obj)) return obj;
+		if (typeof obj !== 'object' || obj === null) return [];
+		const arr = [];
+		for (const each in obj) {
+			if (
+				obj.hasOwnProperty(each) &&
+				(obj[each] || typeof obj[each] === 'number' || typeof obj[each] === 'boolean')
+			) {
+				if (holder) {
+					arr.push(each);
+				} else {
+					arr.push(obj[each]);
+				}
+			}
+		}
+		return arr;
+	}
+
+	/**
+	 * Removes elements from `fromArray` that are present in `removeArray` based on a comparison field.
+	 *
+	 * @param {any[]} removeArray - The array of elements to remove.
+	 * @param {any[]} fromArray - The array from which to remove elements.
+	 * @param {string} [compareField='_id'] - The field to use for comparison.
+	 * @returns {any[]} The modified `fromArray` with elements removed.
+	 */
+	splice(removeArray: any[], fromArray: any[], compareField: string = '_id'): any[] {
+		if (!Array.isArray(removeArray) || !Array.isArray(fromArray)) {
+			return fromArray;
+		}
+
+		const removeSet = new Set(removeArray.map(item => item[compareField]));
+		return fromArray.filter(item => !removeSet.has(item[compareField]));
+	}
+
+	/**
+	 * Unites multiple _id values into a single unique _id.
+	 * The resulting _id is unique regardless of the order of the input _id values.
+	 *
+	 * @param {...string[]} args - The _id values to be united.
+	 * @returns {string} The unique combined _id.
+	 */
+	ids2id(...args: string[]): string {
+		args.sort((a, b) => {
+			if (Number(a.toString().substring(0, 8)) > Number(b.toString().substring(0, 8))) {
+				return 1;
+			}
+			return -1;
+		});
+
+		return args.join();
+	}
+
+	// After While
+	private _afterWhile: Record<string, number> = {};
+	/**
+	 * Delays the execution of a callback function for a specified amount of time.
+	 * If called again within that time, the timer resets.
+	 *
+	 * @param {string | object | (() => void)} doc - A unique identifier for the timer, an object to host the timer, or the callback function.
+	 * @param {() => void} [cb] - The callback function to execute after the delay.
+	 * @param {number} [time=1000] - The delay time in milliseconds.
+	 */
+	afterWhile(doc: string | object | (() => void), cb?: () => void, time: number = 1000): void {
+		if (typeof doc === 'function') {
+			cb = doc as () => void;
+			doc = 'common';
+		}
+
+		if (typeof cb === 'function' && typeof time === 'number') {
+			if (typeof doc === 'string') {
+				clearTimeout(this._afterWhile[doc]);
+				this._afterWhile[doc] = setTimeout(cb, time);
+			} else if (typeof doc === 'object') {
+				clearTimeout((doc as { __afterWhile: number }).__afterWhile);
+				(doc as { __afterWhile: number }).__afterWhile = setTimeout(cb, time);
+			} else {
+				console.warn('badly configured after while');
+			}
+		}
+	}
+
+	/**
+	 * Recursively copies properties from one object to another.
+	 * Handles nested objects, arrays, and Date instances appropriately.
+	 *
+	 * @param from - The source object from which properties are copied.
+	 * @param to - The target object to which properties are copied.
+	 */
+	copy(from: any, to: any) {
+		for (const each in from) {
+			if (
+				typeof from[each] !== 'object' ||
+				from[each] instanceof Date ||
+				Array.isArray(from[each]) ||
+				from[each] === null
+			) {
+				to[each] = from[each];
+			} else {
+				if (
+					typeof to[each] !== 'object' ||
+					to[each] instanceof Date ||
+					Array.isArray(to[each]) ||
+					to[each] === null
+				) {
+					to[each] = {};
+				}
+
+				this.copy(from[each], to[each]);
+			}
+		}
+	}
+
+	// Device management
+	device = '';
+	/**
+	 * Detects the device type based on the user agent.
+	 */
+	detectDevice(): void {
+		if (!this._isBrowser) return;
+
+		const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
+		if (/windows phone/i.test(userAgent)) {
+			this.device = 'Windows Phone';
+		} else if (/android/i.test(userAgent)) {
+			this.device = 'Android';
+		} else if (/iPad|iPhone|iPod/.test(userAgent) && !(window as any).MSStream) {
+			this.device = 'iOS';
+		} else {
+			this.device = 'Web';
+		}
+	}
+
+	/**
+	 * Checks if the device is a mobile device.
+	 * @returns {boolean} - Returns true if the device is a mobile device.
+	 */
+	isMobile(): boolean {
+		return (
+			this.device === 'Windows Phone' || this.device === 'Android' || this.device === 'iOS'
+		);
+	}
+
+	/**
+	 * Checks if the device is a tablet.
+	 * @returns {boolean} - Returns true if the device is a tablet.
+	 */
+	isTablet(): boolean {
+		if (!this._isBrowser) return false;
+
+		return this.device === 'iOS' && /iPad/.test(navigator.userAgent);
+	}
+
+	/**
+	 * Checks if the device is a web browser.
+	 * @returns {boolean} - Returns true if the device is a web browser.
+	 */
+	isWeb(): boolean {
+		return this.device === 'Web';
+	}
+
+	/**
+	 * Checks if the device is an Android device.
+	 * @returns {boolean} - Returns true if the device is an Android device.
+	 */
+	isAndroid(): boolean {
+		return this.device === 'Android';
+	}
+
+	/**
+	 * Checks if the device is an iOS device.
+	 * @returns {boolean} - Returns true if the device is an iOS device.
+	 */
+	isIos(): boolean {
+		return this.device === 'iOS';
+	}
+
+	// Viewport management (responsive breakpoint)
+	readonly viewport = signal<Viewport>('desktop');
+
+	readonly isViewportMobile = computed(() => this.viewport() === 'mobile');
+	readonly isViewportTablet = computed(() => this.viewport() === 'tablet');
+	readonly isViewportDesktop = computed(() => this.viewport() === 'desktop');
+
+	detectViewport(): void {
+		if (!this._isBrowser) return;
+
+		const mqMobile = window.matchMedia('(max-width: 767.98px)');
+		const mqTablet = window.matchMedia('(min-width: 768px) and (max-width: 1023.98px)');
+		const mqDesktop = window.matchMedia('(min-width: 1024px)');
+
+		const update = () => {
+			if (mqMobile.matches) return this.viewport.set('mobile');
+			if (mqTablet.matches) return this.viewport.set('tablet');
+			return this.viewport.set('desktop');
+		};
+
+		update();
+
+		mqMobile.addEventListener('change', update);
+		mqTablet.addEventListener('change', update);
+		mqDesktop.addEventListener('change', update);
+
+		this._destroyRef.onDestroy(() => {
+			mqMobile.removeEventListener('change', update);
+			mqTablet.removeEventListener('change', update);
+			mqDesktop.removeEventListener('change', update);
+		});
+	}
+
+	// Version management
+	version = '1.0.0';
+
+	appVersion = '';
+
+	dateVersion = '';
+
+	/**
+	 * Sets the combined version string based on appVersion and dateVersion.
+	 */
+	setVersion(): void {
+		this.version = this.appVersion || '';
+
+		this.version += this.version && this.dateVersion ? ' ' : '';
+
+		this.version += this.dateVersion || '';
+	}
+
+	/**
+	 * Sets the app version and updates the combined version string.
+	 *
+	 * @param {string} appVersion - The application version to set.
+	 */
+	setAppVersion(appVersion: string): void {
+		this.appVersion = appVersion;
+
+		this.setVersion();
+	}
+
+	/**
+	 * Sets the date version and updates the combined version string.
+	 *
+	 * @param {string} dateVersion - The date version to set.
+	 */
+	setDateVersion(dateVersion: string): void {
+		this.dateVersion = dateVersion;
+
+		this.setVersion();
+	}
+
+	// Locking management
+	private _locked: Record<string, boolean> = {};
+	private _unlockResolvers: Record<string, (() => void)[]> = {};
+
+	/**
+	 * Locks a resource to prevent concurrent access.
+	 * @param which - The resource to lock, identified by a string.
+	 */
+	lock(which: string): void {
+		this._locked[which] = true;
+
+		if (!this._unlockResolvers[which]) {
+			this._unlockResolvers[which] = [];
+		}
+	}
+
+	/**
+	 * Unlocks a resource, allowing access.
+	 * @param which - The resource to unlock, identified by a string.
+	 */
+	unlock(which: string): void {
+		this._locked[which] = false;
+
+		if (this._unlockResolvers[which]) {
+			this._unlockResolvers[which].forEach(resolve => resolve());
+
+			this._unlockResolvers[which] = [];
+		}
+	}
+
+	/**
+	 * Returns a Promise that resolves when the specified resource is unlocked.
+	 * @param which - The resource to watch for unlocking, identified by a string.
+	 * @returns A Promise that resolves when the resource is unlocked.
+	 */
+	onUnlock(which: string): Promise<void> {
+		if (!this._locked[which]) {
+			return Promise.resolve();
+		}
+
+		return new Promise(resolve => {
+			if (!this._unlockResolvers[which]) {
+				this._unlockResolvers[which] = [];
+			}
+
+			this._unlockResolvers[which].push(resolve);
+		});
+	}
+
+	/**
+	 * Checks if a resource is locked.
+	 * @param which - The resource to check, identified by a string.
+	 * @returns True if the resource is locked, false otherwise.
+	 */
+	locked(which: string): boolean {
+		return !!this._locked[which];
+	}
+
+	// Angular Signals //
+	/**
+	 * Converts a plain object into a signal-wrapped object.
+	 * Optionally wraps specific fields of the object as individual signals,
+	 * and merges them into the returned signal for fine-grained reactivity.
+	 *
+	 * @template Document - The type of the object being wrapped.
+	 * @param {Document} document - The plain object to wrap into a signal.
+	 * @param {Record<string, (doc: Document) => unknown>} [signalFields={}] -
+	 *        Optional map where each key is a field name and the value is a function
+	 *        to extract the initial value for that field. These fields will be wrapped
+	 *        as separate signals and embedded in the returned object.
+	 *
+	 * @returns {WritableSignal<Document>} A signal-wrapped object, possibly containing
+	 *          nested field signals for more granular control.
+	 *
+	 * @example
+	 * const user = { _id: '1', name: 'Alice', score: 42 };
+	 * const sig = toSignal(user, { score: (u) => u.score });
+	 * console.log(sig().name); // 'Alice'
+	 * console.log(sig().score()); // 42 — field is now a signal
+	 */
+	toSignal<Document>(
+		document: Document,
+		signalFields: Record<string, (doc: Document) => unknown> = {},
+	): WritableSignal<Document> {
+		if (Object.keys(signalFields).length) {
+			const fields: Record<string, Signal<unknown>> = {};
+
+			for (const key in signalFields) {
+				fields[key] = signal(signalFields[key](document));
+			}
+
+			return signal({ ...document, ...fields });
+		} else {
+			return signal(document);
+		}
+	}
+
+	/**
+	 * Converts an array of objects into an array of Angular signals.
+	 * Optionally wraps specific fields of each object as individual signals.
+	 *
+	 * @template Document - The type of each object in the array.
+	 * @param {Document[]} arr - Array of plain objects to convert into signals.
+	 * @param {Record<string, (doc: Document) => unknown>} [signalFields={}] -
+	 *        Optional map where keys are field names and values are functions that extract the initial value
+	 *        from the object. These fields will be turned into separate signals.
+	 *
+	 * @returns {WritableSignal<Document>[]} An array where each item is a signal-wrapped object,
+	 *          optionally with individual fields also wrapped in signals.
+	 *
+	 * @example
+	 * toSignalsArray(users, {
+	 *   name: (u) => u.name,
+	 *   score: (u) => u.score,
+	 * });
+	 */
+	toSignalsArray<Document>(
+		arr: Document[],
+		signalFields: Record<string, (doc: Document) => unknown> = {},
+	): WritableSignal<Document>[] {
+		return arr.map(obj => this.toSignal(obj, signalFields));
+	}
+
+	/**
+	 * Adds a new object to the signals array.
+	 * Optionally wraps specific fields of the object as individual signals before wrapping the whole object.
+	 *
+	 * @template Document - The type of the object being added.
+	 * @param {WritableSignal<Document>[]} signals - The signals array to append to.
+	 * @param {Document} item - The object to wrap and push as a signal.
+	 * @param {Record<string, (doc: Document) => unknown>} [signalFields={}] -
+	 *        Optional map of fields to be wrapped as signals within the object.
+	 *
+	 * @returns {void}
+	 */
+	pushSignal<Document>(
+		signals: WritableSignal<Document>[],
+		item: Document,
+		signalFields: Record<string, (doc: Document) => unknown> = {},
+	): void {
+		signals.push(this.toSignal(item, signalFields));
+	}
+
+	/**
+	 * Removes the first signal from the array whose object's field matches the provided value.
+	 * @template Document
+	 * @param {WritableSignal<Document>[]} signals - The signals array to modify.
+	 * @param {unknown} value - The value to match.
+	 * @param {string} [field='_id'] - The object field to match against.
+	 * @returns {void}
+	 */
+	removeSignalByField<Document extends Record<string, unknown>>(
+		signals: WritableSignal<Document>[],
+		value: unknown,
+		field: string = '_id',
+	): void {
+		const idx = signals.findIndex(sig => sig()[field] === value);
+
+		if (idx > -1) signals.splice(idx, 1);
+	}
+
+	/**
+	 * Returns a generic trackBy function for *ngFor, tracking by the specified object field.
+	 * @template Document
+	 * @param {string} field - The object field to use for tracking (e.g., '_id').
+	 * @returns {(index: number, sig: Signal<Document>) => unknown} TrackBy function for Angular.
+	 */
+	trackBySignalField<Document extends Record<string, unknown>>(field: string) {
+		return (_: number, sig: Signal<Document>) => sig()[field];
+	}
+
+	/**
+	 * Finds the first signal in the array whose object's field matches the provided value.
+	 * @template Document
+	 * @param {Signal<Document>[]} signals - Array of signals to search.
+	 * @param {unknown} value - The value to match.
+	 * @param {string} [field='_id'] - The object field to match against.
+	 * @returns {Signal<Document> | undefined} The found signal or undefined if not found.
+	 */
+	findSignalByField<Document extends Record<string, unknown>>(
+		signals: WritableSignal<Document>[],
+		value: unknown,
+		field = '_id',
+	): WritableSignal<Document> | undefined {
+		return signals.find(sig => sig()[field] === value) as WritableSignal<Document>;
+	}
+
+	/**
+	 * Updates the first writable signal in the array whose object's field matches the provided value.
+	 * @template Document
+	 * @param {WritableSignal<Document>[]} signals - Array of writable signals to search.
+	 * @param {unknown} value - The value to match.
+	 * @param {(val: Document) => Document} updater - Function to produce the updated object.
+	 * @param {string} field - The object field to match against.
+	 * @returns {void}
+	 */
+	updateSignalByField<Document extends Record<string, unknown>>(
+		signals: WritableSignal<Document>[],
+		value: unknown,
+		updater: (val: Document) => Document,
+		field: string,
+	): void {
+		const sig = this.findSignalByField<Document>(
+			signals,
+			value,
+			field,
+		) as WritableSignal<Document>;
+
+		if (sig) sig.update(updater);
+	}
+}

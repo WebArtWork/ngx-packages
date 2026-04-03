@@ -1,0 +1,12 @@
+/
+/features/core
+/features/ui
+/features/translate
+/features/http
+/features/socket
+/features/crud
+/features/rtc
+/features/datetime
+/features/ace
+/features/fabric
+/features/tinymce

@@ -20,7 +20,17 @@
 		"module": "ES2022",
 		"useDefineForClassFields": false,
 		"paths": {
-			"ngx-core": ["projects/ngx-core/public-api.ts"]
+			"ngx-ace": ["projects/ngx-ace/public-api.ts"],
+			"ngx-fabric": ["projects/ngx-fabric/public-api.ts"],
+			"ngx-core": ["projects/ngx-core/public-api.ts"],
+			"ngx-datetime": ["projects/ngx-datetime/public-api.ts"],
+			"ngx-http": ["projects/ngx-http/public-api.ts"],
+			"ngx-crud": ["projects/ngx-crud/public-api.ts"],
+			"ngx-socket": ["projects/ngx-socket/public-api.ts"],
+			"ngx-rtc": ["projects/ngx-rtc/public-api.ts"],
+			"ngx-translate": ["projects/ngx-translate/public-api.ts"],
+			"ngx-tinymce": ["projects/ngx-tinymce/public-api.ts"],
+			"ngx-ui": ["projects/ngx-ui/public-api.ts"]
 		}
 	},
 	"angularCompilerOptions": {

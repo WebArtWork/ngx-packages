@@ -1,0 +1,103 @@
+<article class="file-section" [class.is-open]="open()" [attr.id]="section().id">
+	<button
+		type="button"
+		class="file-toggle"
+		(click)="toggle.emit(section().raw)"
+		[attr.aria-expanded]="open()"
+	>
+		<div class="file-toggle-copy">
+			<h2>{{ section().label }}</h2>
+			<p class="file-toggle-meta">
+				{{ section().items.length }}
+				{{ section().items.length === 1 ? 'public export' : 'public exports' }}
+			</p>
+		</div>
+		<span class="file-toggle-arrow" [class.is-open]="open()" aria-hidden="true">
+			<svg viewBox="0 0 20 20">
+				<path
+					d="M7 4.5 12.5 10 7 15.5"
+					fill="none"
+					stroke="currentColor"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					stroke-width="1.8"
+				/>
+			</svg>
+		</span>
+	</button>
+
+	@if (open()) {
+		<div class="file-section-body">
+			@if (section().items.length) {
+				@for (item of section().items; track item.id) {
+					<article class="reference-row" [attr.id]="item.id">
+						<section class="info-card">
+							<p class="label">Documentation</p>
+							<div class="item-heading">
+								<div>
+									<p class="item-group">
+										{{ item.docType }} / {{ item.category }}
+									</p>
+									<h3>{{ item.name }}</h3>
+								</div>
+								<code>{{ item.signature }}</code>
+							</div>
+
+							<p class="item-description">
+								{{ item.description }}
+							</p>
+
+							@if (item.details.length) {
+								<section class="doc-group">
+									<h3>Details</h3>
+									<ul>
+										@for (detail of item.details; track detail) {
+											<li>{{ detail }}</li>
+										}
+									</ul>
+								</section>
+							}
+						</section>
+
+						<section class="code-card">
+							<div class="code-card-head">
+								<div>
+									<p class="label">Example</p>
+									<h3>{{ item.name }} in use</h3>
+								</div>
+								@if (item.example) {
+									<button
+										type="button"
+										class="copy-button"
+										(click)="copy.emit(item.example)"
+										[attr.aria-label]="copied() ? 'Copied' : 'Copy example'"
+									>
+										<svg viewBox="0 0 24 24" aria-hidden="true">
+											<path
+												d="M9 9h10v10H9zM5 5h10v2H7v8H5z"
+												fill="currentColor"
+											/>
+										</svg>
+										<span>{{ copied() ? 'Copied' : 'Copy' }}</span>
+									</button>
+								}
+							</div>
+							@if (item.example) {
+								<pre><code>{{ item.example }}</code></pre>
+							} @else {
+								<div class="empty-example">
+									<p>No dedicated example for this API surface.</p>
+									<p>Examples are shown only for service entries.</p>
+								</div>
+							}
+						</section>
+					</article>
+				}
+			} @else {
+				<div class="empty-file-state">
+					<p>No public exports are documented for this file yet.</p>
+				</div>
+			}
+		</div>
+	}
+</article>

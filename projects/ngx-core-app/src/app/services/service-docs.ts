@@ -34,16 +34,12 @@ const _SERVICE_DOC_ORDER = [
 	'dom-service',
 	'emitter-service',
 	'store-service',
-	'theme-service',
 	'meta-service',
 	'network-service',
 	'http-service',
-	'rtc-service',
-	'socket-service',
 	'crud-service',
 	'translate-service',
 	'language',
-	'datetime',
 ] as const;
 
 const _serviceDocOrderMap: ReadonlyMap<string, number> = new Map(
@@ -88,7 +84,7 @@ const _serviceDocs: ServiceDoc[] = [
 				name: 'Config',
 				signature: 'interface Config',
 				description:
-					'Root configuration contract used by provideNgxCore() for store, meta, http, network, socket, and io settings.',
+					'Root configuration contract used by provideNgxCore() for store, meta, http, and network settings.',
 				category: 'Configuration',
 				docType: 'Interface',
 				sourceFile: 'config.interface.ts',
@@ -785,7 +781,7 @@ loadProjects() {
 		],
 		config: [
 			'No provideNgxCore() configuration is required.',
-			'This service does not implement signaling transport; pair it with HttpService, SocketService, or another channel to exchange offers, answers, and ICE candidates.',
+			'This service does not implement signaling transport; pair it with HttpService or another channel to exchange offers, answers, and ICE candidates.',
 			'Browser permissions for camera and microphone are requested when initLocalStream() runs.',
 		],
 		availableItems: ['rtc.service.ts'],
@@ -891,7 +887,7 @@ async startPreview() {
 				items: [
 					'Use RtcService to keep WebRTC browser APIs behind one SSR-safe Angular service.',
 					'The service handles peer/media primitives only; your app still needs a signaling path to exchange SDP and ICE payloads.',
-					'SocketService is a common signaling companion when peers need real-time negotiation events.',
+					'Provide your own signaling companion when peers need real-time negotiation events.',
 				],
 			},
 		],
@@ -906,89 +902,6 @@ async connect(id: string) {
 \tconst offer = await this._rtcService.createOffer(id);
 \t// send offer through your signaling channel
 \tconsole.log(offer);
-}`,
-	},
-	{
-		slug: 'socket-service',
-		name: 'SocketService',
-		description:
-			'Socket.IO client wrapper for SSR-safe connection setup, event binding, and realtime emits.',
-		summary:
-			'SocketService centralizes client-side realtime connection logic around `config.socket` and `config.io`. It resolves the target URL from app config, opens the client only in the browser, coordinates connection state, and forwards lifecycle events through EmitterService.',
-		highlights: [
-			'Reads `socket` and `io` from provideNgxCore() configuration instead of hardcoding client setup in components.',
-			'Completes the `socket` task on connect and emits `socket_disconnect` and `socket_error` events through EmitterService.',
-			'Queues `on()` and `emit()` calls until the socket is connected.',
-		],
-		config: [
-			'Configure with provideNgxCore({ socket, io }).',
-			'`io` should be the Socket.IO client factory or module export.',
-			'`socket` can be `true` for default origin connection or an object with `url`, `port`, and `opts`.',
-		],
-		availableItems: ['socket.service.ts'],
-		methods: [
-			{
-				name: 'setUrl',
-				signature: 'setUrl(url: string): void',
-				description:
-					'Sets the socket endpoint URL, enables socket config if needed, and reconnects in the browser.',
-				category: 'Configuration',
-				sourceFile: 'socket.service.ts',
-			},
-			{
-				name: 'disconnect',
-				signature: 'disconnect(): void',
-				description:
-					'Disconnects the active socket client and resets internal connection state.',
-				category: 'Lifecycle',
-				sourceFile: 'socket.service.ts',
-			},
-			{
-				name: 'on',
-				signature: 'on(to: string, cb?: (message: any) => void): void',
-				description:
-					'Subscribes to a socket event once the client is available and connected.',
-				details: [
-					'When called before connect, it retries until the socket is ready.',
-					'Logs a warning and returns when socket support is not configured.',
-				],
-				category: 'Events',
-				sourceFile: 'socket.service.ts',
-				example: `import { SocketService } from 'ngx-core';
-
-private readonly _socketService = inject(SocketService);
-
-ngOnInit() {
-\tthis._socketService.on('project:updated', project => {
-\t\tconsole.log('project updated', project);
-\t});
-}`,
-			},
-			{
-				name: 'emit',
-				signature: 'emit(to: string, message: any, room = false): void',
-				description: 'Emits a payload to a socket event after the client is connected.',
-				details: ['When called before connect, it retries until the socket is ready.'],
-				category: 'Events',
-				sourceFile: 'socket.service.ts',
-			},
-		],
-		sections: [
-			{
-				title: 'Feature role',
-				items: [
-					'Use SocketService when the app already depends on Socket.IO and wants connection setup centralized under provideNgxCore().',
-					'NetworkService measures connectivity; SocketService handles realtime transport only.',
-					'RtcService can use SocketService as its signaling transport for WebRTC offer, answer, and ICE exchange.',
-				],
-			},
-		],
-		code: `import { SocketService } from 'ngx-core';
-
-private readonly _socketService = inject(SocketService);
-
-sendTyping() {
-\tthis._socketService.emit('chat:typing', { room: 'project-42' });
 }`,
 	},
 	{
@@ -1792,198 +1705,6 @@ markReady() {
 });`,
 	},
 	{
-		slug: 'theme-service',
-		name: 'ThemeService',
-		description:
-			'SSR-safe theme state for mode, density, and radius with provider-based initialization.',
-		summary:
-			'ThemeService applies appearance state to the html dataset and persists it in localStorage. In modern setup, initialize it through provideTheme() so apps do not call init() manually in components.',
-		highlights: [
-			'Recommended bootstrap path: provideTheme() in app providers.',
-			"Mode switching in UI should call ThemeService.setMode('light' | 'dark').",
-			'Fallback mode is dark when no saved theme.mode exists.',
-			'Docs app prevents initial flash with an early index.html script that sets data-mode before Angular bootstraps.',
-		],
-		config: [
-			'Use provideTheme() once in application providers to run ThemeService.init() via environment initializer.',
-			"Styles should be driven by CSS variables under html[data-mode='light'] and html[data-mode='dark'].",
-			'Density and radius are still managed by ThemeService for UIs that need those controls.',
-		],
-		availableItems: ['provide-theme.ts', 'theme.service.ts', 'theme.type.ts'],
-		properties: [
-			{
-				name: 'mode / density / radius',
-				signature: 'Writable signals',
-				description:
-					'Current appearance selections mirrored to html[data-mode|density|radius] and persisted on the client.',
-				category: 'State',
-				sourceFile: 'theme.service.ts',
-			},
-			{
-				name: 'modes / densities / radiuses',
-				signature: 'Writable signals of option arrays',
-				description:
-					'Available values used by setMode(), setDensity(), setRadius(), and nextTheme().',
-				category: 'State',
-				sourceFile: 'theme.service.ts',
-			},
-			{
-				name: 'themeIndex',
-				signature: 'signal<number>',
-				description:
-					'Linear index for the current mode/density/radius combination used by nextTheme().',
-				category: 'State',
-				sourceFile: 'theme.service.ts',
-			},
-			{
-				name: 'ThemeMode / ThemeDensity / ThemeRadius',
-				signature: 'theme option types',
-				description:
-					'Type aliases that constrain valid theme mode, density, and radius values.',
-				category: 'Contracts',
-				docType: 'Type',
-				sourceFile: 'theme.type.ts',
-			},
-		],
-		methods: [
-			{
-				name: 'provideTheme',
-				signature: 'provideTheme(): EnvironmentProviders',
-				description:
-					'Recommended setup API. Registers an environment initializer that injects ThemeService and runs init() at app startup.',
-				details: [
-					'Use this in app config providers instead of calling theme.init() from components.',
-					'Keeps initialization centralized, minimal, and consistent with standalone bootstrap patterns.',
-				],
-				category: 'Providers',
-				sourceFile: 'provide-theme.ts',
-				example: `import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
-import { provideRouter } from '@angular/router';
-import { provideNgxCore, provideTheme } from 'ngx-core';
-
-export const appConfig: ApplicationConfig = {
-	providers: [
-		provideZonelessChangeDetection(),
-		provideRouter([]),
-		provideTheme(),
-		provideNgxCore(),
-	],
-};`,
-			},
-			{
-				name: 'setMode',
-				signature: "setMode(mode: 'light' | 'dark'): void",
-				description:
-					'Updates the mode signal, data-mode attribute, and localStorage value.',
-				details: [
-					'In docs UI, light/dark toggle should switch by calling setMode() directly.',
-				],
-				category: 'State',
-				sourceFile: 'theme.service.ts',
-				example: `import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { ThemeService } from 'ngx-core';
-
-@Component({
-	selector: 'app-theme-toggle',
-	template: '<button type="button" (click)="toggleTheme()">Toggle theme</button>',
-	changeDetection: ChangeDetectionStrategy.OnPush,
-})
-export class ThemeToggleComponent {
-	readonly themeService = inject(ThemeService);
-
-	toggleTheme() {
-		const nextMode = this.themeService.mode() === 'light' ? 'dark' : 'light';
-		this.themeService.setMode(nextMode);
-	}
-}`,
-			},
-			{
-				name: 'setDensity',
-				signature: "setDensity(density: 'comfortable' | 'compact'): void",
-				description:
-					'Updates the density signal, data-density attribute, and localStorage value.',
-				category: 'State',
-				sourceFile: 'theme.service.ts',
-			},
-			{
-				name: 'setRadius',
-				signature: "setRadius(radius: 'rounded' | 'square'): void",
-				description:
-					'Updates the radius signal, data-radius attribute, and localStorage value.',
-				category: 'State',
-				sourceFile: 'theme.service.ts',
-			},
-			{
-				name: 'nextTheme',
-				signature: 'nextTheme(): void',
-				description:
-					'Cycles through every mode/density/radius combination and persists the resulting themeIndex.',
-				category: 'State',
-				sourceFile: 'theme.service.ts',
-			},
-			{
-				name: 'init',
-				signature: 'init(): void',
-				description:
-					'Loads persisted values (theme.mode/theme.density/theme.radius) and applies them to the document root.',
-				details: [
-					'Default mode fallback is dark when theme.mode is missing.',
-					'In app code, prefer provideTheme() so init() runs automatically at bootstrap.',
-				],
-				category: 'Lifecycle',
-				sourceFile: 'theme.service.ts',
-			},
-			{
-				name: 'Early mode script (index.html)',
-				signature: 'small head script before Angular bootstraps',
-				description:
-					'Prevents initial theme blink by applying data-mode from localStorage (fallback dark) before app render.',
-				example: `<script>
-	(() => {
-		try {
-			const mode = localStorage.getItem('theme.mode') || 'dark';
-			document.documentElement.dataset.mode = mode;
-		} catch {
-			document.documentElement.dataset.mode = 'dark';
-		}
-	})();
-</script>`,
-			},
-			{
-				name: 'CSS variable theming',
-				signature: "html[data-mode='light' | 'dark']",
-				description:
-					'Define mode-specific CSS variables at app level and consume them in component styles.',
-				example: `html[data-mode='light'] {
-	--page-bg: #f5f7fb;
-	--text-main: #172033;
-}
-
-html[data-mode='dark'] {
-	--page-bg: #0f172a;
-	--text-main: #e5edf7;
-}
-
-.panel {
-	background: var(--page-bg);
-	color: var(--text-main);
-}`,
-			},
-		],
-		code: `import { ThemeService, provideTheme } from 'ngx-core';
-
-// app.config.ts
-providers: [provideTheme()]
-
-// component
-readonly themeService = inject(ThemeService);
-
-toggleTheme() {
-	const nextMode = this.themeService.mode() === 'light' ? 'dark' : 'light';
-	this.themeService.setMode(nextMode);
-}`,
-	},
-	{
 		slug: 'language',
 		name: 'Language',
 		description:
@@ -2013,7 +1734,7 @@ toggleTheme() {
 				description: 'Registers LanguageService initialization during app bootstrap.',
 				category: 'Providers',
 				sourceFile: 'provide-language.ts',
-				example: `import { provideLanguage } from 'ngx-core';
+				example: `import { provideLanguage } from 'ngx-translate';
 
 export const appConfig = {
 \tproviders: [
@@ -2070,7 +1791,7 @@ export const appConfig = {
 					'Validates and applies the active language, then persists it when enabled.',
 				category: 'State',
 				sourceFile: 'language.service.ts',
-				example: `import { LanguageService } from 'ngx-core';
+				example: `import { LanguageService } from 'ngx-translate';
 
 private readonly _languageService = inject(LanguageService);
 
@@ -2130,7 +1851,7 @@ async switchLanguage(code: string) {
 				],
 			},
 		],
-		code: `import { LanguageService, provideLanguage } from 'ngx-core';
+		code: `import { LanguageService, provideLanguage } from 'ngx-translate';
 
 export const appConfig = {
 \tproviders: [provideLanguage({ defaultLanguage: 'en' })],
@@ -2140,170 +1861,6 @@ readonly languageService = inject(LanguageService);
 
 async setGerman() {
 \tawait this.languageService.setLanguage('de');
-}`,
-	},
-	{
-		slug: 'datetime',
-		name: 'Datetime',
-		description:
-			'Date and time utility feature built around TimeService for formatting, ranges, arithmetic, and comparisons.',
-		summary:
-			'Datetime exposes TimeService as a lightweight helper for common date handling in Angular apps. It centralizes naming, formatting, timezone conversion, period boundaries, date arithmetic, differences, and calendar helpers instead of scattering ad hoc date logic across components.',
-		highlights: [
-			'Provides day/month naming plus DatePipe-based formatting through one injectable service.',
-			'Includes start/end helpers for day, week, month, and year ranges.',
-			'Covers add/subtract operations, differences, same-day checks, ISO week numbers, and month week counts.',
-		],
-		config: [
-			'No provideNgxCore() configuration is required.',
-			'TimeService is provided in root and uses Angular DatePipe internally for formatting.',
-			'Week boundaries depend on locale when using startOfWeek() and endOfWeek().',
-		],
-		availableItems: ['time.service.ts'],
-		methods: [
-			{
-				name: 'getDayName',
-				signature: "getDayName(date: Date, format: 'short' | 'long' = 'long'): string",
-				description: 'Returns the weekday name for a date in short or long form.',
-				category: 'Naming',
-				sourceFile: 'time.service.ts',
-				example: `import { TimeService } from 'ngx-core';
-
-private readonly _timeService = inject(TimeService);
-
-labelFor(date: Date) {
-\treturn this._timeService.getDayName(date, 'short');
-}`,
-			},
-			{
-				name: 'getMonthName',
-				signature:
-					"getMonthName(monthIndex: number, format: 'short' | 'long' = 'long'): string",
-				description:
-					'Returns the month name for a zero-based month index and throws for invalid indexes.',
-				category: 'Naming',
-				sourceFile: 'time.service.ts',
-			},
-			{
-				name: 'formatDate',
-				signature:
-					"formatDate(date: Date, format = 'mediumDate', timezone = 'UTC'): string",
-				description:
-					'Formats a date through Angular DatePipe with optional format and timezone overrides.',
-				category: 'Formatting',
-				sourceFile: 'time.service.ts',
-			},
-			{
-				name: 'convertToTimezone',
-				signature: 'convertToTimezone(date: Date, timezone: string): Date',
-				description: 'Creates a Date adjusted to the target IANA timezone.',
-				category: 'Formatting',
-				sourceFile: 'time.service.ts',
-			},
-			{
-				name: 'startOfDay / endOfDay',
-				signature: 'day boundary helpers',
-				description: 'Returns the local start or end timestamp for the supplied day.',
-				category: 'Ranges',
-				sourceFile: 'time.service.ts',
-			},
-			{
-				name: 'startOfWeek / endOfWeek',
-				signature: 'week boundary helpers with optional locale',
-				description: 'Builds locale-aware week boundaries using runtime locale resolution.',
-				details: [
-					'Sunday-first regions include US, CA, AU, NZ, PH, and BR.',
-					'Other locales default to Monday-first week boundaries.',
-				],
-				category: 'Ranges',
-				sourceFile: 'time.service.ts',
-			},
-			{
-				name: 'startOfMonth / endOfMonth',
-				signature: 'month boundary helpers',
-				description: 'Returns the first or last moment of the month for a given date.',
-				category: 'Ranges',
-				sourceFile: 'time.service.ts',
-			},
-			{
-				name: 'startOfYear / endOfYear',
-				signature: 'year boundary helpers',
-				description: 'Returns the first or last moment of the year for a given date.',
-				category: 'Ranges',
-				sourceFile: 'time.service.ts',
-			},
-			{
-				name: 'getDaysInMonth / isLeapYear',
-				signature: 'calendar helpers',
-				description:
-					'Returns month lengths and leap-year status for calendar calculations.',
-				category: 'Calendar',
-				sourceFile: 'time.service.ts',
-			},
-			{
-				name: 'addDays / addMonths / addYears / addHours / addMinutes / addSeconds',
-				signature: 'date arithmetic helpers',
-				description: 'Returns new dates shifted forward by the requested amount.',
-				category: 'Arithmetic',
-				sourceFile: 'time.service.ts',
-				example: `import { TimeService } from 'ngx-core';
-
-private readonly _timeService = inject(TimeService);
-
-buildReminder(date: Date) {
-\treturn this._timeService.addDays(date, 7);
-}`,
-			},
-			{
-				name: 'subtractDays / subtractMonths / subtractYears / subtractHours / subtractMinutes / subtractSeconds',
-				signature: 'date arithmetic helpers',
-				description: 'Returns new dates shifted backward by the requested amount.',
-				category: 'Arithmetic',
-				sourceFile: 'time.service.ts',
-			},
-			{
-				name: 'differenceInDays / differenceInHours / differenceInMinutes',
-				signature: 'difference helpers',
-				description: 'Calculates elapsed time between two dates in the requested unit.',
-				category: 'Comparison',
-				sourceFile: 'time.service.ts',
-			},
-			{
-				name: 'isSameDay',
-				signature: 'isSameDay(date1: Date, date2: Date): boolean',
-				description: 'Checks whether two dates share the same calendar day.',
-				category: 'Comparison',
-				sourceFile: 'time.service.ts',
-			},
-			{
-				name: 'getWeekNumber / getWeeksInMonth',
-				signature: 'ISO week helpers',
-				description:
-					'Returns ISO week numbers and the number of ISO weeks touched by a month.',
-				category: 'Calendar',
-				sourceFile: 'time.service.ts',
-			},
-		],
-		sections: [
-			{
-				title: 'Feature role',
-				items: [
-					'Use TimeService when features need shared date formatting, ranges, or calendar math without introducing another date library.',
-					'The service returns new Date instances for transformations so callers can keep inputs immutable.',
-					'Formatting uses Angular DatePipe while other helpers rely on built-in Date and Intl APIs.',
-				],
-			},
-		],
-		code: `import { TimeService } from 'ngx-core';
-
-private readonly _timeService = inject(TimeService);
-
-formatDueDate(date: Date) {
-\treturn this._timeService.formatDate(
-\t\tthis._timeService.endOfWeek(date, 'en-GB'),
-\t\t'medium',
-\t\t'UTC',
-\t);
 }`,
 	},
 	{
@@ -2382,7 +1939,7 @@ formatDueDate(date: Date) {
 				],
 			},
 		],
-		code: `import { TranslateService } from 'ngx-core';
+		code: `import { TranslateService } from 'ngx-translate';
 
 private readonly _translateService = inject(TranslateService);
 
@@ -2394,7 +1951,17 @@ switchLanguage() {
 	},
 ];
 
-export const serviceDocs: ServiceDoc[] = [..._serviceDocs].sort((a, b) => {
+const _VISIBLE_SERVICE_DOCS = _serviceDocs.filter(
+	doc =>
+		doc.slug !== 'translate-service' &&
+		doc.slug !== 'language' &&
+		doc.slug !== 'http-service' &&
+		doc.slug !== 'network-service' &&
+		doc.slug !== 'crud-service' &&
+		doc.slug !== 'rtc-service',
+);
+
+export const serviceDocs: ServiceDoc[] = [..._VISIBLE_SERVICE_DOCS].sort((a, b) => {
 	const aIndex = _serviceDocOrderMap.get(a.slug) ?? Number.MAX_SAFE_INTEGER;
 	const bIndex = _serviceDocOrderMap.get(b.slug) ?? Number.MAX_SAFE_INTEGER;
 	return aIndex - bIndex;

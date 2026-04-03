@@ -16,10 +16,6 @@ export interface Config {
 	meta?: MetaConfig;
 	/** Base HTTP settings such as API URL and headers. */
 	http?: HttpConfig;
-	/** Optional socket connection configuration. */
-	socket?: any;
-	/** Raw Socket.IO client instance, if used. */
-	io?: any;
 	network?: NetworkConfig;
 }
 
@@ -33,7 +29,6 @@ export const DEFAULT_CONFIG: Config = {
 		useTitleSuffix: false,
 		defaults: { links: {} },
 	},
-	socket: false,
 	http: {
 		url: '',
 		headers: {},

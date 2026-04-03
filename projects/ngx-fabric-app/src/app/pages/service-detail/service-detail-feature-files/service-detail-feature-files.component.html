@@ -1,0 +1,63 @@
+<p class="label">Feature Files</p>
+
+<div class="service-menu" aria-label="Feature Files">
+	<section class="menu-group">
+		<div class="menu-group-links">
+			@for (section of fileSections(); track section.raw) {
+				<div class="menu-link-shell" [class.is-active]="isFileOpen(section.raw)">
+					<div class="menu-link-row">
+						<button
+							type="button"
+							class="menu-link-main"
+							(click)="fileOpen.emit(section.raw)"
+						>
+							<span class="menu-link-name">{{ section.label }}</span>
+						</button>
+						<button
+							type="button"
+							class="menu-link-toggle"
+							(click)="fileToggle.emit(section.raw)"
+							[attr.aria-expanded]="isFileOpen(section.raw)"
+							[attr.aria-label]="
+								isFileOpen(section.raw)
+									? 'Collapse file contents'
+									: 'Expand file contents'
+							"
+						>
+							<span
+								class="menu-link-arrow"
+								[class.is-open]="isFileOpen(section.raw)"
+								aria-hidden="true"
+							>
+								<svg viewBox="0 0 20 20">
+									<path
+										d="M7 4.5 12.5 10 7 15.5"
+										fill="none"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="1.8"
+									/>
+								</svg>
+							</span>
+						</button>
+					</div>
+
+					@if (isFileOpen(section.raw)) {
+						<div class="menu-link-items">
+							@for (entry of section.items; track entry.id) {
+								<button
+									(click)="itemOpen.emit(entry.id)"
+									class="menu-sub-link"
+									type="button"
+								>
+									<span class="menu-sub-link-name">{{ entry.name }}</span>
+								</button>
+							}
+						</div>
+					}
+				</div>
+			}
+		</div>
+	</section>
+</div>

@@ -1,0 +1,41 @@
+@if (doc(); as currentDoc) {
+	<section class="service-shell">
+		<header class="service-hero">
+			<p class="eyebrow">Reference</p>
+			<h1>{{ pageTitle() }}</h1>
+			<p class="summary">{{ currentDoc.summary }}</p>
+		</header>
+
+		<div class="service-layout">
+			<aside class="menu-card">
+				<app-service-detail-feature-files
+					(fileOpen)="openFileSection($event)"
+					(fileToggle)="toggleFile($event)"
+					(itemOpen)="scrollToItem($event)"
+					[fileSections]="fileSections()"
+					[openFile]="openFile()"
+				/>
+			</aside>
+
+			<div class="content-column">
+				<div class="file-sections">
+					@for (section of fileSections(); track section.raw) {
+						<app-service-detail-section
+							[open]="isFileOpen(section.raw)"
+							(toggle)="toggleFile($event)"
+							(copy)="copyExample($event)"
+							[section]="section"
+							[copied]="copied()"
+						/>
+					}
+				</div>
+			</div>
+		</div>
+	</section>
+} @else {
+	<section class="service-shell">
+		<h1>Service not found</h1>
+		<p>The requested documentation page does not exist.</p>
+		<a class="back-link" routerLink="/">Back to landing</a>
+	</section>
+}

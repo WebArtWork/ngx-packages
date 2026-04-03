@@ -1,0 +1,178 @@
+<section class="landing-shell">
+	<div class="landing-hero">
+		<p class="eyebrow">Angular Transport Package</p>
+		<h1>ngx-http</h1>
+		<p class="summary">
+			Focused Angular transport primitives for shared API access and signal-driven
+			connectivity state.
+		</p>
+		<p class="subsummary">
+			SSR-safe defaults, standalone-first bootstrapping, and one package dedicated to
+			`HttpService` and `NetworkService`.
+		</p>
+	</div>
+
+	<article class="readme-card">
+		<header class="readme-header">
+			<div>
+				<p class="kicker">landing.ts</p>
+				<h2>Project Overview</h2>
+			</div>
+			<div class="window-actions" aria-hidden="true">
+				<span></span>
+				<span></span>
+				<span></span>
+			</div>
+		</header>
+
+		<div class="panel-content">
+			<section class="section-grid">
+				<div>
+					<p class="label">Package</p>
+					<h3>ngx-http</h3>
+					<p>
+						Focused Angular package for API calls and connectivity monitoring, with
+						browser-only behavior guarded for SSR.
+					</p>
+				</div>
+				<div>
+					<p class="label">License</p>
+					<h3>MIT</h3>
+					<p>
+						Published as a public package and designed for reuse across multiple apps.
+					</p>
+				</div>
+			</section>
+
+			<section class="doc-section">
+				<div class="section-heading">
+					<p class="label">Installation</p>
+					<h3>Install the package</h3>
+				</div>
+				<div class="code-block">
+					<button
+						type="button"
+						class="copy-button"
+						(click)="copy('install', installCommand)"
+						[attr.aria-label]="
+							copiedKey() === 'install' ? 'Copied' : 'Copy installation command'
+						"
+					>
+						<svg viewBox="0 0 24 24" aria-hidden="true">
+							<path d="M9 9h10v10H9zM5 5h10v2H7v8H5z" fill="currentColor" />
+						</svg>
+						<span>{{ copiedKey() === 'install' ? 'Copied' : 'Copy' }}</span>
+					</button>
+					<pre
+						class="readme-content"
+					><code><span class="code-prompt">$</span> {{ installCommand }}</code></pre>
+				</div>
+			</section>
+
+			<section class="doc-section">
+				<div class="section-heading">
+					<p class="label">Usage</p>
+					<h3>Bootstrap with <code>provideNgxHttp()</code></h3>
+				</div>
+				<div class="code-block">
+					<button
+						type="button"
+						class="copy-button"
+						(click)="copy('usage', usageCopy)"
+						[attr.aria-label]="
+							copiedKey() === 'usage' ? 'Copied' : 'Copy usage example'
+						"
+					>
+						<svg viewBox="0 0 24 24" aria-hidden="true">
+							<path d="M9 9h10v10H9zM5 5h10v2H7v8H5z" fill="currentColor" />
+						</svg>
+						<span>{{ copiedKey() === 'usage' ? 'Copied' : 'Copy' }}</span>
+					</button>
+					<pre
+						class="readme-content"
+					><code><span class="code-keyword">import</span> <span class="code-punctuation">&#123;</span> <span class="code-symbol">provideNgxHttp</span> <span class="code-punctuation">&#125;</span> <span class="code-keyword">from</span> <span class="code-string">'ngx-http'</span><span class="code-punctuation">;</span>
+
+<span class="code-keyword">export const</span> <span class="code-symbol">appConfig</span> <span class="code-operator">=</span> <span class="code-punctuation">&#123;</span>
+  <span class="code-property">providers</span><span class="code-punctuation">:</span> <span class="code-punctuation">[</span><span class="code-function">provideNgxHttp</span><span class="code-punctuation">()</span><span class="code-punctuation">]</span><span class="code-punctuation">,</span>
+<span class="code-punctuation">&#125;;</span></code></pre>
+				</div>
+			</section>
+
+			<section class="doc-section">
+				<div class="section-heading">
+					<p class="label">Configuration</p>
+					<h3>Centralize app-level defaults</h3>
+				</div>
+				<p>
+					Configure HTTP defaults and connectivity probing in one place instead of
+					scattering API base URLs or endpoint checks across components.
+				</p>
+				<div class="code-block">
+					<button
+						type="button"
+						class="copy-button"
+						(click)="copy('config', configCopy)"
+						[attr.aria-label]="
+							copiedKey() === 'config' ? 'Copied' : 'Copy configuration example'
+						"
+					>
+						<svg viewBox="0 0 24 24" aria-hidden="true">
+							<path d="M9 9h10v10H9zM5 5h10v2H7v8H5z" fill="currentColor" />
+						</svg>
+						<span>{{ copiedKey() === 'config' ? 'Copied' : 'Copy' }}</span>
+					</button>
+					<pre
+						class="readme-content"
+					><code><span class="code-keyword">import</span> <span class="code-punctuation">&#123;</span> <span class="code-symbol">provideNgxHttp</span> <span class="code-punctuation">&#125;</span> <span class="code-keyword">from</span> <span class="code-string">'ngx-http'</span><span class="code-punctuation">;</span>
+
+<span class="code-keyword">export const</span> <span class="code-symbol">appConfig</span> <span class="code-operator">=</span> <span class="code-punctuation">&#123;</span>
+  <span class="code-property">providers</span><span class="code-punctuation">:</span> <span class="code-punctuation">[</span>
+    <span class="code-function">provideNgxHttp</span><span class="code-punctuation">(</span><span class="code-punctuation">&#123;</span>
+      <span class="code-property">http</span><span class="code-punctuation">:</span> <span class="code-punctuation">&#123;</span> <span class="code-property">url</span><span class="code-punctuation">:</span> <span class="code-string">'https://api.example.com'</span> <span class="code-punctuation">&#125;</span><span class="code-punctuation">,</span>
+      <span class="code-property">network</span><span class="code-punctuation">:</span> <span class="code-punctuation">&#123;</span>
+        <span class="code-property">endpoints</span><span class="code-punctuation">:</span> <span class="code-punctuation">[</span><span class="code-string">'https://api.example.com/ping'</span><span class="code-punctuation">]</span><span class="code-punctuation">,</span>
+        <span class="code-property">goodLatencyMs</span><span class="code-punctuation">:</span> <span class="code-number">250</span><span class="code-punctuation">,</span>
+      <span class="code-punctuation">&#125;</span><span class="code-punctuation">,</span>
+    <span class="code-punctuation">&#125;</span><span class="code-punctuation">)</span><span class="code-punctuation">,</span>
+  <span class="code-punctuation">]</span><span class="code-punctuation">,</span>
+<span class="code-punctuation">&#125;;</span></code></pre>
+				</div>
+			</section>
+
+			<section class="doc-section">
+				<div class="section-heading">
+					<p class="label">Features</p>
+					<h3>What ngx-http includes</h3>
+				</div>
+				<div class="service-list">
+					@for (feature of featureGroups; track feature.title) {
+						<article class="service-item">
+							<h4>{{ feature.title }}</h4>
+							<p>{{ feature.description }}</p>
+							<p>{{ feature.items.join(' | ') }}</p>
+						</article>
+					}
+				</div>
+			</section>
+
+			<section class="doc-section">
+				<div class="section-heading">
+					<p class="label">Reference</p>
+					<h3>Documented feature pages</h3>
+				</div>
+				<p>
+					The detailed pages below cover the main service-backed features and their public
+					API surface.
+				</p>
+				<div class="service-list">
+					@for (service of services; track service.name) {
+						<a class="service-item" [routerLink]="['/services', service.slug]">
+							<h4>{{ service.name }}</h4>
+							<p>{{ service.description }}</p>
+						</a>
+					}
+				</div>
+			</section>
+		</div>
+	</article>
+</section>

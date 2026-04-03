@@ -1,0 +1,47 @@
+{
+	"name": "@wawjs/ngx-socket",
+	"version": "21.3.0",
+	"license": "MIT",
+	"repository": "WebArtWork/ngx-socket",
+	"funding": [
+		{
+			"type": "website",
+			"url": "http://wawjs.wiki/fund"
+		},
+		{
+			"type": "opencollective",
+			"url": "https://opencollective.com/wawjs"
+		}
+	],
+	"peerDependencies": {
+		"@angular/core": ">=21.0.0",
+		"@angular/common": ">=21.0.0",
+		"@angular/forms": ">=21.0.0",
+		"@angular/platform-browser": ">=21.0.0",
+		"@angular/router": ">=21.0.0",
+		"rxjs": ">=7.5.0"
+	},
+	"engines": {
+		"node": ">=24",
+		"npm": ">=11"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"sideEffects": false,
+	"keywords": [
+		"angular",
+		"angular-library",
+		"ngx",
+		"typescript",
+		"provide-ngx-socket",
+		"ngx-socket",
+		"waw",
+		"web-art-work",
+		"ssr",
+		"socket",
+		"socket.io",
+		"realtime",
+		"emitter"
+	]
+}

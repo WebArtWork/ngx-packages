@@ -1,0 +1,34 @@
+{
+	"name": "@wawjs/ngx-tinymce",
+	"version": "21.3.0",
+	"license": "MIT",
+	"repository": "WebArtWork/ngx-tinymce",
+	"peerDependencies": {
+		"@angular/core": ">=21.0.0",
+		"@angular/common": ">=21.0.0",
+		"@angular/forms": ">=21.0.0"
+	},
+	"engines": {
+		"node": ">=24",
+		"npm": ">=11"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"sideEffects": false,
+	"keywords": [
+		"angular",
+		"angular-library",
+		"ngx",
+		"typescript",
+		"provide-ngx-tinymce",
+		"ngx-tinymce",
+		"waw",
+		"web-art-work",
+		"ssr",
+		"tinymce",
+		"editor",
+		"rich-text",
+		"wysiwyg"
+	]
+}

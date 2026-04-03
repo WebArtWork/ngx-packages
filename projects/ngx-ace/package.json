@@ -1,0 +1,47 @@
+{
+	"name": "@wawjs/ngx-ace",
+	"version": "21.3.0",
+	"license": "MIT",
+	"repository": "WebArtWork/ngx-ace",
+	"funding": [
+		{
+			"type": "website",
+			"url": "http://wawjs.wiki/fund"
+		},
+		{
+			"type": "opencollective",
+			"url": "https://opencollective.com/wawjs"
+		}
+	],
+	"dependencies": {
+		"ace-builds": "^1.43.5"
+	},
+	"peerDependencies": {
+		"@angular/core": ">=21.0.0",
+		"@angular/common": ">=21.0.0"
+	},
+	"engines": {
+		"node": ">=24",
+		"npm": ">=11"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"sideEffects": false,
+	"keywords": [
+		"angular",
+		"angular-library",
+		"ngx",
+		"typescript",
+		"provide-ngx-ace",
+		"ngx-ace",
+		"waw",
+		"web-art-work",
+		"ssr",
+		"ace",
+		"ace-editor",
+		"code-editor",
+		"signals",
+		"syntax-highlighting"
+	]
+}

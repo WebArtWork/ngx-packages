@@ -1,0 +1,47 @@
+{
+	"name": "@wawjs/ngx-fabric",
+	"version": "21.3.0",
+	"license": "MIT",
+	"repository": "WebArtWork/ngx-fabric",
+	"funding": [
+		{
+			"type": "website",
+			"url": "http://wawjs.wiki/fund"
+		},
+		{
+			"type": "opencollective",
+			"url": "https://opencollective.com/wawjs"
+		}
+	],
+	"dependencies": {
+		"fabric": "^7.0.0",
+		"resize-observer-polyfill": "^1.5.1"
+	},
+	"peerDependencies": {
+		"@angular/common": ">=21.0.0",
+		"@angular/core": ">=21.0.0"
+	},
+	"engines": {
+		"node": ">=24",
+		"npm": ">=11"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"sideEffects": false,
+	"keywords": [
+		"angular",
+		"angular-library",
+		"ngx",
+		"typescript",
+		"provide-ngx-fabric",
+		"ngx-fabric",
+		"waw",
+		"web-art-work",
+		"ssr",
+		"fabric",
+		"canvas",
+		"drawing",
+		"signals"
+	]
+}

@@ -1,0 +1,74 @@
+<div class="app-shell">
+	<header class="topbar">
+		<a class="brand" routerLink="/" [attr.aria-label]="'Go to home page' | translate">
+			<img src="logo.png" alt="ngx-ace" />
+		</a>
+
+		<nav class="topbar-nav" [attr.aria-label]="'Service navigation' | translate">
+			@for (service of services; track service.slug) {
+				<a
+					class="topbar-link"
+					[routerLink]="['/services', service.slug]"
+					routerLinkActive="topbar-link-active"
+				>
+					{{ topbarLabel(service.name) }}
+				</a>
+			}
+		</nav>
+
+		<div class="topbar-actions">
+			<div
+				class="language-switcher"
+				[attr.aria-label]="'Language switcher' | translate"
+				role="group"
+			>
+				<span class="language-label">{{ 'Language' | translate }}</span>
+
+				@for (language of languages(); track language.code) {
+					<button
+						type="button"
+						class="language-button"
+						[class.language-button-active]="isLanguage(language.code)"
+						(click)="setLanguage(language.code)"
+						[attr.aria-label]="switchLanguageLabel(language)"
+						[attr.title]="language.nativeName || language.name"
+					>
+						@if (languageFlag(language); as flag) {
+							<img
+								class="language-flag"
+								[src]="flag"
+								[attr.alt]="language.nativeName || language.name"
+							/>
+						}
+						<span class="language-code">{{ languageCode(language) }}</span>
+					</button>
+				}
+			</div>
+
+			<button
+				class="theme-toggle"
+				(click)="toggleTheme()"
+				[attr.aria-label]="
+					('Switch to' | translate) +
+					' ' +
+					(themeService.mode() === 'light'
+						? ('dark' | translate)
+						: ('light' | translate)) +
+					' ' +
+					('mode' | translate)
+				"
+				[attr.title]="'Toggle dark/light mode' | translate"
+			>
+				@if (themeService.mode() === 'light') {
+					<span class="theme-icon">☀️</span>
+				} @else {
+					<span class="theme-icon">🌙</span>
+				}
+			</button>
+		</div>
+	</header>
+
+	<main class="page-content">
+		<router-outlet />
+	</main>
+</div>

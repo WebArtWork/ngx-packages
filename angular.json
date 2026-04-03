@@ -6,6 +6,69 @@
 	"version": 1,
 	"newProjectRoot": "projects",
 	"projects": {
+		"ngx-datetime-app": {
+			"projectType": "application",
+			"root": "projects/ngx-datetime-app",
+			"sourceRoot": "projects/ngx-datetime-app/src",
+			"prefix": "app",
+			"architect": {
+				"build": {
+					"builder": "@angular/build:application",
+					"options": {
+						"browser": "projects/ngx-datetime-app/src/main.ts",
+						"server": "projects/ngx-datetime-app/src/main.server.ts",
+						"index": "projects/ngx-datetime-app/src/index.html",
+						"tsConfig": "projects/ngx-datetime-app/tsconfig.app.json",
+						"prerender": {
+							"discoverRoutes": true,
+							"routesFile": "projects/ngx-datetime-app/src/prerender-routes.txt"
+						},
+						"assets": [
+							{
+								"glob": "**/*",
+								"input": "projects/ngx-datetime-app/src/assets"
+							}
+						],
+						"styles": ["projects/ngx-datetime-app/src/styles.scss"]
+					},
+					"configurations": {
+						"production": {
+							"budgets": [
+								{
+									"type": "initial",
+									"maximumWarning": "500kB",
+									"maximumError": "1MB"
+								},
+								{
+									"type": "anyComponentStyle",
+									"maximumWarning": "8kB",
+									"maximumError": "12kB"
+								}
+							],
+							"outputHashing": "all"
+						},
+						"development": {
+							"optimization": false,
+							"extractLicenses": false,
+							"sourceMap": true
+						}
+					},
+					"defaultConfiguration": "production"
+				},
+				"serve": {
+					"builder": "@angular/build:dev-server",
+					"configurations": {
+						"production": {
+							"buildTarget": "ngx-datetime-app:build:production"
+						},
+						"development": {
+							"buildTarget": "ngx-datetime-app:build:development"
+						}
+					},
+					"defaultConfiguration": "development"
+				}
+			}
+		},
 		"ngx-core-app": {
 			"projectType": "application",
 			"root": "projects/ngx-core-app",
@@ -69,6 +132,699 @@
 				}
 			}
 		},
+		"ngx-app": {
+			"projectType": "application",
+			"root": "projects/ngx-app",
+			"sourceRoot": "projects/ngx-app/src",
+			"prefix": "app",
+			"architect": {
+				"build": {
+					"builder": "@angular/build:application",
+					"options": {
+						"browser": "projects/ngx-app/src/main.ts",
+						"server": "projects/ngx-app/src/main.server.ts",
+						"index": "projects/ngx-app/src/index.html",
+						"tsConfig": "projects/ngx-app/tsconfig.app.json",
+						"prerender": {
+							"discoverRoutes": true,
+							"routesFile": "projects/ngx-app/src/prerender-routes.txt"
+						},
+						"assets": [
+							{
+								"glob": "**/*",
+								"input": "projects/ngx-app/src/assets"
+							}
+						],
+						"styles": ["projects/ngx-app/src/styles.scss"]
+					},
+					"configurations": {
+						"production": {
+							"budgets": [
+								{
+									"type": "initial",
+									"maximumWarning": "500kB",
+									"maximumError": "1MB"
+								},
+								{
+									"type": "anyComponentStyle",
+									"maximumWarning": "8kB",
+									"maximumError": "12kB"
+								}
+							],
+							"outputHashing": "all"
+						},
+						"development": {
+							"optimization": false,
+							"extractLicenses": false,
+							"sourceMap": true
+						}
+					},
+					"defaultConfiguration": "production"
+				},
+				"serve": {
+					"builder": "@angular/build:dev-server",
+					"configurations": {
+						"production": {
+							"buildTarget": "ngx-app:build:production"
+						},
+						"development": {
+							"buildTarget": "ngx-app:build:development"
+						}
+					},
+					"defaultConfiguration": "development"
+				}
+			}
+		},
+		"wawjs.wiki": {
+			"projectType": "application",
+			"root": "projects/wawjs.wiki",
+			"sourceRoot": "projects/wawjs.wiki/src",
+			"prefix": "app",
+			"architect": {
+				"build": {
+					"builder": "@angular/build:application",
+					"options": {
+						"browser": "projects/wawjs.wiki/src/main.ts",
+						"server": "projects/wawjs.wiki/src/main.server.ts",
+						"index": "projects/wawjs.wiki/src/index.html",
+						"tsConfig": "projects/wawjs.wiki/tsconfig.app.json",
+						"prerender": {
+							"discoverRoutes": true,
+							"routesFile": "projects/wawjs.wiki/src/prerender-routes.txt"
+						},
+						"assets": [
+							{
+								"glob": "**/*",
+								"input": "projects/wawjs.wiki/src/assets"
+							}
+						],
+						"styles": ["projects/wawjs.wiki/src/styles.scss"]
+					},
+					"configurations": {
+						"production": {
+							"budgets": [
+								{
+									"type": "initial",
+									"maximumWarning": "500kB",
+									"maximumError": "1MB"
+								},
+								{
+									"type": "anyComponentStyle",
+									"maximumWarning": "8kB",
+									"maximumError": "12kB"
+								}
+							],
+							"outputHashing": "all"
+						},
+						"development": {
+							"optimization": false,
+							"extractLicenses": false,
+							"sourceMap": true
+						}
+					},
+					"defaultConfiguration": "production"
+				},
+				"serve": {
+					"builder": "@angular/build:dev-server",
+					"configurations": {
+						"production": {
+							"buildTarget": "wawjs.wiki:build:production"
+						},
+						"development": {
+							"buildTarget": "wawjs.wiki:build:development"
+						}
+					},
+					"defaultConfiguration": "development"
+				}
+			}
+		},
+		"ngx-ace-app": {
+			"projectType": "application",
+			"root": "projects/ngx-ace-app",
+			"sourceRoot": "projects/ngx-ace-app/src",
+			"prefix": "app",
+			"architect": {
+				"build": {
+					"builder": "@angular/build:application",
+					"options": {
+						"browser": "projects/ngx-ace-app/src/main.ts",
+						"server": "projects/ngx-ace-app/src/main.server.ts",
+						"index": "projects/ngx-ace-app/src/index.html",
+						"tsConfig": "projects/ngx-ace-app/tsconfig.app.json",
+						"prerender": {
+							"discoverRoutes": true,
+							"routesFile": "projects/ngx-ace-app/src/prerender-routes.txt"
+						},
+						"assets": [
+							{
+								"glob": "**/*",
+								"input": "projects/ngx-ace-app/src/assets"
+							}
+						],
+						"styles": ["projects/ngx-ace-app/src/styles.scss"]
+					},
+					"configurations": {
+						"production": {
+							"budgets": [
+								{
+									"type": "initial",
+									"maximumWarning": "500kB",
+									"maximumError": "1MB"
+								},
+								{
+									"type": "anyComponentStyle",
+									"maximumWarning": "8kB",
+									"maximumError": "12kB"
+								}
+							],
+							"outputHashing": "all"
+						},
+						"development": {
+							"optimization": false,
+							"extractLicenses": false,
+							"sourceMap": true
+						}
+					},
+					"defaultConfiguration": "production"
+				},
+				"serve": {
+					"builder": "@angular/build:dev-server",
+					"configurations": {
+						"production": {
+							"buildTarget": "ngx-ace-app:build:production"
+						},
+						"development": {
+							"buildTarget": "ngx-ace-app:build:development"
+						}
+					},
+					"defaultConfiguration": "development"
+				}
+			}
+		},
+		"ngx-fabric-app": {
+			"projectType": "application",
+			"root": "projects/ngx-fabric-app",
+			"sourceRoot": "projects/ngx-fabric-app/src",
+			"prefix": "app",
+			"architect": {
+				"build": {
+					"builder": "@angular/build:application",
+					"options": {
+						"browser": "projects/ngx-fabric-app/src/main.ts",
+						"server": "projects/ngx-fabric-app/src/main.server.ts",
+						"index": "projects/ngx-fabric-app/src/index.html",
+						"tsConfig": "projects/ngx-fabric-app/tsconfig.app.json",
+						"prerender": {
+							"discoverRoutes": true,
+							"routesFile": "projects/ngx-fabric-app/src/prerender-routes.txt"
+						},
+						"assets": [
+							{
+								"glob": "**/*",
+								"input": "projects/ngx-fabric-app/src/assets"
+							}
+						],
+						"styles": ["projects/ngx-fabric-app/src/styles.scss"]
+					},
+					"configurations": {
+						"production": {
+							"budgets": [
+								{
+									"type": "initial",
+									"maximumWarning": "500kB",
+									"maximumError": "1MB"
+								},
+								{
+									"type": "anyComponentStyle",
+									"maximumWarning": "8kB",
+									"maximumError": "12kB"
+								}
+							],
+							"outputHashing": "all"
+						},
+						"development": {
+							"optimization": false,
+							"extractLicenses": false,
+							"sourceMap": true
+						}
+					},
+					"defaultConfiguration": "production"
+				},
+				"serve": {
+					"builder": "@angular/build:dev-server",
+					"configurations": {
+						"production": {
+							"buildTarget": "ngx-fabric-app:build:production"
+						},
+						"development": {
+							"buildTarget": "ngx-fabric-app:build:development"
+						}
+					},
+					"defaultConfiguration": "development"
+				}
+			}
+		},
+		"ngx-http-app": {
+			"projectType": "application",
+			"root": "projects/ngx-http-app",
+			"sourceRoot": "projects/ngx-http-app/src",
+			"prefix": "app",
+			"architect": {
+				"build": {
+					"builder": "@angular/build:application",
+					"options": {
+						"browser": "projects/ngx-http-app/src/main.ts",
+						"server": "projects/ngx-http-app/src/main.server.ts",
+						"index": "projects/ngx-http-app/src/index.html",
+						"tsConfig": "projects/ngx-http-app/tsconfig.app.json",
+						"prerender": {
+							"discoverRoutes": true,
+							"routesFile": "projects/ngx-http-app/src/prerender-routes.txt"
+						},
+						"assets": [
+							{
+								"glob": "**/*",
+								"input": "projects/ngx-http-app/src/assets"
+							}
+						],
+						"styles": ["projects/ngx-http-app/src/styles.scss"]
+					},
+					"configurations": {
+						"production": {
+							"budgets": [
+								{
+									"type": "initial",
+									"maximumWarning": "500kB",
+									"maximumError": "1MB"
+								},
+								{
+									"type": "anyComponentStyle",
+									"maximumWarning": "8kB",
+									"maximumError": "12kB"
+								}
+							],
+							"outputHashing": "all"
+						},
+						"development": {
+							"optimization": false,
+							"extractLicenses": false,
+							"sourceMap": true
+						}
+					},
+					"defaultConfiguration": "production"
+				},
+				"serve": {
+					"builder": "@angular/build:dev-server",
+					"configurations": {
+						"production": {
+							"buildTarget": "ngx-http-app:build:production"
+						},
+						"development": {
+							"buildTarget": "ngx-http-app:build:development"
+						}
+					},
+					"defaultConfiguration": "development"
+				}
+			}
+		},
+		"ngx-crud-app": {
+			"projectType": "application",
+			"root": "projects/ngx-crud-app",
+			"sourceRoot": "projects/ngx-crud-app/src",
+			"prefix": "app",
+			"architect": {
+				"build": {
+					"builder": "@angular/build:application",
+					"options": {
+						"browser": "projects/ngx-crud-app/src/main.ts",
+						"server": "projects/ngx-crud-app/src/main.server.ts",
+						"index": "projects/ngx-crud-app/src/index.html",
+						"tsConfig": "projects/ngx-crud-app/tsconfig.app.json",
+						"prerender": {
+							"discoverRoutes": true,
+							"routesFile": "projects/ngx-crud-app/src/prerender-routes.txt"
+						},
+						"assets": [
+							{
+								"glob": "**/*",
+								"input": "projects/ngx-crud-app/src/assets"
+							}
+						],
+						"styles": ["projects/ngx-crud-app/src/styles.scss"]
+					},
+					"configurations": {
+						"production": {
+							"budgets": [
+								{
+									"type": "initial",
+									"maximumWarning": "500kB",
+									"maximumError": "1MB"
+								},
+								{
+									"type": "anyComponentStyle",
+									"maximumWarning": "8kB",
+									"maximumError": "12kB"
+								}
+							],
+							"outputHashing": "all"
+						},
+						"development": {
+							"optimization": false,
+							"extractLicenses": false,
+							"sourceMap": true
+						}
+					},
+					"defaultConfiguration": "production"
+				},
+				"serve": {
+					"builder": "@angular/build:dev-server",
+					"configurations": {
+						"production": {
+							"buildTarget": "ngx-crud-app:build:production"
+						},
+						"development": {
+							"buildTarget": "ngx-crud-app:build:development"
+						}
+					},
+					"defaultConfiguration": "development"
+				}
+			}
+		},
+		"ngx-socket-app": {
+			"projectType": "application",
+			"root": "projects/ngx-socket-app",
+			"sourceRoot": "projects/ngx-socket-app/src",
+			"prefix": "app",
+			"architect": {
+				"build": {
+					"builder": "@angular/build:application",
+					"options": {
+						"browser": "projects/ngx-socket-app/src/main.ts",
+						"server": "projects/ngx-socket-app/src/main.server.ts",
+						"index": "projects/ngx-socket-app/src/index.html",
+						"tsConfig": "projects/ngx-socket-app/tsconfig.app.json",
+						"prerender": {
+							"discoverRoutes": true,
+							"routesFile": "projects/ngx-socket-app/src/prerender-routes.txt"
+						},
+						"assets": [
+							{
+								"glob": "**/*",
+								"input": "projects/ngx-socket-app/src/assets"
+							}
+						],
+						"styles": ["projects/ngx-socket-app/src/styles.scss"]
+					},
+					"configurations": {
+						"production": {
+							"budgets": [
+								{
+									"type": "initial",
+									"maximumWarning": "500kB",
+									"maximumError": "1MB"
+								},
+								{
+									"type": "anyComponentStyle",
+									"maximumWarning": "8kB",
+									"maximumError": "12kB"
+								}
+							],
+							"outputHashing": "all"
+						},
+						"development": {
+							"optimization": false,
+							"extractLicenses": false,
+							"sourceMap": true
+						}
+					},
+					"defaultConfiguration": "production"
+				},
+				"serve": {
+					"builder": "@angular/build:dev-server",
+					"configurations": {
+						"production": {
+							"buildTarget": "ngx-socket-app:build:production"
+						},
+						"development": {
+							"buildTarget": "ngx-socket-app:build:development"
+						}
+					},
+					"defaultConfiguration": "development"
+				}
+			}
+		},
+		"ngx-rtc-app": {
+			"projectType": "application",
+			"root": "projects/ngx-rtc-app",
+			"sourceRoot": "projects/ngx-rtc-app/src",
+			"prefix": "app",
+			"architect": {
+				"build": {
+					"builder": "@angular/build:application",
+					"options": {
+						"browser": "projects/ngx-rtc-app/src/main.ts",
+						"server": "projects/ngx-rtc-app/src/main.server.ts",
+						"index": "projects/ngx-rtc-app/src/index.html",
+						"tsConfig": "projects/ngx-rtc-app/tsconfig.app.json",
+						"prerender": {
+							"discoverRoutes": true,
+							"routesFile": "projects/ngx-rtc-app/src/prerender-routes.txt"
+						},
+						"assets": [
+							{
+								"glob": "**/*",
+								"input": "projects/ngx-rtc-app/src/assets"
+							}
+						],
+						"styles": ["projects/ngx-rtc-app/src/styles.scss"]
+					},
+					"configurations": {
+						"production": {
+							"budgets": [
+								{
+									"type": "initial",
+									"maximumWarning": "500kB",
+									"maximumError": "1MB"
+								},
+								{
+									"type": "anyComponentStyle",
+									"maximumWarning": "8kB",
+									"maximumError": "12kB"
+								}
+							],
+							"outputHashing": "all"
+						},
+						"development": {
+							"optimization": false,
+							"extractLicenses": false,
+							"sourceMap": true
+						}
+					},
+					"defaultConfiguration": "production"
+				},
+				"serve": {
+					"builder": "@angular/build:dev-server",
+					"configurations": {
+						"production": {
+							"buildTarget": "ngx-rtc-app:build:production"
+						},
+						"development": {
+							"buildTarget": "ngx-rtc-app:build:development"
+						}
+					},
+					"defaultConfiguration": "development"
+				}
+			}
+		},
+		"ngx-translate-app": {
+			"projectType": "application",
+			"root": "projects/ngx-translate-app",
+			"sourceRoot": "projects/ngx-translate-app/src",
+			"prefix": "app",
+			"architect": {
+				"build": {
+					"builder": "@angular/build:application",
+					"options": {
+						"browser": "projects/ngx-translate-app/src/main.ts",
+						"server": "projects/ngx-translate-app/src/main.server.ts",
+						"index": "projects/ngx-translate-app/src/index.html",
+						"tsConfig": "projects/ngx-translate-app/tsconfig.app.json",
+						"prerender": {
+							"discoverRoutes": true,
+							"routesFile": "projects/ngx-translate-app/src/prerender-routes.txt"
+						},
+						"assets": [
+							{
+								"glob": "**/*",
+								"input": "projects/ngx-translate-app/src/assets"
+							}
+						],
+						"styles": ["projects/ngx-translate-app/src/styles.scss"]
+					},
+					"configurations": {
+						"production": {
+							"budgets": [
+								{
+									"type": "initial",
+									"maximumWarning": "500kB",
+									"maximumError": "1MB"
+								},
+								{
+									"type": "anyComponentStyle",
+									"maximumWarning": "8kB",
+									"maximumError": "12kB"
+								}
+							],
+							"outputHashing": "all"
+						},
+						"development": {
+							"optimization": false,
+							"extractLicenses": false,
+							"sourceMap": true
+						}
+					},
+					"defaultConfiguration": "production"
+				},
+				"serve": {
+					"builder": "@angular/build:dev-server",
+					"configurations": {
+						"production": {
+							"buildTarget": "ngx-translate-app:build:production"
+						},
+						"development": {
+							"buildTarget": "ngx-translate-app:build:development"
+						}
+					},
+					"defaultConfiguration": "development"
+				}
+			}
+		},
+		"ngx-tinymce-app": {
+			"projectType": "application",
+			"root": "projects/ngx-tinymce-app",
+			"sourceRoot": "projects/ngx-tinymce-app/src",
+			"prefix": "app",
+			"architect": {
+				"build": {
+					"builder": "@angular/build:application",
+					"options": {
+						"browser": "projects/ngx-tinymce-app/src/main.ts",
+						"server": "projects/ngx-tinymce-app/src/main.server.ts",
+						"index": "projects/ngx-tinymce-app/src/index.html",
+						"tsConfig": "projects/ngx-tinymce-app/tsconfig.app.json",
+						"prerender": {
+							"discoverRoutes": true,
+							"routesFile": "projects/ngx-tinymce-app/src/prerender-routes.txt"
+						},
+						"assets": [
+							{
+								"glob": "**/*",
+								"input": "projects/ngx-tinymce-app/src/assets"
+							}
+						],
+						"styles": ["projects/ngx-tinymce-app/src/styles.scss"]
+					},
+					"configurations": {
+						"production": {
+							"budgets": [
+								{
+									"type": "initial",
+									"maximumWarning": "500kB",
+									"maximumError": "1MB"
+								},
+								{
+									"type": "anyComponentStyle",
+									"maximumWarning": "8kB",
+									"maximumError": "12kB"
+								}
+							],
+							"outputHashing": "all"
+						},
+						"development": {
+							"optimization": false,
+							"extractLicenses": false,
+							"sourceMap": true
+						}
+					},
+					"defaultConfiguration": "production"
+				},
+				"serve": {
+					"builder": "@angular/build:dev-server",
+					"configurations": {
+						"production": {
+							"buildTarget": "ngx-tinymce-app:build:production"
+						},
+						"development": {
+							"buildTarget": "ngx-tinymce-app:build:development"
+						}
+					},
+					"defaultConfiguration": "development"
+				}
+			}
+		},
+		"ngx-ui-app": {
+			"projectType": "application",
+			"root": "projects/ngx-ui-app",
+			"sourceRoot": "projects/ngx-ui-app/src",
+			"prefix": "app",
+			"architect": {
+				"build": {
+					"builder": "@angular/build:application",
+					"options": {
+						"browser": "projects/ngx-ui-app/src/main.ts",
+						"server": "projects/ngx-ui-app/src/main.server.ts",
+						"index": "projects/ngx-ui-app/src/index.html",
+						"tsConfig": "projects/ngx-ui-app/tsconfig.app.json",
+						"prerender": {
+							"discoverRoutes": true,
+							"routesFile": "projects/ngx-ui-app/src/prerender-routes.txt"
+						},
+						"assets": [
+							{
+								"glob": "**/*",
+								"input": "projects/ngx-ui-app/src/assets"
+							}
+						],
+						"styles": ["projects/ngx-ui-app/src/styles.scss"]
+					},
+					"configurations": {
+						"production": {
+							"budgets": [
+								{
+									"type": "initial",
+									"maximumWarning": "500kB",
+									"maximumError": "1MB"
+								},
+								{
+									"type": "anyComponentStyle",
+									"maximumWarning": "8kB",
+									"maximumError": "12kB"
+								}
+							],
+							"outputHashing": "all"
+						},
+						"development": {
+							"optimization": false,
+							"extractLicenses": false,
+							"sourceMap": true
+						}
+					},
+					"defaultConfiguration": "production"
+				},
+				"serve": {
+					"builder": "@angular/build:dev-server",
+					"configurations": {
+						"production": {
+							"buildTarget": "ngx-ui-app:build:production"
+						},
+						"development": {
+							"buildTarget": "ngx-ui-app:build:development"
+						}
+					},
+					"defaultConfiguration": "development"
+				}
+			}
+		},
 		"ngx-core": {
 			"projectType": "library",
 			"root": "projects/ngx-core",
@@ -86,6 +842,236 @@
 						},
 						"development": {
 							"tsConfig": "projects/ngx-core/tsconfig.lib.json"
+						}
+					},
+					"defaultConfiguration": "production"
+				}
+			}
+		},
+		"ngx-ace": {
+			"projectType": "library",
+			"root": "projects/ngx-ace",
+			"sourceRoot": "projects/ngx-ace/src",
+			"prefix": "lib",
+			"architect": {
+				"build": {
+					"builder": "@angular/build:ng-packagr",
+					"options": {
+						"project": "projects/ngx-ace/ng-package.json"
+					},
+					"configurations": {
+						"production": {
+							"tsConfig": "projects/ngx-ace/tsconfig.lib.prod.json"
+						},
+						"development": {
+							"tsConfig": "projects/ngx-ace/tsconfig.lib.json"
+						}
+					},
+					"defaultConfiguration": "production"
+				}
+			}
+		},
+		"ngx-fabric": {
+			"projectType": "library",
+			"root": "projects/ngx-fabric",
+			"sourceRoot": "projects/ngx-fabric/src",
+			"prefix": "lib",
+			"architect": {
+				"build": {
+					"builder": "@angular/build:ng-packagr",
+					"options": {
+						"project": "projects/ngx-fabric/ng-package.json"
+					},
+					"configurations": {
+						"production": {
+							"tsConfig": "projects/ngx-fabric/tsconfig.lib.prod.json"
+						},
+						"development": {
+							"tsConfig": "projects/ngx-fabric/tsconfig.lib.json"
+						}
+					},
+					"defaultConfiguration": "production"
+				}
+			}
+		},
+		"ngx-datetime": {
+			"projectType": "library",
+			"root": "projects/ngx-datetime",
+			"sourceRoot": "projects/ngx-datetime/src",
+			"prefix": "lib",
+			"architect": {
+				"build": {
+					"builder": "@angular/build:ng-packagr",
+					"options": {
+						"project": "projects/ngx-datetime/ng-package.json"
+					},
+					"configurations": {
+						"production": {
+							"tsConfig": "projects/ngx-datetime/tsconfig.lib.prod.json"
+						},
+						"development": {
+							"tsConfig": "projects/ngx-datetime/tsconfig.lib.json"
+						}
+					},
+					"defaultConfiguration": "production"
+				}
+			}
+		},
+		"ngx-http": {
+			"projectType": "library",
+			"root": "projects/ngx-http",
+			"sourceRoot": "projects/ngx-http/src",
+			"prefix": "lib",
+			"architect": {
+				"build": {
+					"builder": "@angular/build:ng-packagr",
+					"options": {
+						"project": "projects/ngx-http/ng-package.json"
+					},
+					"configurations": {
+						"production": {
+							"tsConfig": "projects/ngx-http/tsconfig.lib.prod.json"
+						},
+						"development": {
+							"tsConfig": "projects/ngx-http/tsconfig.lib.json"
+						}
+					},
+					"defaultConfiguration": "production"
+				}
+			}
+		},
+		"ngx-crud": {
+			"projectType": "library",
+			"root": "projects/ngx-crud",
+			"sourceRoot": "projects/ngx-crud/src",
+			"prefix": "lib",
+			"architect": {
+				"build": {
+					"builder": "@angular/build:ng-packagr",
+					"options": {
+						"project": "projects/ngx-crud/ng-package.json"
+					},
+					"configurations": {
+						"production": {
+							"tsConfig": "projects/ngx-crud/tsconfig.lib.prod.json"
+						},
+						"development": {
+							"tsConfig": "projects/ngx-crud/tsconfig.lib.json"
+						}
+					},
+					"defaultConfiguration": "production"
+				}
+			}
+		},
+		"ngx-socket": {
+			"projectType": "library",
+			"root": "projects/ngx-socket",
+			"sourceRoot": "projects/ngx-socket/src",
+			"prefix": "lib",
+			"architect": {
+				"build": {
+					"builder": "@angular/build:ng-packagr",
+					"options": {
+						"project": "projects/ngx-socket/ng-package.json"
+					},
+					"configurations": {
+						"production": {
+							"tsConfig": "projects/ngx-socket/tsconfig.lib.prod.json"
+						},
+						"development": {
+							"tsConfig": "projects/ngx-socket/tsconfig.lib.json"
+						}
+					},
+					"defaultConfiguration": "production"
+				}
+			}
+		},
+		"ngx-rtc": {
+			"projectType": "library",
+			"root": "projects/ngx-rtc",
+			"sourceRoot": "projects/ngx-rtc/src",
+			"prefix": "lib",
+			"architect": {
+				"build": {
+					"builder": "@angular/build:ng-packagr",
+					"options": {
+						"project": "projects/ngx-rtc/ng-package.json"
+					},
+					"configurations": {
+						"production": {
+							"tsConfig": "projects/ngx-rtc/tsconfig.lib.prod.json"
+						},
+						"development": {
+							"tsConfig": "projects/ngx-rtc/tsconfig.lib.json"
+						}
+					},
+					"defaultConfiguration": "production"
+				}
+			}
+		},
+		"ngx-translate": {
+			"projectType": "library",
+			"root": "projects/ngx-translate",
+			"sourceRoot": "projects/ngx-translate/src",
+			"prefix": "lib",
+			"architect": {
+				"build": {
+					"builder": "@angular/build:ng-packagr",
+					"options": {
+						"project": "projects/ngx-translate/ng-package.json"
+					},
+					"configurations": {
+						"production": {
+							"tsConfig": "projects/ngx-translate/tsconfig.lib.prod.json"
+						},
+						"development": {
+							"tsConfig": "projects/ngx-translate/tsconfig.lib.json"
+						}
+					},
+					"defaultConfiguration": "production"
+				}
+			}
+		},
+		"ngx-tinymce": {
+			"projectType": "library",
+			"root": "projects/ngx-tinymce",
+			"sourceRoot": "projects/ngx-tinymce/src",
+			"prefix": "lib",
+			"architect": {
+				"build": {
+					"builder": "@angular/build:ng-packagr",
+					"options": {
+						"project": "projects/ngx-tinymce/ng-package.json"
+					},
+					"configurations": {
+						"production": {
+							"tsConfig": "projects/ngx-tinymce/tsconfig.lib.prod.json"
+						},
+						"development": {
+							"tsConfig": "projects/ngx-tinymce/tsconfig.lib.json"
+						}
+					},
+					"defaultConfiguration": "production"
+				}
+			}
+		},
+		"ngx-ui": {
+			"projectType": "library",
+			"root": "projects/ngx-ui",
+			"sourceRoot": "projects/ngx-ui/src",
+			"prefix": "lib",
+			"architect": {
+				"build": {
+					"builder": "@angular/build:ng-packagr",
+					"options": {
+						"project": "projects/ngx-ui/ng-package.json"
+					},
+					"configurations": {
+						"production": {
+							"tsConfig": "projects/ngx-ui/tsconfig.lib.prod.json"
+						},
+						"development": {
+							"tsConfig": "projects/ngx-ui/tsconfig.lib.json"
 						}
 					},
 					"defaultConfiguration": "production"

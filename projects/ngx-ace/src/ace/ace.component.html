@@ -1,0 +1,17 @@
+<div
+	ace
+	class="ace-host"
+	[config]="config()"
+	[disabled]="disabled()"
+	[readOnly]="readOnly()"
+	[mode]="mode()"
+	[theme]="theme()"
+	(blur)="blur.emit($event)"
+	(focus)="focus.emit($event)"
+	(copy)="copy.emit($event)"
+	(paste)="paste.emit($event)"
+	(change)="onContentChange($event)"
+	(changeCursor)="changeCursor.emit($event)"
+	(changeSession)="changeSession.emit($event)"
+	(changeSelection)="changeSelection.emit($event)"
+></div>

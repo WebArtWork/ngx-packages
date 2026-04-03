@@ -1,6 +1,8 @@
 import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
-import { provideNgxCore, provideTheme, provideTranslate } from 'ngx-core';
+import { provideNgxCore } from 'ngx-core';
+import { provideTranslate } from 'ngx-translate';
+import { provideTheme } from 'ngx-ui';
 import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
@@ -19,7 +21,7 @@ export const appConfig: ApplicationConfig = {
 				{ code: 'en', name: 'English', nativeName: 'English' },
 				{ code: 'ua', name: 'Ukrainian', nativeName: 'Українська' },
 			],
-			folder: '/assets/i18n/',
+			folder: '/i18n/',
 		}),
 		provideNgxCore({
 			meta: {
@@ -28,7 +30,7 @@ export const appConfig: ApplicationConfig = {
 					title: 'ngx-core',
 					titleSuffix: ' | Web Art Work',
 					description:
-						'Angular utility library from Web Art Work for feature-oriented services, translation helpers, UI primitives, and app-level configuration.',
+						'Angular utility library from Web Art Work for feature-oriented services, UI primitives, and app-level configuration.',
 					image: 'https://wawjs.wiki/logo.png',
 					links: {
 						canonical: 'https://wawjs.wiki/',

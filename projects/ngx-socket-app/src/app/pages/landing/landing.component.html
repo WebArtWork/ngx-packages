@@ -1,0 +1,176 @@
+<section class="landing-shell">
+	<div class="landing-hero">
+		<p class="eyebrow">Angular Realtime Library</p>
+		<h1>ngx-socket</h1>
+		<p class="summary">
+			SSR-safe Socket.IO setup for Angular apps that want one place for realtime connection
+			configuration and event flow.
+		</p>
+		<p class="subsummary">
+			One focused package for browser-only socket startup, shared connection config, and
+			reusable realtime helpers.
+		</p>
+	</div>
+
+	<article class="readme-card">
+		<header class="readme-header">
+			<div>
+				<p class="kicker">landing.ts</p>
+				<h2>Project Overview</h2>
+			</div>
+			<div class="window-actions" aria-hidden="true">
+				<span></span>
+				<span></span>
+				<span></span>
+			</div>
+		</header>
+
+		<div class="panel-content">
+			<section class="section-grid">
+				<div>
+					<p class="label">Package</p>
+					<h3>ngx-socket</h3>
+					<p>
+						Socket.IO client wiring for Angular, extracted from ngx-core and kept
+						SSR-safe by default.
+					</p>
+				</div>
+				<div>
+					<p class="label">License</p>
+					<h3>MIT</h3>
+					<p>
+						Published as a public package and designed for reuse across multiple apps.
+					</p>
+				</div>
+			</section>
+
+			<section class="doc-section">
+				<div class="section-heading">
+					<p class="label">Installation</p>
+					<h3>Install the package</h3>
+				</div>
+				<div class="code-block">
+					<button
+						type="button"
+						class="copy-button"
+						(click)="copy('install', installCommand)"
+						[attr.aria-label]="
+							copiedKey() === 'install' ? 'Copied' : 'Copy installation command'
+						"
+					>
+						<svg viewBox="0 0 24 24" aria-hidden="true">
+							<path d="M9 9h10v10H9zM5 5h10v2H7v8H5z" fill="currentColor" />
+						</svg>
+						<span>{{ copiedKey() === 'install' ? 'Copied' : 'Copy' }}</span>
+					</button>
+					<pre
+						class="readme-content"
+					><code><span class="code-prompt">$</span> {{ installCommand }}</code></pre>
+				</div>
+			</section>
+
+			<section class="doc-section">
+				<div class="section-heading">
+					<p class="label">Usage</p>
+					<h3>Bootstrap with <code>provideNgxSocket()</code></h3>
+				</div>
+				<div class="code-block">
+					<button
+						type="button"
+						class="copy-button"
+						(click)="copy('usage', usageCopy)"
+						[attr.aria-label]="
+							copiedKey() === 'usage' ? 'Copied' : 'Copy usage example'
+						"
+					>
+						<svg viewBox="0 0 24 24" aria-hidden="true">
+							<path d="M9 9h10v10H9zM5 5h10v2H7v8H5z" fill="currentColor" />
+						</svg>
+						<span>{{ copiedKey() === 'usage' ? 'Copied' : 'Copy' }}</span>
+					</button>
+					<pre
+						class="readme-content"
+					><code><span class="code-keyword">import</span> <span class="code-punctuation">&#123;</span> <span class="code-symbol">provideNgxSocket</span> <span class="code-punctuation">&#125;</span> <span class="code-keyword">from</span> <span class="code-string">'ngx-socket'</span><span class="code-punctuation">;</span>
+
+<span class="code-keyword">export const</span> <span class="code-symbol">appConfig</span> <span class="code-operator">=</span> <span class="code-punctuation">&#123;</span>
+  <span class="code-property">providers</span><span class="code-punctuation">:</span> <span class="code-punctuation">[</span><span class="code-function">provideNgxSocket</span><span class="code-punctuation">()</span><span class="code-punctuation">]</span><span class="code-punctuation">,</span>
+<span class="code-punctuation">&#125;;</span></code></pre>
+				</div>
+			</section>
+
+			<section class="doc-section">
+				<div class="section-heading">
+					<p class="label">Configuration</p>
+					<h3>Centralize realtime connection setup</h3>
+				</div>
+				<p>
+					Configure the socket endpoint and client factory once instead of scattering
+					connection setup across components.
+				</p>
+				<div class="code-block">
+					<button
+						type="button"
+						class="copy-button"
+						(click)="copy('config', configCopy)"
+						[attr.aria-label]="
+							copiedKey() === 'config' ? 'Copied' : 'Copy configuration example'
+						"
+					>
+						<svg viewBox="0 0 24 24" aria-hidden="true">
+							<path d="M9 9h10v10H9zM5 5h10v2H7v8H5z" fill="currentColor" />
+						</svg>
+						<span>{{ copiedKey() === 'config' ? 'Copied' : 'Copy' }}</span>
+					</button>
+					<pre
+						class="readme-content"
+					><code><span class="code-keyword">import</span> <span class="code-punctuation">&#123;</span> <span class="code-symbol">provideNgxSocket</span> <span class="code-punctuation">&#125;</span> <span class="code-keyword">from</span> <span class="code-string">'ngx-socket'</span><span class="code-punctuation">;</span>
+<span class="code-keyword">import</span> <span class="code-punctuation">&#123;</span> <span class="code-symbol">io</span> <span class="code-punctuation">&#125;</span> <span class="code-keyword">from</span> <span class="code-string">'socket.io-client'</span><span class="code-punctuation">;</span>
+
+<span class="code-keyword">export const</span> <span class="code-symbol">appConfig</span> <span class="code-operator">=</span> <span class="code-punctuation">&#123;</span>
+  <span class="code-property">providers</span><span class="code-punctuation">:</span> <span class="code-punctuation">[</span>
+    <span class="code-function">provideNgxSocket</span><span class="code-punctuation">(</span><span class="code-punctuation">&#123;</span>
+      <span class="code-property">socket</span><span class="code-punctuation">:</span> <span class="code-punctuation">&#123;</span>
+        <span class="code-property">url</span><span class="code-punctuation">:</span> <span class="code-string">'https://realtime.example.com'</span><span class="code-punctuation">,</span>
+        <span class="code-property">opts</span><span class="code-punctuation">:</span> <span class="code-punctuation">&#123;</span> <span class="code-property">transports</span><span class="code-punctuation">:</span> <span class="code-punctuation">[</span><span class="code-string">'websocket'</span><span class="code-punctuation">]</span> <span class="code-punctuation">&#125;</span><span class="code-punctuation">,</span>
+      <span class="code-punctuation">&#125;</span><span class="code-punctuation">,</span>
+      <span class="code-property">io</span><span class="code-punctuation">:</span> <span class="code-symbol">io</span><span class="code-punctuation">,</span>
+    <span class="code-punctuation">&#125;</span><span class="code-punctuation">)</span><span class="code-punctuation">,</span>
+  <span class="code-punctuation">]</span><span class="code-punctuation">,</span>
+<span class="code-punctuation">&#125;;</span></code></pre>
+				</div>
+			</section>
+
+			<section class="doc-section">
+				<div class="section-heading">
+					<p class="label">Features</p>
+					<h3>What ngx-socket includes</h3>
+				</div>
+				<div class="service-list">
+					@for (feature of featureGroups; track feature.title) {
+						<article class="service-item">
+							<h4>{{ feature.title }}</h4>
+							<p>{{ feature.description }}</p>
+							<p>{{ feature.items.join(' | ') }}</p>
+						</article>
+					}
+				</div>
+			</section>
+
+			<section class="doc-section">
+				<div class="section-heading">
+					<p class="label">Reference</p>
+					<h3>Documented feature pages</h3>
+				</div>
+				<p>The detailed page below covers the Socket feature and its public API surface.</p>
+				<div class="service-list">
+					@for (service of services; track service.name) {
+						<a class="service-item" [routerLink]="['/services', service.slug]">
+							<h4>{{ service.name }}</h4>
+							<p>{{ service.description }}</p>
+						</a>
+					}
+				</div>
+			</section>
+		</div>
+	</article>
+</section>
