@@ -1,9 +1,7 @@
 name: Deploy to GitHub Pages
 
 on:
-    pull_request_review:
-        types:
-            - submitted
+    push:
         branches:
             - master
 
