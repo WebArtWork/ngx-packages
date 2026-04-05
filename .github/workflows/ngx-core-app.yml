@@ -27,13 +27,19 @@ jobs:
               run: npm rebuild lightningcss
 
             - name: Build App
-              run: ng build ngx-core-app
+              run: |
+                ng build ngx-core-app
+                ng build ngx-ui-app
 
             - name: Copy CNAME file
-              run: cp projects/ngx-core-app/CNAME dist/ngx-core-app/browser/
+              run: |
+                cp projects/ngx-core-app/CNAME dist/ngx-core-app/browser/
+                cp projects/ngx-ui-app/CNAME dist/ngx-ui-app/browser/
 
             - name: Copy README file
-              run: cp projects/ngx-core/README.md dist/ngx-core-app/browser/
+              run: |
+                cp projects/ngx-core/README.md dist/ngx-core-app/browser/
+                cp projects/ngx-ui/README.md dist/ngx-ui-app/browser/
 
             - name: Set up SSH
               env:
@@ -56,6 +62,12 @@ jobs:
                   git commit -m "Deploy to GitHub Pages"
                   git checkout -B gh-pages  # Switch to gh-pages branch
                   git push git@github.com:WebArtWork/ngx-core.webart.work gh-pages --force
+                  cd dist/ngx-ui-app/browser
+                  git init  # Initialize a new git repository
+                  git add --all .  # Add all changes
+                  git commit -m "Deploy to GitHub Pages"
+                  git checkout -B gh-pages  # Switch to gh-pages branch
+                  git push git@github.com:WebArtWork/ngx-ui.webart.work gh-pages --force
 
             - name: Clean up SSH
               run: |
