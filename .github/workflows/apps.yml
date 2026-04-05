@@ -27,25 +27,7 @@ jobs:
               run: npm rebuild lightningcss
 
             - name: Build apps
-              run: |
-                apps=(
-                  ngx-datetime-app
-                  ngx-core-app
-                  ngx-app
-                  ngx-ace-app
-                  ngx-fabric-app
-                  ngx-http-app
-                  ngx-crud-app
-                  ngx-socket-app
-                  ngx-rtc-app
-                  ngx-translate-app
-                  ngx-tinymce-app
-                  ngx-ui-app
-                )
-
-                for app in "${apps[@]}"; do
-                  ng build "$app"
-                done
+              run: npm run build:apps
 
             - name: Copy CNAME and README files
               run: |

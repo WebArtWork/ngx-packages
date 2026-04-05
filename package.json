@@ -3,6 +3,7 @@
 	"version": "21.3.0",
 	"scripts": {
 		"start": "ng serve ngx-core-app",
+		"build:apps": "node scripts/build-apps.mjs",
 		"publish": "node scripts/publish.mjs",
 		"start:ace": "ng serve ngx-ace-app",
 		"start:fabric": "ng serve ngx-fabric-app",

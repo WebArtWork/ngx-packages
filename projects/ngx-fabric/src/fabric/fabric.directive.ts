@@ -15,7 +15,12 @@ import {
 	Output,
 	SimpleChanges,
 } from '@angular/core';
-import { Canvas, type CanvasOptions, StaticCanvas, type StaticCanvasOptions } from 'fabric';
+import {
+	Canvas,
+	type CanvasOptions,
+	StaticCanvas,
+	type StaticCanvasOptions,
+} from 'fabric';
 import ResizeObserver from 'resize-observer-polyfill';
 import {
 	FABRIC_CONFIG,
@@ -24,6 +29,8 @@ import {
 	type FabricEvent,
 	FabricEvents,
 } from './fabric.interfaces';
+
+type FabricLoadFromJSONReviver = Parameters<Canvas['loadFromJSON']>[1];
 
 @Directive({
 	selector: '[fabric]',
@@ -253,7 +260,7 @@ export class FabricDirective implements OnInit, OnDestroy, DoCheck, OnChanges {
 	loadFromJSON(
 		json: string | object,
 		callback?: () => boolean | void,
-		reviverOpt?: unknown,
+		reviverOpt?: FabricLoadFromJSONReviver,
 	): void {
 		if (!this._instance) {
 			return;

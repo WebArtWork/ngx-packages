@@ -186,7 +186,7 @@ export const appConfig = {
 			{
 				name: 'loadFromJSON',
 				signature:
-					'loadFromJSON(json: object, callback?: () => boolean | void, reviverOpt?: unknown): void',
+					'loadFromJSON(json: object, callback?: () => boolean | void, reviverOpt?: EnlivenObjectOptions["reviver"]): void',
 				description:
 					'Populates the Fabric canvas from JSON and renders automatically unless the callback returns false.',
 				category: 'Data loading',
