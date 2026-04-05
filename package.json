@@ -1,14 +1,14 @@
 {
 	"name": "ngx-packages",
-	"version": "21.3.0",
+	"version": "21.3.1",
 	"scripts": {
 		"start": "ng serve ngx-core-app",
 		"build:apps": "node scripts/build-apps.mjs",
+		"build:libs": "node scripts/build-libs.mjs",
 		"publish": "node scripts/publish.mjs",
 		"start:ace": "ng serve ngx-ace-app",
 		"start:fabric": "ng serve ngx-fabric-app",
 		"start:core": "ng serve ngx-core-app",
-		"start:app": "ng serve ngx-app",
 		"start:datetime": "ng serve ngx-datetime-app",
 		"start:http": "ng serve ngx-http-app",
 		"start:crud": "ng serve ngx-crud-app",
@@ -17,6 +17,7 @@
 		"start:translate": "ng serve ngx-translate-app",
 		"start:tinymce": "ng serve ngx-tinymce-app",
 		"start:ui": "ng serve ngx-ui-app",
+		"start:app": "ng serve ngx-app",
 		"start:wiki": "ng serve wawjs.wiki"
 	},
 	"dependencies": {
