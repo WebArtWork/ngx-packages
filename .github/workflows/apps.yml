@@ -26,23 +26,54 @@ jobs:
             - name: Rebuild lightningcss
               run: npm rebuild lightningcss
 
-            - name: Build App
+            - name: Build apps
               run: |
-                ng build ngx-core-app
-                ng build ngx-ui-app
-                ng build ngx-translate-app
+                apps=(
+                  ngx-datetime-app
+                  ngx-core-app
+                  ngx-app
+                  ngx-ace-app
+                  ngx-fabric-app
+                  ngx-http-app
+                  ngx-crud-app
+                  ngx-socket-app
+                  ngx-rtc-app
+                  ngx-translate-app
+                  ngx-tinymce-app
+                  ngx-ui-app
+                )
 
-            - name: Copy CNAME file
-              run: |
-                cp projects/ngx-core-app/CNAME dist/ngx-core-app/browser/
-                cp projects/ngx-ui-app/CNAME dist/ngx-ui-app/browser/
-                cp projects/ngx-translate-app/CNAME dist/ngx-translate-app/browser/
+                for app in "${apps[@]}"; do
+                  ng build "$app"
+                done
 
-            - name: Copy README file
+            - name: Copy CNAME and README files
               run: |
-                cp projects/ngx-core/README.md dist/ngx-core-app/browser/
-                cp projects/ngx-translate/README.md dist/ngx-translate-app/browser/
-                cp projects/ngx-ui/README.md dist/ngx-ui-app/browser/
+                apps=(
+                  ngx-datetime-app
+                  ngx-core-app
+                  ngx-app
+                  ngx-ace-app
+                  ngx-fabric-app
+                  ngx-http-app
+                  ngx-crud-app
+                  ngx-socket-app
+                  ngx-rtc-app
+                  ngx-translate-app
+                  ngx-tinymce-app
+                  ngx-ui-app
+                )
+
+                for app in "${apps[@]}"; do
+                  cp "projects/$app/CNAME" "dist/$app/browser/"
+
+                  package_name="${app%-app}"
+                  readme_path="projects/$package_name/README.md"
+
+                  if [ -f "$readme_path" ]; then
+                    cp "$readme_path" "dist/$app/browser/"
+                  fi
+                done
 
             - name: Set up SSH
               env:
@@ -55,38 +86,36 @@ jobs:
                   git config --global user.name "github-actions[bot]"
                   git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-            - name: Commit and push to gh-pages using SSH
+            - name: Deploy apps to gh-pages using SSH
               env:
                   GIT_SSH_COMMAND: 'ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no'
               run: |
-                  cd dist/ngx-core-app/browser
-                  git init  # Initialize a new git repository
-                  git add --all .  # Add all changes
-                  git commit -m "Deploy to GitHub Pages"
-                  git checkout -B gh-pages  # Switch to gh-pages branch
-                  git push git@github.com:WebArtWork/ngx-core.webart.work gh-pages --force
+                  apps=(
+                    ngx-datetime-app
+                    ngx-core-app
+                    ngx-app
+                    ngx-ace-app
+                    ngx-fabric-app
+                    ngx-http-app
+                    ngx-crud-app
+                    ngx-socket-app
+                    ngx-rtc-app
+                    ngx-translate-app
+                    ngx-tinymce-app
+                    ngx-ui-app
+                  )
 
-            - name: Commit and push to gh-pages using SSH
-              env:
-                  GIT_SSH_COMMAND: 'ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no'
-              run: |
-                  cd dist/ngx-ui-app/browser
-                  git init  # Initialize a new git repository
-                  git add --all .  # Add all changes
-                  git commit -m "Deploy to GitHub Pages"
-                  git checkout -B gh-pages  # Switch to gh-pages branch
-                  git push git@github.com:WebArtWork/ngx-ui.webart.work gh-pages --force
+                  for app in "${apps[@]}"; do
+                    domain="${app%-app}.webart.work"
 
-            - name: Commit and push to gh-pages using SSH
-              env:
-                  GIT_SSH_COMMAND: 'ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no'
-              run: |
-                  cd dist/ngx-translate-app/browser
-                  git init  # Initialize a new git repository
-                  git add --all .  # Add all changes
-                  git commit -m "Deploy to GitHub Pages"
-                  git checkout -B gh-pages  # Switch to gh-pages branch
-                  git push git@github.com:WebArtWork/ngx-translate.webart.work gh-pages --force
+                    pushd "dist/$app/browser"
+                    git init
+                    git add --all .
+                    git commit -m "Deploy to GitHub Pages"
+                    git checkout -B gh-pages
+                    git push "git@github.com:WebArtWork/$domain" gh-pages --force
+                    popd
+                  done
 
             - name: Clean up SSH
               run: |
