@@ -1,25 +1,28 @@
 name: Deploy to GitHub Pages
 
 on:
-    push:
+    pull_request_review:
+        types:
+            - submitted
         branches:
             - master
 
 jobs:
     deploy:
+        if: github.event.review.state == 'approved'
         runs-on: ubuntu-latest
 
         steps:
             - name: Checkout repository
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
 
             - name: Install Node.js
-              uses: actions/setup-node@v3
+              uses: actions/setup-node@v4
               with:
-                  node-version: '20'
+                  node-version: '24'
 
             - name: Install dependencies
-              run: npm install --legacy-peer-deps
+              run: npm install
 
             - name: Rebuild lightningcss
               run: npm rebuild lightningcss
@@ -28,10 +31,10 @@ jobs:
               run: npm run build:app
 
             - name: Copy CNAME file
-              run: cp CNAME dist/app/browser/
+              run: cp projects/ngx-core-app/CNAME dist/ngx-core-app/browser/
 
             - name: Copy CNAME file
-              run: cp README.md dist/app/browser/
+              run: cp projects/ngx-core/README.md dist/app/browser/
 
             - name: Set up SSH
               env:
@@ -53,7 +56,7 @@ jobs:
                   git add --all .  # Add all changes
                   git commit -m "Deploy to GitHub Pages"
                   git checkout -B gh-pages  # Switch to gh-pages branch
-                  git push git@github.com:${{ github.repository }} gh-pages --force
+                  git push git@github.com:WebArtWork/ngx-core.webart.work gh-pages --force
 
             - name: Clean up SSH
               run: |
