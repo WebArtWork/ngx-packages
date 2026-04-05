@@ -49,19 +49,24 @@ jobs:
                   echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
                   chmod 600 ~/.ssh/id_rsa
                   ssh-keyscan github.com >> ~/.ssh/known_hosts
+                  git config --global user.name "github-actions[bot]"
+                  git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
             - name: Commit and push to gh-pages using SSH
               env:
                   GIT_SSH_COMMAND: 'ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no'
               run: |
-                  git config --global user.name "github-actions[bot]"
-                  git config --global user.email "github-actions[bot]@users.noreply.github.com"
                   cd dist/ngx-core-app/browser
                   git init  # Initialize a new git repository
                   git add --all .  # Add all changes
                   git commit -m "Deploy to GitHub Pages"
                   git checkout -B gh-pages  # Switch to gh-pages branch
                   git push git@github.com:WebArtWork/ngx-core.webart.work gh-pages --force
+
+            - name: Commit and push to gh-pages using SSH
+              env:
+                  GIT_SSH_COMMAND: 'ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no'
+              run: |
                   cd dist/ngx-ui-app/browser
                   git init  # Initialize a new git repository
                   git add --all .  # Add all changes
