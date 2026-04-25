@@ -1,6 +1,6 @@
 {
 	"name": "ngx-packages",
-	"version": "21.3.1",
+	"version": "21.3.2",
 	"scripts": {
 		"start": "ng serve ngx-core-app",
 		"build:apps": "node scripts/build-apps.mjs",
@@ -21,30 +21,27 @@
 		"start:wiki": "ng serve wawjs.wiki"
 	},
 	"dependencies": {
-		"@angular/common": "21.2.7",
-		"@angular/compiler": "21.2.7",
-		"@angular/core": "21.2.7",
-		"@angular/forms": "21.2.7",
-		"@angular/platform-browser": "21.2.7",
-		"@angular/platform-server": "21.2.7",
-		"@angular/router": "21.2.7",
-		"@angular/ssr": "21.2.6",
+		"@angular/common": "21.2.10",
+		"@angular/compiler": "21.2.10",
+		"@angular/core": "21.2.10",
+		"@angular/forms": "21.2.10",
+		"@angular/platform-browser": "21.2.10",
+		"@angular/platform-server": "21.2.10",
+		"@angular/router": "21.2.10",
+		"@angular/ssr": "21.2.8",
 		"ace-builds": "1.43.5",
-		"fabric": "7.0.0",
+		"fabric": "7.3.1",
 		"resize-observer-polyfill": "1.5.1",
 		"rxjs": "7.8.2",
 		"tslib": "2.6.2"
 	},
 	"devDependencies": {
-		"@angular/build": "21.2.6",
-		"@angular/cli": "21.2.6",
-		"@angular/compiler-cli": "21.2.7",
+		"@angular/build": "21.2.8",
+		"@angular/cli": "21.2.8",
+		"@angular/compiler-cli": "21.2.10",
 		"ng-packagr": "21.0.0",
 		"prettier": "3.6.2",
 		"typescript": "5.9.3"
 	},
-	"overrides": {
-		"picomatch": "4.0.4",
-		"undici": "7.24.6"
-	}
+	"overrides": {}
 }

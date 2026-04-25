@@ -1,6 +1,6 @@
 import { isPlatformBrowser } from '@angular/common';
 import { inject, PLATFORM_ID, signal, WritableSignal } from '@angular/core';
-import { defer, from, Observable, switchMap } from 'rxjs';
+import { Observable, ReplaySubject } from 'rxjs';
 import { CoreService } from '../core/core.service';
 import { EmitterService } from '../emitter/emitter.service';
 import { HttpService } from '../http/http.service';
@@ -512,6 +512,17 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	}
 
 	/**
+	 * Runs an operation immediately and replays its result to later subscribers.
+	 */
+	private _hot<T>(run: (subject: ReplaySubject<T>) => void | Promise<void>): Observable<T> {
+		const subject = new ReplaySubject<T>(1);
+
+		void Promise.resolve(run(subject)).catch(err => subject.error(err));
+
+		return subject.asObservable();
+	}
+
+	/**
 	 * Fetches a list of documents from the API with optional pagination.
 	 *
 	 * @param config - Optional pagination configuration.
@@ -589,79 +600,80 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 		doc: Document = {} as Document,
 		options: CrudOptions<Document> = {},
 	): Observable<Document> {
-		return defer(() =>
-			from(this._mw(this.beforeCreate(doc, options))).pipe(
-				switchMap(mwDoc => {
-					doc = (mwDoc || doc) as Document;
+		return this._hot<Document>(async subject => {
+			doc = ((await this._mw(this.beforeCreate(doc, options))) || doc) as Document;
 
-					if (doc._id) {
-						return this.update(doc, options);
+			if (doc._id) {
+				this.update(doc, options).subscribe(subject);
+
+				return;
+			}
+
+			doc._localId ||= this._localId();
+
+			doc.__options ||= {};
+			doc.__options['create'] = options;
+
+			this.addDoc(doc);
+			this._filterDocuments();
+
+			if (!this.__networkService.isOnline()) {
+				this._onOnline.push(() => {
+					this.create(doc, options).subscribe(subject);
+				});
+
+				return;
+			}
+
+			if (doc.__creating) {
+				subject.error(new Error('Document is currently already creating.'));
+
+				return;
+			}
+
+			if (this._config.appId) {
+				doc.appId = this._config.appId;
+			}
+
+			doc.__creating = true;
+
+			const obs = this.__httpService.post(
+				`${this._url}/create${options.name || ''}`,
+				doc,
+			) as Observable<Document>;
+
+			obs.subscribe({
+				next: resp => {
+					if (resp) {
+						this.__coreService.copy(resp, doc);
+						doc.__creating = false;
+
+						this.addDoc(doc);
+						this._filterDocuments();
+
+						if (options.callback) options.callback(doc);
+
+						void this._mw(this.afterCreate(resp, doc, options));
+					} else {
+						doc.__creating = false;
+
+						if (options.errCallback) options.errCallback(resp);
 					}
 
-					doc._localId ||= this._localId();
+					this.__emitterService.emit(`${this._config.name}_create`, doc);
+					this.__emitterService.emit(`${this._config.name}_list`, doc);
+					this.__emitterService.emit(`${this._config.name}_changed`, doc);
 
-					doc.__options ||= {};
-					doc.__options['create'] = options;
-
-					this.addDoc(doc);
-					this._filterDocuments();
-
-					if (!this.__networkService.isOnline()) {
-						return new Observable(observer => {
-							this._onOnline.push(() => {
-								this.create(doc, options).subscribe(observer);
-							});
-						});
-					}
-
-					if (doc.__creating) {
-						return new Observable<Document>(observer => {
-							observer.error(new Error('Document is currently already creating.'));
-						});
-					}
-
-					if (this._config.appId) {
-						doc.appId = this._config.appId;
-					}
-
-					doc.__creating = true;
-
-					const obs = this.__httpService.post(
-						`${this._url}/create${options.name || ''}`,
-						doc,
-					);
-
-					obs.subscribe({
-						next: async (resp: unknown) => {
-							if (resp) {
-								this.__coreService.copy(resp, doc);
-
-								this.addDoc(doc);
-								this._filterDocuments();
-
-								if (options.callback) options.callback(doc);
-
-								await this._mw(this.afterCreate(resp, doc, options));
-							} else {
-								doc.__creating = false;
-
-								if (options.errCallback) options.errCallback(resp);
-							}
-
-							this.__emitterService.emit(`${this._config.name}_create`, doc);
-							this.__emitterService.emit(`${this._config.name}_list`, doc);
-							this.__emitterService.emit(`${this._config.name}_changed`, doc);
-						},
-						error: (err: unknown) => {
-							doc.__creating = false;
-							if (options.errCallback) options.errCallback(err);
-						},
-					});
-
-					return obs as Observable<Document>;
-				}),
-			),
-		) as Observable<Document>;
+					subject.next(resp);
+				},
+				error: (err: unknown) => {
+					doc.__creating = false;
+					if (options.errCallback) options.errCallback(err);
+					subject.error(err);
+				},
+				complete: () => subject.complete(),
+			});
+		});
 	}
 
 	/**
@@ -672,48 +684,46 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	 * @returns An observable that resolves with the fetched document.
 	 */
 	fetch(query: object = {}, options: CrudOptions<Document> = {}): Observable<Document> {
-		return defer(() =>
-			from(this._mw(this.beforeFetch(query, options))).pipe(
-				switchMap(mwQuery => {
-					query = (mwQuery || query) as object;
+		return this._hot<Document>(async subject => {
+			query = ((await this._mw(this.beforeFetch(query, options))) || query) as object;
 
-					if (!this.__networkService.isOnline()) {
-						return new Observable(observer => {
-							this._onOnline.push(() => {
-								this.fetch(query, options).subscribe(observer);
-							});
-						});
+			if (!this.__networkService.isOnline()) {
+				this._onOnline.push(() => {
+					this.fetch(query, options).subscribe(subject);
+				});
+
+				return;
+			}
+
+			const obs = this.__httpService.post(
+				`${this._url}/fetch${options.name || ''}`,
+				query,
+			) as Observable<Document>;
+
+			obs.subscribe({
+				next: doc => {
+					if (doc) {
+						this.addDoc(doc);
+						this._filterDocuments();
+
+						if (options.callback) options.callback(doc);
+
+						void this._mw(this.afterFetch(doc, query, options));
+
+						this.__emitterService.emit(`${this._config.name}_changed`, doc);
+					} else {
+						if (options.errCallback) options.errCallback(doc);
 					}
 
-					const obs = this.__httpService.post(
-						`${this._url}/fetch${options.name || ''}`,
-						query,
-					);
-
-					obs.subscribe({
-						next: async (doc: unknown) => {
-							if (doc) {
-								this.addDoc(doc as Document);
-								this._filterDocuments();
-
-								if (options.callback) options.callback(doc as Document);
-
-								await this._mw(this.afterFetch(doc, query, options));
-
-								this.__emitterService.emit(`${this._config.name}_changed`, doc);
-							} else {
-								if (options.errCallback) options.errCallback(doc as Document);
-							}
-						},
-						error: (err: unknown) => {
-							if (options.errCallback) options.errCallback(err);
-						},
-					});
-
-					return obs as Observable<Document>;
-				}),
-			),
-		) as Observable<Document>;
+					subject.next(doc);
+				},
+				error: (err: unknown) => {
+					if (options.errCallback) options.errCallback(err);
+					subject.error(err);
+				},
+				complete: () => subject.complete(),
+			});
+		});
 	}
 
 	/**
@@ -749,57 +759,55 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	 * @returns An observable that resolves with the updated document.
 	 */
 	update(doc: Document, options: CrudOptions<Document> = {}): Observable<Document> {
-		return defer(() =>
-			from(this._mw(this.beforeUpdate(doc, options))).pipe(
-				switchMap(mwDoc => {
-					doc = (mwDoc || doc) as Document;
+		return this._hot<Document>(async subject => {
+			doc = ((await this._mw(this.beforeUpdate(doc, options))) || doc) as Document;
 
-					this._updateModified(doc, 'up' + (options.name || ''), options);
+			this._updateModified(doc, 'up' + (options.name || ''), options);
 
-					if (!this.__networkService.isOnline()) {
-						return new Observable(observer => {
-							this._onOnline.push(() => {
-								this.update(doc, options).subscribe(observer);
-							});
-						});
+			if (!this.__networkService.isOnline()) {
+				this._onOnline.push(() => {
+					this.update(doc, options).subscribe(subject);
+				});
+
+				return;
+			}
+
+			const obs = this.__httpService.post(
+				`${this._url}/update${options.name || ''}`,
+				doc,
+			) as Observable<Document>;
+
+			obs.subscribe({
+				next: resp => {
+					if (resp) {
+						this._removeModified(doc, 'up' + (options.name || ''));
+
+						const storedDoc = this.doc(doc._id as string);
+
+						this.__coreService.copy(resp, storedDoc);
+						this.__coreService.copy(resp, doc);
+
+						this._syncSignalForDoc(storedDoc);
+
+						if (options.callback) options.callback(doc);
+
+						void this._mw(this.afterUpdate(resp, doc, options));
+					} else {
+						if (options.errCallback) options.errCallback(resp);
 					}
 
-					const obs = this.__httpService.post(
-						`${this._url}/update${options.name || ''}`,
-						doc,
-					);
+					this.__emitterService.emit(`${this._config.name}_update`, doc);
+					this.__emitterService.emit(`${this._config.name}_changed`, doc);
 
-					obs.subscribe({
-						next: async (resp: unknown) => {
-							if (resp) {
-								this._removeModified(doc, 'up' + (options.name || ''));
-
-								const storedDoc = this.doc(doc._id as string);
-
-								this.__coreService.copy(resp, storedDoc);
-								this.__coreService.copy(resp, doc);
-
-								this._syncSignalForDoc(storedDoc);
-
-								if (options.callback) options.callback(doc);
-
-								await this._mw(this.afterUpdate(resp, doc, options));
-							} else {
-								if (options.errCallback) options.errCallback(resp);
-							}
-
-							this.__emitterService.emit(`${this._config.name}_update`, doc);
-							this.__emitterService.emit(`${this._config.name}_changed`, doc);
-						},
-						error: (err: unknown) => {
-							if (options.errCallback) options.errCallback(err);
-						},
-					});
-
-					return obs as Observable<Document>;
-				}),
-			),
-		) as Observable<Document>;
+					subject.next(resp);
+				},
+				error: (err: unknown) => {
+					if (options.errCallback) options.errCallback(err);
+					subject.error(err);
+				},
+				complete: () => subject.complete(),
+			});
+		});
 	}
 
 	/**
@@ -810,54 +818,52 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	 * @returns An observable that resolves with the updated document.
 	 */
 	unique(doc: Document, options: CrudOptions<Document> = {}): Observable<Document> {
-		return defer(() =>
-			from(this._mw(this.beforeUnique(doc, options))).pipe(
-				switchMap(mwDoc => {
-					doc = (mwDoc || doc) as Document;
+		return this._hot<Document>(async subject => {
+			doc = ((await this._mw(this.beforeUnique(doc, options))) || doc) as Document;
 
-					this._updateModified(doc, 'un' + (options.name || ''), options);
+			this._updateModified(doc, 'un' + (options.name || ''), options);
 
-					if (!this.__networkService.isOnline()) {
-						return new Observable(observer => {
-							this._onOnline.push(() => {
-								this.unique(doc, options).subscribe(observer);
-							});
-						});
+			if (!this.__networkService.isOnline()) {
+				this._onOnline.push(() => {
+					this.unique(doc, options).subscribe(subject);
+				});
+
+				return;
+			}
+
+			const obs = this.__httpService.post(
+				`${this._url}/unique${options.name || ''}`,
+				doc,
+			) as Observable<Document>;
+
+			obs.subscribe({
+				next: resp => {
+					if (resp) {
+						this._removeModified(doc, 'un' + (options.name || ''));
+
+						(doc as any)[options.name as string] = resp;
+
+						this._syncSignalForDoc(doc);
+
+						if (options.callback) options.callback(doc);
+
+						void this._mw(this.afterUnique(resp, doc, options));
+					} else {
+						if (options.errCallback) options.errCallback(resp);
 					}
 
-					const obs = this.__httpService.post(
-						`${this._url}/unique${options.name || ''}`,
-						doc,
-					);
+					this.__emitterService.emit(`${this._config.name}_unique`, doc);
+					this.__emitterService.emit(`${this._config.name}_changed`, doc);
 
-					obs.subscribe({
-						next: async (resp: unknown) => {
-							if (resp) {
-								this._removeModified(doc, 'un' + (options.name || ''));
-
-								(doc as any)[options.name as string] = resp;
-
-								this._syncSignalForDoc(doc);
-
-								if (options.callback) options.callback(doc);
-
-								await this._mw(this.afterUnique(resp, doc, options));
-							} else {
-								if (options.errCallback) options.errCallback(resp);
-							}
-
-							this.__emitterService.emit(`${this._config.name}_unique`, doc);
-							this.__emitterService.emit(`${this._config.name}_changed`, doc);
-						},
-						error: (err: unknown) => {
-							if (options.errCallback) options.errCallback(err);
-						},
-					});
-
-					return obs as Observable<Document>;
-				}),
-			),
-		) as Observable<Document>;
+					subject.next(resp);
+				},
+				error: (err: unknown) => {
+					if (options.errCallback) options.errCallback(err);
+					subject.error(err);
+				},
+				complete: () => subject.complete(),
+			});
+		});
 	}
 
 	/**
@@ -868,68 +874,64 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	 * @returns An observable that resolves with the deleted document.
 	 */
 	delete(doc: Document, options: CrudOptions<Document> = {}): Observable<Document> {
-		return defer(() =>
-			from(this._mw(this.beforeDelete(doc, options))).pipe(
-				switchMap(mwDoc => {
-					doc = (mwDoc || doc) as Document;
+		return this._hot<Document>(async subject => {
+			doc = ((await this._mw(this.beforeDelete(doc, options))) || doc) as Document;
 
-					doc.__deleted = true;
+			doc.__deleted = true;
 
-					doc.__options ||= {};
-					doc.__options['delete'] = options;
+			doc.__options ||= {};
+			doc.__options['delete'] = options;
 
-					this.addDoc(doc);
-					this._filterDocuments();
+			this.addDoc(doc);
+			this._filterDocuments();
 
-					if (!this.__networkService.isOnline()) {
-						return new Observable(observer => {
-							this._onOnline.push(() => {
-								this.delete(doc, options).subscribe(observer);
-							});
-						});
+			if (!this.__networkService.isOnline()) {
+				this._onOnline.push(() => {
+					this.delete(doc, options).subscribe(subject);
+				});
+
+				return;
+			}
+
+			const obs = this.__httpService.post(
+				`${this._url}/delete${options.name || ''}`,
+				doc,
+			) as Observable<Document>;
+
+			obs.subscribe({
+				next: resp => {
+					if (resp) {
+						const idx = this._docs.findIndex(d => this._id(d) === this._id(doc));
+						if (idx !== -1) this._docs.splice(idx, 1);
+
+						this.setDocs();
+
+						this._syncSignalForDoc({
+							...doc,
+							__deleted: true,
+						} as Document);
+
+						this._filterDocuments();
+
+						if (options.callback) options.callback(doc);
+
+						void this._mw(this.afterDelete(resp, doc, options));
+					} else {
+						if (options.errCallback) options.errCallback(resp);
 					}
 
-					const obs = this.__httpService.post(
-						`${this._url}/delete${options.name || ''}`,
-						doc,
-					);
+					this.__emitterService.emit(`${this._config.name}_delete`, doc);
+					this.__emitterService.emit(`${this._config.name}_changed`, doc);
 
-					obs.subscribe({
-						next: async (resp: unknown) => {
-							if (resp) {
-								const idx = this._docs.findIndex(
-									d => this._id(d) === this._id(doc),
-								);
-								if (idx !== -1) this._docs.splice(idx, 1);
-
-								this.setDocs();
-
-								this._syncSignalForDoc({
-									...doc,
-									__deleted: true,
-								} as Document);
-
-								this._filterDocuments();
-
-								if (options.callback) options.callback(doc);
-
-								await this._mw(this.afterDelete(resp, doc, options));
-							} else {
-								if (options.errCallback) options.errCallback(resp);
-							}
-
-							this.__emitterService.emit(`${this._config.name}_delete`, doc);
-							this.__emitterService.emit(`${this._config.name}_changed`, doc);
-						},
-						error: (err: unknown) => {
-							if (options.errCallback) options.errCallback(err);
-						},
-					});
-
-					return obs as Observable<Document>;
-				}),
-			),
-		) as Observable<Document>;
+					subject.next(resp);
+				},
+				error: (err: unknown) => {
+					if (options.errCallback) options.errCallback(err);
+					subject.error(err);
+				},
+				complete: () => subject.complete(),
+			});
+		});
 	}
 
 	/**
