@@ -1,5 +1,5 @@
 import { isPlatformBrowser } from '@angular/common';
-import { inject, PLATFORM_ID, signal, WritableSignal } from '@angular/core';
+import { computed, inject, PLATFORM_ID, Signal, signal, WritableSignal } from '@angular/core';
 import { Observable, ReplaySubject } from 'rxjs';
 import { CoreService } from '../core/core.service';
 import { EmitterService } from '../emitter/emitter.service';
@@ -25,19 +25,9 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	private _url = '/api/';
 
 	/**
-	 * In-memory cache with all documents currently known by the service.
-	 */
-	private _docs: Document[] = [];
-
-	/**
 	 * Number of documents per page for paginated `get()` calls.
 	 */
 	private _perPage = 20;
-
-	/**
-	 * Registered callbacks that recompute filtered document views.
-	 */
-	private _filteredDocumentsCallbacks: (() => void)[] = [];
 
 	/**
 	 * HTTP client wrapper used for API communication.
@@ -65,38 +55,36 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	protected __networkService = inject(NetworkService);
 
 	/**
-	 * Emits once when documents are restored from local storage on startup.
+	 * Signals whether the initial restore flow has completed.
 	 */
-	loaded: Observable<unknown>;
+	readonly isLoaded = signal(false);
 
 	/**
-	 * Emits once when the initial `get()` (without page param) completes.
+	 * Cache of detached signals requested by id but not yet part of the collection.
 	 */
-	getted: Observable<unknown>;
+	private _detachedSignals: Record<string, WritableSignal<Document>> = {};
 
 	constructor(private _config: CrudConfig<Document>) {
 		this._config.signalFields = this._config.signalFields || {};
 
 		this._url += this._config.name;
 
-		this.loaded = this.__emitterService.onComplete(this._config.name + '_loaded');
-
-		this.getted = this.__emitterService.onComplete(this._config.name + '_getted');
-
 		if (this._config.unauthorized) {
-			this.restoreDocs();
+			void this.restoreDocs();
 		} else if (this._isBrowser && localStorage.getItem('waw_user')) {
 			const user = JSON.parse(localStorage.getItem('waw_user') as string);
 
 			if (user._id === localStorage.getItem(this._config.name + 'waw_user_id')) {
-				this.restoreDocs();
+				void this.restoreDocs();
+			} else {
+				this.isLoaded.set(true);
 			}
+		} else {
+			this.isLoaded.set(true);
 		}
 
 		this.__emitterService.on('wipe').subscribe((): void => {
 			this.clearDocs();
-
-			this._filterDocuments();
 		});
 
 		this.__emitterService.on('wacom_online').subscribe(() => {
@@ -115,30 +103,56 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	private _signal: Record<string, WritableSignal<Document>> = {};
 
 	/**
+	 * Canonical signal-backed collection store.
+	 */
+	private _documentSignals = signal<WritableSignal<Document>[]>([]);
+
+	/**
+	 * Read-only signal with the current list of per-document signals.
+	 */
+	readonly documentSignals = this._documentSignals.asReadonly();
+
+	/**
+	 * Derived read-only signal exposing the current documents as plain values.
+	 */
+	readonly documents = computed(() => this._documentSignals().map(document => document()));
+
+	/**
 	 * Cache of per (field,value) lists of document signals.
 	 * Key format: `${field}_${JSON.stringify(value)}`.
 	 */
-	private _signals: Record<string, WritableSignal<WritableSignal<Document>[]>> = {};
+	private _signals: Record<string, Signal<WritableSignal<Document>[]>> = {};
 
 	/**
 	 * Cache of per-field maps: fieldValue -> array of document signals.
 	 */
-	private _fieldSignals: Record<
-		string,
-		WritableSignal<Record<string, WritableSignal<Document>[]>>
-	> = {};
+	private _fieldSignals: Record<string, Signal<Record<string, WritableSignal<Document>[]>>> = {};
 
 	/**
-	 * Returns a WritableSignal for a document by _id, creating it if absent.
-	 * Caches the signal to avoid redundant instances and initializes it
-	 * with the current snapshot of the document.
-	 * Work very carefully with this and localId, better avoid such flows.
+	 * Returns a WritableSignal for a document instance or identifier.
+	 * String lookups stay detached from the collection until the document is
+	 * created or loaded through the normal collection flows.
 	 *
 	 * @param _id - Document identifier or a document instance.
 	 */
 	getSignal(_id: string | Document) {
 		if (typeof _id !== 'string') {
-			_id = this._id(_id);
+			const existingSignalId = this._getSignalIds(_id).find(id => !!this._signal[id]);
+
+			if (existingSignalId) {
+				return this._signal[existingSignalId];
+			}
+
+			const docSignal = this.__coreService.toSignal(
+				_id,
+				this._config.signalFields,
+			) as WritableSignal<Document>;
+
+			for (const id of this._getSignalIds(_id)) {
+				this._signal[id] = docSignal;
+			}
+
+			return docSignal;
 		}
 
 		// Reuse existing signal if present
@@ -146,15 +160,7 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 			return this._signal[_id];
 		}
 
-		// Always base the signal on the current canonical doc()
-		const doc = this.doc(_id);
-
-		this._signal[_id] = this.__coreService.toSignal(
-			doc,
-			this._config.signalFields,
-		) as WritableSignal<Document>;
-
-		return this._signal[_id];
+		return this.prepareDocument(_id);
 	}
 
 	/**
@@ -168,7 +174,7 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 		const id = field + '_' + JSON.stringify(value);
 
 		if (!this._signals[id]) {
-			this._signals[id] = signal<WritableSignal<Document>[]>(this._getSignals(id));
+			this._signals[id] = computed(() => this._getSignals(id));
 		}
 
 		return this._signals[id];
@@ -189,7 +195,7 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 
 		const list: WritableSignal<Document>[] = [];
 
-		for (const doc of this.getDocs()) {
+		for (const doc of this.documents()) {
 			if (JSON.stringify(doc[field] as unknown) !== valueJson) {
 				continue;
 			}
@@ -212,9 +218,7 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	 */
 	getFieldSignals(field: string) {
 		if (!this._fieldSignals[field]) {
-			this._fieldSignals[field] = signal<Record<string, WritableSignal<Document>[]>>(
-				this._getFieldSignals(field),
-			);
+			this._fieldSignals[field] = computed(() => this._getFieldSignals(field));
 		}
 
 		return this._fieldSignals[field];
@@ -227,7 +231,7 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	private _getFieldSignals(field: string): Record<string, WritableSignal<Document>[]> {
 		const byFields: Record<string, WritableSignal<Document>[]> = {};
 
-		for (const doc of this.getDocs()) {
+		for (const doc of this.documents()) {
 			const docId = this._id(doc);
 			if (!docId) continue;
 
@@ -244,34 +248,18 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	}
 
 	/**
-	 * Clears cached document signals except those explicitly preserved.
-	 * Useful when changing routes or contexts to reduce memory.
-	 *
-	 * @param exceptIds - List of ids whose signals should be kept.
-	 */
-	removeSignals(exceptIds: string[] = []) {
-		for (const _id in this._signal) {
-			if (!exceptIds.includes(_id)) {
-				delete this._signal[_id];
-			}
-		}
-	}
-
-	/**
-	 * Restores documents from local storage (if present) and syncs
-	 * all existing signals with the restored data.
+	 * Restores documents from local storage (if present) into the
+	 * canonical signal-backed collection.
 	 */
 	async restoreDocs() {
 		const docs = await this.__storeService.getJson<Document[]>('docs_' + this._config.name);
 
 		if (docs?.length) {
-			this._docs.length = 0;
+			const signals = docs.map(doc => this._materializeSignal(doc));
 
-			this._docs.push(...docs);
+			this._documentSignals.set(this._dedupeSignals(signals));
 
-			this._filterDocuments();
-
-			for (const doc of this._docs) {
+			for (const doc of this.documents()) {
 				if (doc.__deleted) {
 					this.delete(doc, doc.__options?.['delete'] || {});
 				} else if (!doc._id) {
@@ -287,47 +275,32 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 				}
 			}
 
-			this.__emitterService.complete(this._config.name + '_loaded', this._docs);
 		}
+
+		this.isLoaded.set(true);
 	}
 
 	/**
 	 * Saves the current set of documents to local storage.
 	 */
-	setDocs(): void {
-		this.__storeService.setJson<Document[]>('docs_' + this._config.name, this._docs);
+	private setDocs(): void {
+		this.__storeService.setJson<Document[]>('docs_' + this._config.name, this.documents());
 	}
 
 	/**
-	 * Retrieves the current list of documents.
-	 *
-	 * @returns The list of documents.
-	 */
-	getDocs(filter: (doc: Document) => boolean = () => true): Document[] {
-		return this._docs.filter(filter);
-	}
-
-	/**
-	 * Retrieves the first document that matches the given predicate.
-	 *
-	 * @param find - Predicate used to locate a specific document.
-	 */
-	getDoc(find: (doc: Document) => boolean): Document | undefined {
-		return this._docs.find(find);
-	}
-
-	/**
-	 * Clears the current list of documents, persists the empty state
-	 * and recomputes all derived signals.
-	 *
-	 * Empties the internal documents array and saves the updated state to local storage.
+	 * Clears the current collection state and persists the empty result.
 	 */
 	clearDocs(): void {
-		this._docs.splice(0, this._docs.length);
+		for (const doc of this.documents()) {
+			for (const id of this._getSignalIds(doc)) {
+				delete this._signal[id];
+				delete this._detachedSignals[id];
+			}
+		}
+
+		this._documentSignals.set([]);
 
 		this.setDocs();
-
-		this._updateSignals();
 	}
 
 	/**
@@ -353,65 +326,71 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 			this._config.replace(doc);
 		}
 
-		const existingDoc = this._docs.find(
-			d =>
-				(this._id(doc) && this._id(d) === this._id(doc)) ||
-				(doc._localId && d._localId === doc._localId),
-		);
+		const signal = this._materializeSignal(doc);
 
-		if (existingDoc) {
-			this.__coreService.copy(doc, existingDoc);
-			this.__coreService.copy(existingDoc, doc);
-			this._syncSignalForDoc(existingDoc);
-		} else {
-			this._docs.push(doc);
-			this._syncSignalForDoc(doc);
+		if (!this._documentSignals().includes(signal)) {
+			this._documentSignals.update(documents => [...documents, signal]);
 		}
 
 		this.setDocs();
 	}
 
 	/**
-	 * Creates a new document with a temporary ID and status flags.
+	 * Returns a detached per-document signal or draft signal.
+	 * If the document is already in the collection, the canonical collection signal is used.
+	 * Otherwise a detached signal is created and optionally hydrated by `fetch()`.
 	 *
-	 * @param doc - Optional base document to use for the new document.
-	 * @returns A new document instance with default properties.
+	 * @param _id - Optional document id to search for or hydrate.
+	 * @returns A writable signal for the prepared document.
 	 */
-	new(doc: Document = {} as Document): Document {
-		return {
-			...doc,
-			_id: undefined,
-			_localId: this._localId(),
-			__created: false,
-			__modified: false,
-		} as Document;
-	}
+	prepareDocument(_id?: string): WritableSignal<Document> {
+		if (!_id) {
+			const doc = {
+				_id: undefined,
+				_localId: this._localId(),
+				__modified: [],
+			} as unknown as Document;
+			const docSignal = this.__coreService.toSignal(
+				doc,
+				this._config.signalFields,
+			) as WritableSignal<Document>;
 
-	/**
-	 * Retrieves a document by its unique ID or creates a new one if it doesn't exist.
-	 *
-	 * @param _id - The document ID to search for.
-	 * @returns The found document or a new document if not found.
-	 */
-	doc(_id: string): Document {
-		// If we already have a signal for this id, use its current value
+			this._registerSignal(docSignal, doc);
+
+			for (const id of this._getSignalIds(doc)) {
+				this._detachedSignals[id] = docSignal;
+			}
+
+			return docSignal;
+		}
+
 		if (this._signal[_id]) {
-			return this._signal[_id]();
+			return this._signal[_id];
 		}
 
-		let doc =
-			this._docs.find(
-				d => this._id(d) === _id || (d._localId && d._localId === Number(_id)),
-			) || null;
-
-		// If doc not found, create + push into _docs so it is not detached
-		if (!doc) {
-			doc = this.new({ _id } as Document);
-			this._docs.push(doc);
-			this.setDocs();
+		if (this._detachedSignals[_id]) {
+			return this._detachedSignals[_id];
 		}
 
-		if (!this._docs.find(d => this._id(d) === _id) && !this._fetchingId[_id]) {
+		const existingDoc = this.documentSignals().find(
+			document => this._getSignalIds(document()).includes(_id),
+		);
+
+		if (existingDoc) {
+			this._signal[_id] = existingDoc;
+
+			return existingDoc;
+		}
+
+		const docSignal = this.__coreService.toSignal(
+			{ _id } as Document,
+			this._config.signalFields,
+		) as WritableSignal<Document>;
+
+		this._signal[_id] = docSignal;
+		this._detachedSignals[_id] = docSignal;
+
+		if (!this.documentSignals().find(document => this._getSignalIds(document()).includes(_id)) && !this._fetchingId[_id]) {
 			this._fetchingId[_id] = true;
 
 			setTimeout(() => {
@@ -419,14 +398,16 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 					this._fetchingId[_id] = false;
 
 					if (_doc) {
-						this.__coreService.copy(_doc, doc as Document);
-						this._syncSignalForDoc(doc as Document);
+						docSignal.set({ ..._doc });
 					}
+				},
+				() => {
+					this._fetchingId[_id] = false;
 				});
 			});
 		}
 
-		return doc as Document;
+		return docSignal;
 	}
 
 	/**
@@ -568,16 +549,6 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 				if (options.callback) {
 					options.callback(resp as Document[]);
 				}
-
-				if (typeof config.page !== 'number') {
-					this._filterDocuments();
-
-					this.__emitterService.complete(this._config.name + '_getted', this._docs);
-				}
-
-				this.__emitterService.emit(`${this._config.name}_get`, this._docs);
-
-				this.__emitterService.emit(`${this._config.name}_changed`, this._docs);
 			},
 			error: (err: unknown): void => {
 				if (options.errCallback) {
@@ -615,7 +586,6 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 			doc.__options['create'] = options;
 
 			this.addDoc(doc);
-			this._filterDocuments();
 
 			if (!this.__networkService.isOnline()) {
 				this._onOnline.push(() => {
@@ -649,7 +619,6 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 						doc.__creating = false;
 
 						this.addDoc(doc);
-						this._filterDocuments();
 
 						if (options.callback) options.callback(doc);
 
@@ -659,10 +628,6 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 
 						if (options.errCallback) options.errCallback(resp);
 					}
-
-					this.__emitterService.emit(`${this._config.name}_create`, doc);
-					this.__emitterService.emit(`${this._config.name}_list`, doc);
-					this.__emitterService.emit(`${this._config.name}_changed`, doc);
 
 					subject.next(resp);
 				},
@@ -704,13 +669,10 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 				next: doc => {
 					if (doc) {
 						this.addDoc(doc);
-						this._filterDocuments();
 
 						if (options.callback) options.callback(doc);
 
 						void this._mw(this.afterFetch(doc, query, options));
-
-						this.__emitterService.emit(`${this._config.name}_changed`, doc);
 					} else {
 						if (options.errCallback) options.errCallback(doc);
 					}
@@ -762,7 +724,7 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 		return this._hot<Document>(async subject => {
 			doc = ((await this._mw(this.beforeUpdate(doc, options))) || doc) as Document;
 
-			this._updateModified(doc, 'up' + (options.name || ''), options);
+			doc = this._updateModified(doc, 'up' + (options.name || ''), options);
 
 			if (!this.__networkService.isOnline()) {
 				this._onOnline.push(() => {
@@ -782,12 +744,8 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 					if (resp) {
 						this._removeModified(doc, 'up' + (options.name || ''));
 
-						const storedDoc = this.doc(doc._id as string);
-
-						this.__coreService.copy(resp, storedDoc);
 						this.__coreService.copy(resp, doc);
-
-						this._syncSignalForDoc(storedDoc);
+						this.getSignal(doc._id as string).set({ ...resp });
 
 						if (options.callback) options.callback(doc);
 
@@ -795,9 +753,6 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 					} else {
 						if (options.errCallback) options.errCallback(resp);
 					}
-
-					this.__emitterService.emit(`${this._config.name}_update`, doc);
-					this.__emitterService.emit(`${this._config.name}_changed`, doc);
 
 					subject.next(resp);
 				},
@@ -821,7 +776,7 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 		return this._hot<Document>(async subject => {
 			doc = ((await this._mw(this.beforeUnique(doc, options))) || doc) as Document;
 
-			this._updateModified(doc, 'un' + (options.name || ''), options);
+			doc = this._updateModified(doc, 'un' + (options.name || ''), options);
 
 			if (!this.__networkService.isOnline()) {
 				this._onOnline.push(() => {
@@ -852,9 +807,6 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 						if (options.errCallback) options.errCallback(resp);
 					}
 
-					this.__emitterService.emit(`${this._config.name}_unique`, doc);
-					this.__emitterService.emit(`${this._config.name}_changed`, doc);
-
 					subject.next(resp);
 				},
 				error: (err: unknown) => {
@@ -883,7 +835,6 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 			doc.__options['delete'] = options;
 
 			this.addDoc(doc);
-			this._filterDocuments();
 
 			if (!this.__networkService.isOnline()) {
 				this._onOnline.push(() => {
@@ -901,17 +852,19 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 			obs.subscribe({
 				next: resp => {
 					if (resp) {
-						const idx = this._docs.findIndex(d => this._id(d) === this._id(doc));
-						if (idx !== -1) this._docs.splice(idx, 1);
-
-						this.setDocs();
+						const signal = this._resolveSignal(doc);
+						if (signal) {
+							this._documentSignals.update(documents =>
+								documents.filter(document => document !== signal),
+							);
+						}
 
 						this._syncSignalForDoc({
 							...doc,
 							__deleted: true,
 						} as Document);
 
-						this._filterDocuments();
+						this.setDocs();
 
 						if (options.callback) options.callback(doc);
 
@@ -919,9 +872,6 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 					} else {
 						if (options.errCallback) options.errCallback(resp);
 					}
-
-					this.__emitterService.emit(`${this._config.name}_delete`, doc);
-					this.__emitterService.emit(`${this._config.name}_changed`, doc);
 
 					subject.next(resp);
 				},
@@ -932,116 +882,6 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 				complete: () => subject.complete(),
 			});
 		});
-	}
-
-	/**
-	 * Registers a filtered view of documents and returns the recompute callback.
-	 *
-	 * The callback is called automatically whenever `_filterDocuments()` runs.
-	 */
-	filteredDocuments(
-		storeObjectOrArray: Record<string, Document[]> | Document[],
-		config: {
-			field?: string | ((doc: Document) => string);
-			valid?: (doc: Document) => boolean;
-			sort?: (a: Document, b: Document) => number;
-			filtered?: (storeObjectOrArray: Record<string, Document[]> | Document[]) => void;
-		} = {},
-	) {
-		const callback = (): void => {
-			if (Array.isArray(storeObjectOrArray)) {
-				let result = this._docs
-					.filter(doc => !doc.__deleted)
-					.filter(config.valid ?? (() => true));
-
-				storeObjectOrArray.length = 0;
-
-				if (typeof config.sort === 'function') {
-					result = result.sort(config.sort);
-				}
-
-				storeObjectOrArray.push(...result);
-			} else {
-				const storeObject = storeObjectOrArray as Record<string, Document[]>;
-
-				/* remove docs if they were removed */
-				for (const parentId in storeObject) {
-					for (let i = storeObject[parentId].length - 1; i >= 0; i--) {
-						const _field =
-							typeof config.field === 'function'
-								? config.field(storeObject[parentId][i])
-								: config.field || 'author';
-						const _doc: any = storeObject[parentId][i];
-
-						if (
-							!this._docs.find((doc: any) =>
-								Array.isArray(doc[_field])
-									? doc[_field].includes(_doc[this._id(doc)])
-									: doc[_field] === _doc[this._id(doc)],
-							)
-						) {
-							storeObject[parentId].splice(i, 1);
-						}
-					}
-				}
-
-				/* add docs if they are not added */
-				for (const doc of this._docs) {
-					if (doc.__deleted) continue;
-
-					const _field =
-						typeof config.field === 'function'
-							? config.field(doc)
-							: config.field || 'author';
-
-					if (
-						typeof config.valid === 'function'
-							? !config.valid(doc)
-							: Array.isArray((doc as any)[_field])
-								? !(doc as any)[_field]?.length
-								: !(doc as any)[_field]
-					) {
-						continue;
-					}
-
-					if (typeof config.field === 'function') {
-						if (
-							config.field(doc) &&
-							!storeObject[(doc as any)[_field]].find(c => c._id === doc._id)
-						) {
-							storeObject[(doc as any)[_field]].push(doc);
-						}
-					} else if (Array.isArray((doc as any)[_field])) {
-						(doc as any)[_field].forEach((_field: string) => {
-							storeObject[_field] = storeObject[_field] || [];
-
-							if (!storeObject[_field].find(c => c._id === doc._id)) {
-								storeObject[_field].push(doc);
-							}
-						});
-					} else {
-						storeObject[(doc as any)[_field]] = storeObject[(doc as any)[_field]] || [];
-
-						if (!storeObject[(doc as any)[_field]].find(c => c._id === doc._id)) {
-							storeObject[(doc as any)[_field]].push(doc);
-						}
-					}
-				}
-
-				/* sort the array's */
-				if (typeof config.sort === 'function') {
-					for (const parentId in storeObject) {
-						storeObject[parentId].sort(config.sort);
-					}
-				}
-			}
-
-			config.filtered?.(storeObjectOrArray);
-		};
-
-		this._filteredDocumentsCallbacks.push(callback);
-
-		return callback;
 	}
 
 	/**
@@ -1069,6 +909,18 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	}
 
 	/**
+	 * Returns all cache keys that can identify a document signal.
+	 */
+	private _getSignalIds(doc: Document): string[] {
+		const ids = [
+			this._id(doc),
+			typeof doc._localId === 'number' ? doc._localId.toString() : undefined,
+		].filter((id): id is string => !!id);
+
+		return [...new Set(ids)];
+	}
+
+	/**
 	 * Returns the configured identity field for the given document as string.
 	 *
 	 * @param doc - The document for which to generate the ID.
@@ -1081,33 +933,27 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	}
 
 	/**
-	 * Executes all registered filter document callbacks and emits a
-	 * `<name>_filtered` event.
-	 */
-	private _filterDocuments(): void {
-		for (const callback of this._filteredDocumentsCallbacks) {
-			callback();
-		}
-
-		this.__emitterService.emit(`${this._config.name}_filtered`);
-	}
-
-	/**
 	 * Marks a document as modified for a given operation id and
 	 * keeps the document in the store until the operation is confirmed.
 	 */
-	private _updateModified(doc: Document, id: string, options: CrudOptions<Document>) {
-		doc.__modified ||= [];
+	private _updateModified(doc: Document, id: string, options: CrudOptions<Document>): Document {
+		const signal = this._resolveSignal(doc);
+		const target = signal ? signal() : doc;
 
-		doc.__options ||= {};
+		target.__modified ||= [];
 
-		doc.__options[id] = options;
+		target.__options ||= {};
 
-		if (!doc.__modified.find(m => m === id)) {
-			doc.__modified.push(id);
+		target.__options[id] = options;
 
-			this.addDoc(doc);
+		if (!target.__modified.includes(id)) {
+			target.__modified.push(id);
 		}
+
+		this._syncSignalForDoc(target);
+		this.addDoc(target);
+
+		return target;
 	}
 
 	/**
@@ -1128,36 +974,62 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	}
 
 	/**
-	 * Syncs a single document's signal (if exists) and refreshes all
-	 * derived collections (field/value lists and field maps).
+	 * Syncs a single document signal with the latest plain object data.
 	 */
 	private _syncSignalForDoc(doc: Document) {
-		const id = this._id(doc);
+		const ids = this._getSignalIds(doc);
+		const existingSignal = ids.map(id => this._signal[id]).find(signal => !!signal);
 
-		if (id && this._signal[id]) {
-			this._signal[id].set({ ...doc });
+		if (existingSignal) {
+			existingSignal.update(current => {
+				this.__coreService.copy(doc, current);
+
+				return current;
+			});
+
+			this.__coreService.copy(existingSignal(), doc);
+			this._registerSignal(existingSignal, existingSignal());
+
+			for (const id of ids) {
+				delete this._detachedSignals[id];
+			}
 		}
-
-		this._updateSignals();
 	}
 
-	/**
-	 * Rebuilds all derived signal collections:
-	 *  - all per (field,value) lists of document signals
-	 *  - all per-field maps value -> [signals]
-	 *
-	 * This keeps `getSignals()` and `getFieldSignals()` in sync after
-	 * any mutation that touches `_docs`.
-	 */
-	private _updateSignals() {
-		// refresh all (field,value) collections
-		for (const key in this._signals) {
-			this._signals[key].set(this._getSignals(key));
+	private _registerSignal(signal: WritableSignal<Document>, doc: Document) {
+		for (const id of this._getSignalIds(doc)) {
+			this._signal[id] = signal;
+		}
+	}
+
+	private _resolveSignal(doc: Document) {
+		return this._getSignalIds(doc)
+			.map(id => this._signal[id] || this._detachedSignals[id])
+			.find(signal => !!signal);
+	}
+
+	private _materializeSignal(doc: Document): WritableSignal<Document> {
+		const signal =
+			this._resolveSignal(doc) ||
+			(this.__coreService.toSignal(doc, this._config.signalFields) as WritableSignal<Document>);
+
+		signal.update(current => {
+			this.__coreService.copy(doc, current);
+
+			return current;
+		});
+
+		this.__coreService.copy(signal(), doc);
+		this._registerSignal(signal, signal());
+
+		for (const id of this._getSignalIds(signal())) {
+			delete this._detachedSignals[id];
 		}
 
-		// refresh all per-field maps
-		for (const field in this._fieldSignals) {
-			this._fieldSignals[field].set(this._getFieldSignals(field));
-		}
+		return signal;
+	}
+
+	private _dedupeSignals(signals: WritableSignal<Document>[]) {
+		return signals.filter((signal, index) => signals.indexOf(signal) === index);
 	}
 }

@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs';
+import { Signal, WritableSignal } from '@angular/core';
 
 /**
  * Basic fields expected on a document managed by the CRUD service.
@@ -39,8 +39,10 @@ export interface CrudOptions<Document> {
 export interface CrudServiceInterface<Document> {
 	/** Retrieve a page of documents from the server. */
 	get: (params: { page: number; query?: string }, options: CrudOptions<Document>) => any;
-	/** Return the current in‑memory documents. */
-	getDocs: () => Document[];
+	/** Read-only signal containing the current plain documents. */
+	documents: Signal<Document[]>;
+	/** Read-only signal containing the current per-document signals. */
+	documentSignals: Signal<WritableSignal<Document>[]>;
 	/** Create a new document. */
 	create: (doc: Document) => any;
 	/** Update an existing document. */
@@ -49,8 +51,8 @@ export interface CrudServiceInterface<Document> {
 	delete: (doc: Document) => any;
 	/** Change the number of documents retrieved per page. */
 	setPerPage?: (count: number) => void;
-	/** Resolves when the initial data load has completed. */
-	loaded: Observable<unknown>;
+	/** Signals whether the initial restore flow has completed. */
+	isLoaded: Signal<boolean>;
 	getSignal: (doc: string | Document) => any;
 }
 
@@ -78,7 +80,7 @@ export interface TableConfig<Document> {
 	update: ((doc: Document) => void) | null;
 	/** Handler invoked to delete a record. */
 	delete: ((doc: Document) => void) | null;
-	/** Row‑level action buttons. */
+	/** Row-level action buttons. */
 	buttons: TableConfigButton<Document>[];
 	/** Buttons displayed in the table header. */
 	headerButtons: TableConfigButton<Document>[];

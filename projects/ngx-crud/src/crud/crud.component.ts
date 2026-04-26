@@ -1,5 +1,14 @@
-import { ChangeDetectorRef, inject, Signal, signal, WritableSignal } from '@angular/core';
-import { firstValueFrom, take } from 'rxjs';
+import {
+	ChangeDetectorRef,
+	effect,
+	EffectRef,
+	inject,
+	Injector,
+	Signal,
+	signal,
+	WritableSignal,
+} from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 import { CoreService } from '../core/core.service';
 import { CrudDocument, CrudOptions, CrudServiceInterface, TableConfig } from './crud.interface';
 
@@ -11,7 +20,7 @@ interface FormServiceInterface<FormInterface> {
 	modal: <T>(
 		form: FormInterface,
 		buttons?: unknown | unknown[],
-		submition?: unknown,
+		submission?: unknown,
 		change?: (update: T) => void | Promise<(update: T) => void>,
 		modalOptions?: unknown,
 	) => Promise<T>;
@@ -49,6 +58,9 @@ export abstract class CrudComponent<
 	/** ChangeDetectorRef handles on push strategy */
 	private __cdr = inject(ChangeDetectorRef);
 
+	/** Injector is used for signal effects created in methods. */
+	private __injector = inject(Injector);
+
 	/** Internal reference to form service matching FormServiceInterface */
 	private __formService: FormServiceInterface<FormInterface>;
 
@@ -73,8 +85,11 @@ export abstract class CrudComponent<
 
 	protected localDocumentsFilter: (doc: Document) => boolean = () => true;
 
+	/** Handles request errors without forcing a library-level UI decision. */
+	protected handleCrudError(_error: unknown): void {}
+
 	/**
-	 * Allow set query customization
+	 * Allows query customization before fetching documents.
 	 */
 	protected setDocumentsQuery(query: string) {
 		return query;
@@ -95,14 +110,20 @@ export abstract class CrudComponent<
 					() => {
 						this.crudService
 							.get({ page, query }, this.getOptions())
-							.subscribe((docs: Document[]) => {
-								this.documents.update(() =>
-									(docs || []).map(doc => this.crudService.getSignal(doc)),
-								);
+							.subscribe({
+								next: (docs: Document[]) => {
+									this.documents.update(() =>
+										(docs || []).map(doc => this.crudService.getSignal(doc)),
+									);
 
-								resolve();
+									resolve();
 
-								this.__cdr.markForCheck();
+									this.__cdr.markForCheck();
+								},
+								error: (error: unknown) => {
+									this.handleCrudError(error);
+									resolve();
+								},
 							});
 					},
 					250,
@@ -110,16 +131,33 @@ export abstract class CrudComponent<
 			} else {
 				this.documents.update(() =>
 					this.crudService
-						.getDocs()
+						.documents()
 						.filter(this.localDocumentsFilter)
 						.map(doc => this.crudService.getSignal(doc)),
 				);
 
-				this.crudService.loaded.pipe(take(1)).subscribe(() => {
+				if (this.crudService.isLoaded()) {
 					resolve();
 
 					this.__cdr.markForCheck();
-				});
+
+					return;
+				}
+
+				let loadEffect: EffectRef | undefined;
+
+				loadEffect = effect(
+					() => {
+						if (!this.crudService.isLoaded()) {
+							return;
+						}
+
+						loadEffect?.destroy();
+						resolve();
+						this.__cdr.markForCheck();
+					},
+					{ injector: this.__injector },
+				);
 			}
 		});
 	}
@@ -135,21 +173,21 @@ export abstract class CrudComponent<
 	}
 
 	/**
-	 * Funciton which controls whether the create functionality is available.
+	 * Function which controls whether the create functionality is available.
 	 */
 	protected allowCreate(): boolean {
 		return true;
 	}
 
 	/**
-	 * Funciton which controls whether the update and delete functionality is available.
+	 * Function which controls whether the update and delete functionality is available.
 	 */
 	protected allowMutate(): boolean {
 		return true;
 	}
 
 	/**
-	 * Funciton which controls whether the unique url functionality is available.
+	 * Function which controls whether the unique URL functionality is available.
 	 */
 	protected allowUrl(): boolean {
 		return true;
@@ -161,10 +199,15 @@ export abstract class CrudComponent<
 	}
 
 	/**
-	 * Funciton which prepare get crud options.
+	 * Function which prepares CRUD request options.
 	 */
 	protected getOptions(): CrudOptions<Document> {
 		return {} as CrudOptions<Document>;
+	}
+
+	/** Reloads documents after successful mutations. */
+	protected refreshDocuments() {
+		return this.setDocuments();
 	}
 
 	/**
@@ -186,43 +229,53 @@ export abstract class CrudComponent<
 							),
 				)
 				.then(async (docs: Document[]) => {
-					if (isCreateFlow) {
-						for (const doc of docs) {
-							this.preCreate(doc);
-
-							await firstValueFrom(this.crudService.create(doc));
-						}
-					} else {
-						for (const document of this.documents()) {
-							if (!docs.find(d => d._id === document()._id)) {
-								await firstValueFrom(this.crudService.delete(document()));
-							}
-						}
-
-						for (const doc of docs) {
-							const local = this.documents().find(
-								document => document()._id === doc._id,
-							);
-
-							if (local) {
-								(local as WritableSignal<Document>).update(document => {
-									this.__core.copy(doc, document);
-
-									return document;
-								});
-
-								await firstValueFrom(this.crudService.update(local()));
-							} else {
+					try {
+						if (isCreateFlow) {
+							for (const doc of docs) {
 								this.preCreate(doc);
 
 								await firstValueFrom(this.crudService.create(doc));
 							}
-						}
-					}
+						} else {
+							for (const document of this.documents()) {
+								if (!docs.find(d => d._id === document()._id)) {
+									await firstValueFrom(this.crudService.delete(document()));
+								}
+							}
 
-					this.setDocuments();
+							for (const doc of docs) {
+								const local = this.documents().find(
+									document => document()._id === doc._id,
+								);
+
+								if (local) {
+									(local as WritableSignal<Document>).update(document => {
+										this.__core.copy(doc, document);
+
+										return document;
+									});
+
+									await firstValueFrom(this.crudService.update(local()));
+								} else {
+									this.preCreate(doc);
+
+									await firstValueFrom(this.crudService.create(doc));
+								}
+							}
+						}
+
+						await this.refreshDocuments();
+					} catch (error) {
+						this.handleCrudError(error);
+					}
 				});
 		};
+	}
+
+	// Provide the default shape expected by the form modal.
+	// Start with an empty data payload so derived components can extend it.
+	protected createObject() {
+		return { data: {} };
 	}
 
 	/** Opens a modal to create a new document. */
@@ -234,14 +287,18 @@ export abstract class CrudComponent<
 				click: async (created: unknown, close: () => void) => {
 					close();
 
-					this.preCreate(created as Document);
+					try {
+						this.preCreate(created as Document);
 
-					await firstValueFrom(this.crudService.create(created as Document));
+						await firstValueFrom(this.crudService.create(created as Document));
 
-					this.setDocuments();
+						await this.refreshDocuments();
+					} catch (error) {
+						this.handleCrudError(error);
+					}
 				},
 			},
-			{ data: {} },
+			this.createObject(),
 			() => {},
 			{
 				resetOnSubmit: true,
@@ -271,8 +328,13 @@ export abstract class CrudComponent<
 
 	/** Requests confirmation before deleting the provided document. */
 	protected async delete(doc: Document) {
-		this.crudService.delete(doc).subscribe(() => {
-			this.setDocuments();
+		this.crudService.delete(doc).subscribe({
+			next: () => {
+				this.refreshDocuments();
+			},
+			error: (error: unknown) => {
+				this.handleCrudError(error);
+			},
 		});
 	}
 

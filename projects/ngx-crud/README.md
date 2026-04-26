@@ -39,26 +39,24 @@ export const appConfig = {
 
 `CrudService` is designed to be extended by feature-specific services that manage a particular document type.
 
+Prefer `documents` and `documentSignals` for new reads and derived collection state.
+
 ### Core document methods
 
-- `new(doc?)`
-- `doc(_id)`
-- `getDocs(filter?)`
-- `getDoc(find)`
+- `prepareDocument(_id?)`
 - `addDoc(doc)`
 - `addDocs(docs)`
 - `clearDocs()`
-- `setDocs()`
 - `restoreDocs()`
 
 ### Signals and reactive helpers
 
+- `documents`
+- `documentSignals`
 - `getSignal(_id | doc)`
 - `getSignals(field, value)`
 - `getFieldSignals(field)`
-- `removeSignals(exceptIds?)`
-- `loaded`
-- `getted`
+- `isLoaded`
 
 ### Remote operations
 
@@ -70,7 +68,6 @@ export const appConfig = {
 - `unique(doc, options?)`
 - `delete(doc, options?)`
 - `setPerPage(count)`
-- `filteredDocuments(storeObjectOrArray, config?)`
 
 Example:
 
@@ -85,7 +82,7 @@ export interface Work extends CrudDocument<Work> {
 
 @Injectable({ providedIn: 'root' })
 export class WorkService extends CrudService<Work> {
-	works = this.getDocs();
+	works = this.documents;
 
 	constructor() {
 		super({ name: 'work' });

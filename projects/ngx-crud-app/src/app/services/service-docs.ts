@@ -1201,17 +1201,10 @@ async saveSettings() {
 		availableItems: ['crud.service.ts', 'crud.interface.ts', 'crud.component.ts'],
 		properties: [
 			{
-				name: 'loaded',
-				signature: 'Observable<unknown>',
-				description: 'Completes when cached documents are restored from storage.',
-				category: 'Lifecycle',
-				docType: 'Service',
-				sourceFile: 'crud.service.ts',
-			},
-			{
-				name: 'getted',
-				signature: 'Observable<unknown>',
-				description: 'Completes after the first full get() without page pagination.',
+				name: 'isLoaded',
+				signature: 'Signal<boolean>',
+				description:
+					'Turns true once the initial restore decision completes, including the empty-cache case.',
 				category: 'Lifecycle',
 				docType: 'Service',
 				sourceFile: 'crud.service.ts',
@@ -1295,9 +1288,9 @@ async saveSettings() {
 				sourceFile: 'crud.service.ts',
 			},
 			{
-				name: 'setDocs / getDocs / getDoc / clearDocs',
-				signature: 'cache management helpers',
-				description: 'Persist, retrieve, or reset the local in-memory document cache.',
+				name: 'clearDocs',
+				signature: 'clearDocs(): void',
+				description: 'Resets the local collection cache and keeps signal state in sync.',
 				category: 'Cache',
 				docType: 'Service',
 				sourceFile: 'crud.service.ts',
@@ -1311,18 +1304,10 @@ async saveSettings() {
 				sourceFile: 'crud.service.ts',
 			},
 			{
-				name: 'new',
-				signature: 'new(doc?: Document): Document',
-				description: 'Creates a local-first document with _localId and mutation flags.',
-				category: 'Documents',
-				docType: 'Service',
-				sourceFile: 'crud.service.ts',
-			},
-			{
-				name: 'doc',
-				signature: 'doc(_id: string): Document',
+				name: 'prepareDocument',
+				signature: 'prepareDocument(_id?: string): WritableSignal<Document>',
 				description:
-					'Returns a cached document, creates a placeholder if missing, and fetches the server copy in the background.',
+					'Returns a detached per-document signal or empty draft signal without injecting it into the collection, and hydrates it in the background when fetched by id.',
 				category: 'Documents',
 				docType: 'Service',
 				sourceFile: 'crud.service.ts',
@@ -1340,7 +1325,7 @@ async saveSettings() {
 				signature:
 					'get(config?: GetConfig, options?: CrudOptions<Document>): Observable<Document[]>',
 				description:
-					'Fetches collection documents, fills the cache, emits collection events, and supports pagination.',
+					'Fetches collection documents, fills the signal-backed cache, and supports pagination.',
 				category: 'Requests',
 				docType: 'Service',
 				sourceFile: 'crud.service.ts',
@@ -1405,23 +1390,23 @@ async saveSettings() {
 				sourceFile: 'crud.service.ts',
 			},
 			{
-				name: 'getSignal / getSignals / getFieldSignals / removeSignals',
+				name: 'getSignal / getSignals / getFieldSignals',
 				signature: 'signal helpers',
 				description:
-					'Expose per-document signals, field/value grouped signals, and cache cleanup for signal instances.',
+					'Expose per-document signals and field/value grouped signal collections.',
 				category: 'Signals',
 				docType: 'Service',
 				sourceFile: 'crud.service.ts',
 			},
 			{
-				name: 'filteredDocuments',
-				signature: 'filteredDocuments(storeObjectOrArray, config): () => void',
+				name: 'documents / documentSignals',
+				signature: 'read-only signals',
 				description:
-					'Registers a live projection callback for arrays or grouped maps of documents.',
+					'Expose the current collection as plain documents or per-document signals for computed projections in child services and components.',
 				details: [
-					'Supports grouping by a field name or a custom field resolver.',
-					'Supports valid(), sort(), and filtered() callbacks.',
-					'Triggered whenever _filterDocuments() runs after cache mutations.',
+					'Use documents for list-level computed state.',
+					'Use documentSignals when row identity or fine-grained updates matter.',
+					'Prefer computed() in extending services or components instead of callback-driven projections.',
 				],
 				category: 'Signals',
 				docType: 'Service',
@@ -1496,9 +1481,6 @@ async saveSettings() {
 			{
 				title: 'Events emitted through EmitterService',
 				items: [
-					'<name>_loaded after cached restore.',
-					'<name>_getted after initial full get().',
-					'<name>_filtered after filteredDocuments projections recompute.',
 					'<name>_get, _create, _update, _unique, _delete, _list, _changed during CRUD workflows.',
 					'Responds to global wipe by clearing docs and to wacom_online by replaying queued operations.',
 				],

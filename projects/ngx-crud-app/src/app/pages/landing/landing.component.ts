@@ -50,7 +50,7 @@ export class LandingComponent {
 			items: [
 				'create(), update(), unique(), delete() retry on reconnect',
 				'getSignal(), getSignals(), getFieldSignals()',
-				'loaded and getted completion streams',
+				'isLoaded signal and prepareDocument(_id)',
 			],
 		},
 		{
