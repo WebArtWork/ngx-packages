@@ -1,8 +1,8 @@
 import { isPlatformBrowser } from '@angular/common';
 import { computed, inject, PLATFORM_ID, Signal, signal, WritableSignal } from '@angular/core';
 import { Observable, ReplaySubject } from 'rxjs';
+import { EmitterService } from '@wawjs/ngx-core';
 import { CoreService } from '../core/core.service';
-import { EmitterService } from '../emitter/emitter.service';
 import { HttpService } from '../http/http.service';
 import { NetworkService } from '../network/network.service';
 import { StoreService } from '../store/store.service';

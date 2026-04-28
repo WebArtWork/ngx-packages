@@ -1,7 +1,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Inject, inject, Injectable, Optional, PLATFORM_ID } from '@angular/core';
+import { EmitterService } from '@wawjs/ngx-core';
 import { Config, CONFIG_TOKEN, DEFAULT_CONFIG } from '../core/config.interface';
-import { EmitterService } from '../emitter/emitter.service';
 
 @Injectable({
 	providedIn: 'root',

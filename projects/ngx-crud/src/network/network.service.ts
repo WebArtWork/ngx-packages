@@ -1,8 +1,8 @@
 // network.service.ts â€” Angular 20+ (zoneless) signal-based connectivity checker
 import { isPlatformBrowser } from '@angular/common';
 import { Inject, inject, Injectable, Optional, PLATFORM_ID, signal } from '@angular/core';
+import { EmitterService } from '@wawjs/ngx-core';
 import { Config, CONFIG_TOKEN } from '../core/config.interface';
-import { EmitterService } from '../emitter/emitter.service';
 import { DEFAULT_NETWORK_CONFIG, NetworkConfig, NetworkStatus } from './network.interface';
 
 @Injectable({ providedIn: 'root' })

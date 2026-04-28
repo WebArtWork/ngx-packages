@@ -20,6 +20,7 @@
 		"module": "ES2022",
 		"useDefineForClassFields": false,
 		"paths": {
+			"@wawjs/ngx-core": ["dist/ngx-core"],
 			"ngx-ace": ["projects/ngx-ace/public-api.ts"],
 			"ngx-fabric": ["projects/ngx-fabric/public-api.ts"],
 			"ngx-core": ["projects/ngx-core/public-api.ts"],
