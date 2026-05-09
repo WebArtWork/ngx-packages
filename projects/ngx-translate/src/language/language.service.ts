@@ -16,6 +16,9 @@ export class LanguageService {
 		persistLanguage: true,
 	};
 
+	readonly language = this._language.asReadonly();
+	readonly defaultLanguage = this._defaultLanguage.asReadonly();
+
 	async init(config: ProvideLanguageConfig = {}): Promise<void> {
 		this._config = {
 			...this._config,
@@ -41,14 +44,6 @@ export class LanguageService {
 		if (initialLanguage) {
 			await this.setLanguage(initialLanguage);
 		}
-	}
-
-	language(): string {
-		return this._language();
-	}
-
-	defaultLanguage(): string {
-		return this._defaultLanguage();
 	}
 
 	allLanguages(): Language[] {

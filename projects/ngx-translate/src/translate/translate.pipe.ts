@@ -12,10 +12,10 @@ export class TranslatePipe implements PipeTransform {
 	 *   (fallback behavior), so the UI remains readable.
 	 *
 	 * @param text - Translate key (typically the source text).
-	 * @returns The translated string for the current in-memory/store state.
+	 * @returns A signal containing the translated string for the current state.
 	 */
 	transform(text: string) {
-		return this._translateService.translate(text)();
+		return this._translateService.translate(text);
 	}
 
 	private _translateService = inject(TranslateService);

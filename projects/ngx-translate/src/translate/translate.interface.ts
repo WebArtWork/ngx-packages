@@ -9,6 +9,13 @@ export type TranslateConfigTranslations = Record<string, Translate[]>;
 
 export interface TranslateFileLoaderConfig {
 	folder?: string;
+	folders?: string[];
+}
+
+export interface TranslateExtraLoadOptions {
+	language?: string;
+	replace?: boolean;
+	forceReload?: boolean;
 }
 
 export interface ProvideTranslateConfig extends TranslateFileLoaderConfig, ProvideLanguageConfig {
