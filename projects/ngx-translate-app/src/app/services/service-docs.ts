@@ -279,8 +279,7 @@ export const appConfig = {
 				name: 'loadExtraTranslation',
 				signature:
 					'loadExtraTranslation(path: string, options?: TranslateExtraLoadOptions): Promise<Translate[]>',
-				description:
-					'Single-path helper that delegates to loadExtraTranslations([...]).',
+				description: 'Single-path helper that delegates to loadExtraTranslations([...]).',
 				sourceFile: 'translate.service.ts',
 			},
 			{
