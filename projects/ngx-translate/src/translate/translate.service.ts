@@ -122,7 +122,9 @@ export class TranslateService {
 
 		const baseTranslations = options.replace
 			? []
-			: (this._translationsByLanguage.get(language) || []).map(translation => ({ ...translation }));
+			: (this._translationsByLanguage.get(language) || []).map(translation => ({
+					...translation,
+				}));
 
 		if (!this._isBrowser || !Array.isArray(paths) || !paths.length) {
 			this._translationsByLanguage.set(language, [...baseTranslations]);
@@ -144,7 +146,10 @@ export class TranslateService {
 		);
 		const merged = this._mergeTranslations(baseTranslations, loaded);
 
-		this._translationsByLanguage.set(language, merged.map(translation => ({ ...translation })));
+		this._translationsByLanguage.set(
+			language,
+			merged.map(translation => ({ ...translation })),
+		);
 
 		if (this._languageService.language() === language) {
 			this._applyTranslations(merged);
@@ -291,7 +296,10 @@ export class TranslateService {
 			: [];
 		const merged = this._mergeTranslations(mergedWithFiles, normalizedInline);
 
-		this._translationsByLanguage.set(language, merged.map(translation => ({ ...translation })));
+		this._translationsByLanguage.set(
+			language,
+			merged.map(translation => ({ ...translation })),
+		);
 
 		return [...merged];
 	}
@@ -310,7 +318,10 @@ export class TranslateService {
 		return Array.from(new Set(urls));
 	}
 
-	private async _loadTranslationsFromUrls(urls: string[], language: string): Promise<Translate[]> {
+	private async _loadTranslationsFromUrls(
+		urls: string[],
+		language: string,
+	): Promise<Translate[]> {
 		if (!urls.length) {
 			return [];
 		}
@@ -342,7 +353,10 @@ export class TranslateService {
 			const loadedByUrl = await this._loadTranslationPayloadsByUrl(urlsToFetch, language);
 
 			for (const [url, translations] of loadedByUrl.entries()) {
-				cacheByUrl.set(url, translations.map(translation => ({ ...translation })));
+				cacheByUrl.set(
+					url,
+					translations.map(translation => ({ ...translation })),
+				);
 			}
 		}
 
