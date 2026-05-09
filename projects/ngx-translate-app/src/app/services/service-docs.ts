@@ -205,11 +205,11 @@ async setGerman() {
 		highlights: [
 			'translate(text) lazily creates a signal that falls back to the source text.',
 			'setLanguage() switches through LanguageService, lazy-loads payloads, and applies them without stale state.',
-			'Works with inline translations or JSON files such as /i18n/en.json.',
+			'Works with inline translations, folder/folders file loaders, and route/page extra JSON bundles.',
 		],
 		config: [
-			'Register bootstrap with provideTranslate({ language, defaultLanguage, translations?, folder? }).',
-			'With folder mode, language files are loaded as /i18n/{lang}.json by default.',
+			'Register bootstrap with provideTranslate({ language, defaultLanguage, translations?, folder?, folders? }).',
+			'With folder/folders mode, language files are loaded as /i18n/{lang}.json and optional additional sources.',
 			'Language selection is handled by the Language feature and reused here.',
 			'The translate pipe and directive both build on top of this runtime service.',
 		],
@@ -237,6 +237,7 @@ export const appConfig = {
 			defaultLanguage: 'en',
 			languages: ['en', 'ua'],
 			folder: '/i18n/',
+			folders: ['/i18n/common/', '/i18n/articles/'],
 		}),
 	],
 };`,
@@ -260,6 +261,26 @@ export const appConfig = {
 				signature: 'loadTranslations(language: string): Promise<Translate[]>',
 				description:
 					'Loads a language payload from inline config or the JSON file loader and caches it per language.',
+				sourceFile: 'translate.service.ts',
+			},
+			{
+				name: 'loadExtraTranslations',
+				signature:
+					'loadExtraTranslations(paths: string[], options?: TranslateExtraLoadOptions): Promise<Translate[]>',
+				description:
+					'Loads route/page-specific JSON bundles and merges them into the active language cache.',
+				details: [
+					'Folder-like inputs such as /i18n/articles/ are resolved to /i18n/articles/{language}.json.',
+					'Extra URLs are cached per language and skipped on repeat calls unless forceReload is true.',
+				],
+				sourceFile: 'translate.service.ts',
+			},
+			{
+				name: 'loadExtraTranslation',
+				signature:
+					'loadExtraTranslation(path: string, options?: TranslateExtraLoadOptions): Promise<Translate[]>',
+				description:
+					'Single-path helper that delegates to loadExtraTranslations([...]).',
 				sourceFile: 'translate.service.ts',
 			},
 			{
@@ -316,8 +337,9 @@ export const appConfig = {
 				title: 'Bootstrap behavior',
 				items: [
 					'Initial language resolves from language ?? stored language ?? defaultLanguage.',
-					'If inline translations exist for a language they are used directly; otherwise the file loader is used.',
+					'Language payloads are merged from file loaders (folder/folders) and inline translations when provided.',
 					'Missing language files fail safely and translations fall back to source text.',
+					'Extra page bundles can be merged at runtime and are cached per language/url.',
 					'Signals are created lazily; there is no need to pre-register every possible text.',
 				],
 			},

@@ -52,14 +52,14 @@ export const appConfig = {
 
 ## Available Features
 
-| Name | Description |
-| --- | --- |
-| `LanguageService` | Active language state, registry management, validation, and persistence |
-| `TranslateService` | Signal-based runtime translation loading and updates |
-| `TranslatePipe` | Template pipe for reactive runtime translations |
-| `TranslateDirective` | Directive that translates explicit or inline text |
-| `provideLanguage`, `provideTranslate` | Environment providers for bootstrap |
-| `Language`, `LanguageInput`, `ProvideLanguageConfig`, `ProvideTranslateConfig`, `Translate` | Public types |
+| Name                                                                                        | Description                                                             |
+| ------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| `LanguageService`                                                                           | Active language state, registry management, validation, and persistence |
+| `TranslateService`                                                                          | Signal-based runtime translation loading and updates                    |
+| `TranslatePipe`                                                                             | Template pipe for reactive runtime translations                         |
+| `TranslateDirective`                                                                        | Directive that translates explicit or inline text                       |
+| `provideLanguage`, `provideTranslate`                                                       | Environment providers for bootstrap                                     |
+| `Language`, `LanguageInput`, `ProvideLanguageConfig`, `ProvideTranslateConfig`, `Translate` | Public types                                                            |
 
 ## Language Service
 
@@ -131,10 +131,7 @@ const _translateService = inject(TranslateService);
 
 const slug = _route.snapshot.paramMap.get('slug') || '';
 
-await _translateService.loadExtraTranslations([
-	'/i18n/articles/',
-	`/i18n/article/${slug}`,
-]);
+await _translateService.loadExtraTranslations(['/i18n/articles/', `/i18n/article/${slug}`]);
 
 await _translateService.loadExtraTranslation('/i18n/articles/');
 ```

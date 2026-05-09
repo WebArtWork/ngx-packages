@@ -30,7 +30,7 @@ export class LandingComponent {
 			items: [
 				'provideLanguage() for language-only bootstrap',
 				'provideTranslate() for runtime i18n bootstrap',
-				'inline translations or /i18n/{lang}.json file loading',
+				'inline translations, /i18n/{lang}.json, folders, and extra page bundles',
 			],
 		},
 		{
@@ -58,20 +58,21 @@ export class LandingComponent {
 	protected readonly usageCopy = `import { provideTranslate } from 'ngx-translate';
 
 export const appConfig = {
-\tproviders: [provideTranslate({ defaultLanguage: 'en' })],
+	providers: [provideTranslate({ defaultLanguage: 'en' })],
 };`;
 
 	protected readonly configCopy = `import { provideTranslate } from 'ngx-translate';
 
 export const appConfig = {
-\tproviders: [
-\t\tprovideTranslate({
-\t\t\tdefaultLanguage: 'en',
-\t\t\tlanguages: ['en', 'de', 'fr'],
-\t\t\tfolder: '/i18n/',
-\t\t\tpersistLanguage: true,
-\t\t}),
-\t],
+	providers: [
+		provideTranslate({
+			defaultLanguage: 'en',
+			languages: ['en', 'de', 'fr'],
+			folder: '/i18n/',
+			folders: ['/i18n/common/', '/i18n/articles/'],
+			persistLanguage: true,
+		}),
+	],
 };`;
 
 	protected copy(key: string, value: string): void {
