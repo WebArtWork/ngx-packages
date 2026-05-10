@@ -1,14 +1,12 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Inject, inject, Injectable, Optional, PLATFORM_ID } from '@angular/core';
-import { EmitterService } from '@wawjs/ngx-core';
-import { Config, CONFIG_TOKEN, DEFAULT_CONFIG } from '../core/config.interface';
+import { Config, CONFIG_TOKEN, DEFAULT_CONFIG } from '../config.interface';
 
 @Injectable({
 	providedIn: 'root',
 })
 export class SocketService {
 	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
-	private readonly _emitterService = inject(EmitterService);
 
 	private _url = '';
 	private _io: any;
@@ -66,18 +64,15 @@ export class SocketService {
 
 		this._io.on('connect', () => {
 			this._connected = true;
-			this._emitterService.complete('socket');
 		});
 
 		this._io.on('disconnect', (reason: any) => {
 			this._connected = false;
-			this._emitterService.emit('socket_disconnect', reason);
 			console.warn('Socket disconnected', reason);
 		});
 
 		this._io.on('error', (err: any) => {
 			this._connected = false;
-			this._emitterService.emit('socket_error', err);
 			console.warn('Socket error', err);
 		});
 	}

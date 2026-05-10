@@ -1,11 +1,8 @@
 import { isPlatformBrowser } from '@angular/common';
 import { computed, inject, PLATFORM_ID, Signal, signal, WritableSignal } from '@angular/core';
 import { Observable, ReplaySubject } from 'rxjs';
-import { EmitterService } from '@wawjs/ngx-core';
-import { CoreService } from '../core/core.service';
-import { HttpService } from '../http/http.service';
-import { NetworkService } from '../network/network.service';
-import { StoreService } from '../store/store.service';
+import { CoreService, EmitterService, StoreService } from '@wawjs/ngx-core';
+import { HttpService, NetworkService } from '@wawjs/ngx-http';
 import { CrudConfig, CrudDocument, CrudOptions, GetConfig } from './crud.interface';
 
 /**

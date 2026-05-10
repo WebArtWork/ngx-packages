@@ -1,34 +1,23 @@
 import { DatePipe } from '@angular/common';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import {
+	DATETIME_CONFIG,
+	DatetimeConfig,
+	DEFAULT_DATETIME_CONFIG,
+	WeekStartDay,
+} from './datetime.interface';
 
 @Injectable({
 	providedIn: 'root',
 })
 export class TimeService {
-	private _weekDays = [
-		'Sunday',
-		'Monday',
-		'Tuesday',
-		'Wednesday',
-		'Thursday',
-		'Friday',
-		'Saturday',
-	];
+	private readonly _config = this._resolveConfig(
+		inject<DatetimeConfig | null>(DATETIME_CONFIG, { optional: true }),
+	);
 
-	private _monthNames = [
-		'January',
-		'February',
-		'March',
-		'April',
-		'May',
-		'June',
-		'July',
-		'August',
-		'September',
-		'October',
-		'November',
-		'December',
-	];
+	private _weekDays = this._config.weekDays;
+
+	private _monthNames = this._config.monthNames;
 
 	constructor(private _datePipe: DatePipe) {}
 
@@ -69,7 +58,11 @@ export class TimeService {
 	 * @param timezone - The timezone to use for formatting.
 	 * @returns The formatted date string.
 	 */
-	formatDate(date: Date, format: string = 'mediumDate', timezone: string = 'UTC'): string {
+	formatDate(
+		date: Date,
+		format: string = this._config.defaultFormat,
+		timezone: string = this._config.defaultTimezone,
+	): string {
 		return this._datePipe.transform(date, format, timezone) || '';
 	}
 
@@ -119,13 +112,9 @@ export class TimeService {
 	 * const date = new Date('2024-05-15');
 	 * service.startOfWeek(date); // => Monday May 13 2024 00:00:00 for en-GB
 	 */
-	startOfWeek(date: Date, locale?: string): Date {
+	startOfWeek(date: Date, locale = this._config.defaultLocale): Date {
 		const newDate = this.startOfDay(date);
-		const dtf = new Intl.DateTimeFormat(locale);
-		const resolved = dtf.resolvedOptions().locale;
-		const region = resolved.split('-')[1]?.toUpperCase();
-		const sundayFirst = ['US', 'CA', 'AU', 'NZ', 'PH', 'BR'];
-		const firstDay = sundayFirst.includes(region) ? 0 : 1;
+		const firstDay = this._firstDayOfWeek(locale);
 		const day = newDate.getDay();
 		const diff = (day - firstDay + 7) % 7;
 		newDate.setDate(newDate.getDate() - diff);
@@ -143,7 +132,7 @@ export class TimeService {
 	 * const date = new Date('2024-05-15');
 	 * service.endOfWeek(date); // => Sunday May 19 2024 23:59:59.999 for en-GB
 	 */
-	endOfWeek(date: Date, locale?: string): Date {
+	endOfWeek(date: Date, locale = this._config.defaultLocale): Date {
 		const start = this.startOfWeek(date, locale);
 		const end = this.addDays(start, 6);
 		return this.endOfDay(end);
@@ -464,5 +453,24 @@ export class TimeService {
 			lastWeek = this.getWeekNumber(new Date(year, 11, 31)); // Get week of the last day of the year
 		}
 		return lastWeek - firstWeek + 1;
+	}
+
+	private _firstDayOfWeek(locale: string): WeekStartDay {
+		if (this._config.firstDayOfWeek !== undefined) {
+			return this._config.firstDayOfWeek;
+		}
+
+		const dtf = new Intl.DateTimeFormat(locale || undefined);
+		const resolved = dtf.resolvedOptions().locale;
+		const region = resolved.split('-')[1]?.toUpperCase();
+
+		return this._config.sundayFirstRegions.includes(region || '') ? 0 : 1;
+	}
+
+	private _resolveConfig(config: DatetimeConfig | null): Required<DatetimeConfig> {
+		return {
+			...DEFAULT_DATETIME_CONFIG,
+			...(config || {}),
+		} as Required<DatetimeConfig>;
 	}
 }

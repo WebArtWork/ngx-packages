@@ -9,7 +9,7 @@ import {
 	WritableSignal,
 } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { CoreService } from '../core/core.service';
+import { CoreService } from '@wawjs/ngx-core';
 import { CrudDocument, CrudOptions, CrudServiceInterface, TableConfig } from './crud.interface';
 
 /**

@@ -119,18 +119,18 @@
 					</button>
 					<pre
 						class="readme-content"
-					><code><span class="code-keyword">import</span> <span class="code-punctuation">&#123;</span> <span class="code-symbol">inject</span> <span class="code-punctuation">&#125;</span> <span class="code-keyword">from</span> <span class="code-string">'@angular/core'</span><span class="code-punctuation">;</span>
-<span class="code-keyword">import</span> <span class="code-punctuation">&#123;</span> <span class="code-symbol">ThemeService</span><span class="code-punctuation">,</span> <span class="code-symbol">provideTheme</span> <span class="code-punctuation">&#125;</span> <span class="code-keyword">from</span> <span class="code-string">'ngx-ui'</span><span class="code-punctuation">;</span>
+					><code><span class="code-keyword">import</span> <span class="code-punctuation">&#123;</span> <span class="code-symbol">provideTheme</span> <span class="code-punctuation">&#125;</span> <span class="code-keyword">from</span> <span class="code-string">'ngx-ui'</span><span class="code-punctuation">;</span>
 
 <span class="code-keyword">export const</span> <span class="code-symbol">appConfig</span> <span class="code-operator">=</span> <span class="code-punctuation">&#123;</span>
-  <span class="code-property">providers</span><span class="code-punctuation">:</span> <span class="code-punctuation">[</span><span class="code-function">provideTheme</span><span class="code-punctuation">()</span><span class="code-punctuation">]</span><span class="code-punctuation">,</span>
-<span class="code-punctuation">&#125;;</span>
-
-<span class="code-keyword">const</span> <span class="code-symbol">themeService</span> <span class="code-operator">=</span> <span class="code-function">inject</span><span class="code-punctuation">(</span><span class="code-symbol">ThemeService</span><span class="code-punctuation">)</span><span class="code-punctuation">;</span>
-
-<span class="code-symbol">themeService</span><span class="code-punctuation">.</span><span class="code-function">setMode</span><span class="code-punctuation">(</span><span class="code-string">'dark'</span><span class="code-punctuation">)</span><span class="code-punctuation">;</span>
-<span class="code-symbol">themeService</span><span class="code-punctuation">.</span><span class="code-function">setDensity</span><span class="code-punctuation">(</span><span class="code-string">'comfortable'</span><span class="code-punctuation">)</span><span class="code-punctuation">;</span>
-<span class="code-symbol">themeService</span><span class="code-punctuation">.</span><span class="code-function">setRadius</span><span class="code-punctuation">(</span><span class="code-string">'rounded'</span><span class="code-punctuation">)</span><span class="code-punctuation">;</span></code></pre>
+  <span class="code-property">providers</span><span class="code-punctuation">:</span> <span class="code-punctuation">[</span>
+    <span class="code-function">provideTheme</span><span class="code-punctuation">(</span><span class="code-punctuation">&#123;</span>
+      <span class="code-property">mode</span><span class="code-punctuation">:</span> <span class="code-string">'dark'</span><span class="code-punctuation">,</span>
+      <span class="code-property">modes</span><span class="code-punctuation">:</span> <span class="code-punctuation">[</span><span class="code-string">'light'</span><span class="code-punctuation">,</span> <span class="code-string">'dark'</span><span class="code-punctuation">,</span> <span class="code-string">'contrast'</span><span class="code-punctuation">]</span><span class="code-punctuation">,</span>
+      <span class="code-property">density</span><span class="code-punctuation">:</span> <span class="code-string">'comfortable'</span><span class="code-punctuation">,</span>
+      <span class="code-property">radius</span><span class="code-punctuation">:</span> <span class="code-string">'rounded'</span><span class="code-punctuation">,</span>
+    <span class="code-punctuation">&#125;</span><span class="code-punctuation">)</span><span class="code-punctuation">,</span>
+  <span class="code-punctuation">]</span><span class="code-punctuation">,</span>
+<span class="code-punctuation">&#125;;</span></code></pre>
 				</div>
 			</section>
 

@@ -1,6 +1,7 @@
 /*
  * Datetime
  */
+export * from './src/datetime/datetime.interface';
 export * from './src/datetime/time.service';
 
 /*

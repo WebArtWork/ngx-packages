@@ -1,6 +1,6 @@
 import { provideHttpClient, withFetch, withInterceptorsFromDi } from '@angular/common/http';
 import { EnvironmentProviders, makeEnvironmentProviders } from '@angular/core';
-import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from './core/config.interface';
+import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from './config.interface';
 
 export function provideNgxHttp(config: Config = DEFAULT_CONFIG): EnvironmentProviders {
 	return makeEnvironmentProviders([

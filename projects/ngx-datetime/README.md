@@ -20,11 +20,17 @@ npm i --save ngx-datetime
 import { provideNgxDatetime } from 'ngx-datetime';
 
 export const appConfig = {
-	providers: [provideNgxDatetime()],
+	providers: [
+		provideNgxDatetime({
+			defaultFormat: 'mediumDate',
+			defaultTimezone: 'UTC',
+			defaultLocale: 'en-GB',
+		}),
+	],
 };
 ```
 
-`provideNgxDatetime()` registers Angular `DatePipe`, which is used internally by `TimeService`.
+`provideNgxDatetime()` registers Angular `DatePipe` and datetime defaults used internally by `TimeService`.
 
 ## Available Features
 
@@ -32,6 +38,7 @@ export const appConfig = {
 | --- | --- |
 | `TimeService` | Date formatting, timezone conversion, range helpers, date math, and week/month calculations |
 | `provideNgxDatetime` | Environment provider for package setup |
+| `DatetimeConfig`, `DATETIME_CONFIG`, `DEFAULT_DATETIME_CONFIG` | Provider configuration helpers |
 
 ## Time Service
 

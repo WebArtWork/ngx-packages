@@ -17,14 +17,20 @@ npm i --save ngx-crud
 ## Usage
 
 ```ts
+import { provideNgxCore } from 'ngx-core';
 import { provideNgxCrud } from 'ngx-crud';
 
 export const appConfig = {
-	providers: [provideNgxCrud()],
+	providers: [provideNgxCore(), provideNgxCrud()],
 };
 ```
 
-`provideNgxCrud()` registers the package config token and Angular `HttpClient` with `fetch` support.
+`ngx-crud` uses shared services from sibling packages instead of carrying duplicate utility code:
+
+- `CoreService`, `EmitterService`, and `StoreService` come from `ngx-core`.
+- `HttpService` and `NetworkService` come from `ngx-http`.
+
+Use `provideNgxCore()` for core/store configuration. `provideNgxCrud()` keeps a CRUD-local config token and forwards HTTP/network setup to `provideNgxHttp()` so existing CRUD apps can keep a single CRUD provider for request setup.
 
 ## Available Features
 
@@ -33,6 +39,7 @@ export const appConfig = {
 | `CrudService` | Base service for create, read, update, delete, offline retry, and signal-based document access |
 | `CrudComponent` | Reusable CRUD table component |
 | `CrudDocument`, `CrudOptions`, `CrudConfig`, `GetConfig`, `TableConfig` | Public typing helpers |
+| `Config`, `CONFIG_TOKEN`, `DEFAULT_CONFIG` | CRUD provider configuration helpers |
 | `provideNgxCrud` | Environment provider for package setup |
 
 ## Crud Service
@@ -101,7 +108,8 @@ Copy this into your project `AGENTS.md` when using `ngx-crud`:
 
 ```md
 - This project uses `ngx-crud`, an Angular utility library for CRUD data flows and reusable table behavior.
-- Prefer bootstrapping with `provideNgxCrud()` in application providers.
+- Prefer bootstrapping shared configuration with `provideNgxCore(...)` and CRUD HTTP/network setup with `provideNgxCrud(...)`.
+- `ngx-crud` depends on `ngx-core` for `CoreService`, `EmitterService`, and `StoreService`, and on `ngx-http` for `HttpService` and `NetworkService`; do not add duplicate utility services inside CRUD features.
 - Prefer extending `CrudService` for document collections that need fetch/create/update/delete flows, offline retry behavior, and reactive document access.
 - Prefer `CrudComponent` with `TableConfig` for reusable CRUD tables before building one-off implementations.
 - Keep collection-specific behavior in child services by overriding `beforeCreate`, `afterCreate`, `beforeUpdate`, `afterUpdate`, and related hooks instead of forking the base library behavior.

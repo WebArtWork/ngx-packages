@@ -26,10 +26,11 @@ export class LandingComponent {
 		{
 			title: 'Bootstrap and configuration',
 			description:
-				'Standalone-first setup centered on provideNgxCrud() for collection syncing and offline-aware CRUD flows.',
+				'Standalone-first setup that composes ngx-core storage utilities with ngx-http request and network services.',
 			items: [
+				'provideNgxCore()',
 				'provideNgxCrud()',
-				'store / http / network config',
+				'http / network config from ngx-http',
 				'SSR-safe collection defaults',
 			],
 		},
@@ -65,18 +66,22 @@ export class LandingComponent {
 		},
 	];
 
-	protected readonly usageCopy = `import { provideNgxCrud } from 'ngx-crud';
+	protected readonly usageCopy = `import { provideNgxCore } from 'ngx-core';
+import { provideNgxCrud } from 'ngx-crud';
 
 export const appConfig = {
-\tproviders: [provideNgxCrud()],
+\tproviders: [provideNgxCore(), provideNgxCrud()],
 };`;
 
-	protected readonly configCopy = `import { provideNgxCrud } from 'ngx-crud';
+	protected readonly configCopy = `import { provideNgxCore } from 'ngx-core';
+import { provideNgxCrud } from 'ngx-crud';
 
 export const appConfig = {
 \tproviders: [
-\t\tprovideNgxCrud({
+\t\tprovideNgxCore({
 \t\t\tstore: { prefix: 'waStore' },
+\t\t}),
+\t\tprovideNgxCrud({
 \t\t\thttp: {
 \t\t\t\turl: 'https://api.example.com',
 \t\t\t},

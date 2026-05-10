@@ -1,10 +1,10 @@
-import { provideHttpClient, withFetch, withInterceptorsFromDi } from '@angular/common/http';
 import { EnvironmentProviders, makeEnvironmentProviders } from '@angular/core';
-import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from './core/config.interface';
+import { provideNgxHttp } from '@wawjs/ngx-http';
+import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from './config.interface';
 
 export function provideNgxCrud(config: Config = DEFAULT_CONFIG): EnvironmentProviders {
 	return makeEnvironmentProviders([
 		{ provide: CONFIG_TOKEN, useValue: config },
-		provideHttpClient(withFetch(), withInterceptorsFromDi()),
+		provideNgxHttp(config),
 	]);
 }

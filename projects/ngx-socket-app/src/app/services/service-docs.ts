@@ -36,10 +36,10 @@ export const serviceDocs: ServiceDoc[] = [
 		description:
 			'Socket.IO client wrapper for SSR-safe connection setup, event binding, and realtime emits.',
 		summary:
-			'SocketService centralizes client-side realtime connection logic around `config.socket` and `config.io`. It resolves the target URL from app config, opens the client only in the browser, coordinates connection state, and forwards lifecycle events through EmitterService.',
+			'SocketService centralizes client-side realtime connection logic around `config.socket` and `config.io`. It resolves the target URL from app config, opens the client only in the browser, and coordinates connection state internally.',
 		highlights: [
 			'Reads `socket` and `io` from provideNgxSocket() configuration instead of hardcoding client setup in components.',
-			'Completes the `socket` task on connect and emits `socket_disconnect` and `socket_error` events through EmitterService.',
+			'Keeps connection lifecycle handling inside SocketService without depending on ngx-core emitter utilities.',
 			'Queues `on()` and `emit()` calls until the socket is connected.',
 		],
 		config: [
@@ -158,7 +158,7 @@ ngOnInit() {
 				items: [
 					'Use SocketService when the app already depends on Socket.IO and wants connection setup centralized under provideNgxSocket().',
 					'The service resolves its browser endpoint lazily and never opens the client during SSR.',
-					'EmitterService receives socket lifecycle events so other parts of the app can react without wiring directly into the client instance.',
+					'Socket lifecycle warnings stay local to the service; consumers subscribe to socket events directly with on().',
 				],
 			},
 		],

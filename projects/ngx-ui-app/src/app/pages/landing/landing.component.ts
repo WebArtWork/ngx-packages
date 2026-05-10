@@ -26,8 +26,8 @@ export class LandingComponent {
 		{
 			title: 'Bootstrap',
 			description:
-				'Standalone-first setup centered on provideTheme() so theme state initializes once during app startup.',
-			items: ['provideTheme()', 'environment initializer', 'SSR-safe startup defaults'],
+				'Standalone-first setup centered on provideTheme() so configurable theme state initializes once during app startup.',
+			items: ['provideTheme(config)', 'provideNgxUi(config)', 'SSR-safe startup defaults'],
 		},
 		{
 			title: 'Mode switching',
@@ -55,18 +55,18 @@ export const appConfig = {
 \tproviders: [provideTheme()],
 };`;
 
-	protected readonly configCopy = `import { inject } from '@angular/core';
-import { ThemeService, provideTheme } from 'ngx-ui';
+	protected readonly configCopy = `import { provideTheme } from 'ngx-ui';
 
 export const appConfig = {
-\tproviders: [provideTheme()],
-};
-
-const themeService = inject(ThemeService);
-
-themeService.setMode('dark');
-themeService.setDensity('comfortable');
-themeService.setRadius('rounded');`;
+\tproviders: [
+\t\tprovideTheme({
+\t\t\tmode: 'dark',
+\t\t\tmodes: ['light', 'dark', 'contrast'],
+\t\t\tdensity: 'comfortable',
+\t\t\tradius: 'rounded',
+\t\t}),
+\t],
+};`;
 
 	protected copy(key: string, value: string): void {
 		if (!isPlatformBrowser(this._platformId) || !navigator?.clipboard) {

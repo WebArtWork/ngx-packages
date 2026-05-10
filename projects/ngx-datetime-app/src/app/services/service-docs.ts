@@ -43,23 +43,48 @@ const _serviceDocs: ServiceDoc[] = [
 			'Covers add/subtract operations, differences, same-day checks, ISO week numbers, and month week counts.',
 		],
 		config: [
-			'Register the package with provideNgxDatetime() to provide Angular DatePipe for TimeService.',
+			'Register the package with provideNgxDatetime(config?) to provide Angular DatePipe for TimeService.',
 			'TimeService is provided in root and uses Angular DatePipe internally for formatting.',
-			'Week boundaries depend on locale when using startOfWeek() and endOfWeek().',
+			'Configure day/month names, default format, timezone, locale, and first-day-of-week policy through DatetimeConfig.',
 		],
-		availableItems: ['provide-ngx-datetime.ts', 'time.service.ts'],
+		availableItems: ['datetime.interface.ts', 'provide-ngx-datetime.ts', 'time.service.ts'],
+		properties: [
+			{
+				name: 'DatetimeConfig',
+				signature: 'interface DatetimeConfig',
+				description:
+					'Provider configuration for weekday/month labels, default formatting, timezone, locale, and week-start policy.',
+				category: 'Configuration',
+				docType: 'Interface',
+				sourceFile: 'datetime.interface.ts',
+			},
+			{
+				name: 'DATETIME_CONFIG / DEFAULT_DATETIME_CONFIG',
+				signature: 'InjectionToken<DatetimeConfig> and default config const',
+				description:
+					'Configuration token and defaults consumed by TimeService.',
+				category: 'Configuration',
+				docType: 'Const',
+				sourceFile: 'datetime.interface.ts',
+			},
+		],
 		methods: [
 			{
 				name: 'provideNgxDatetime',
-				signature: 'provideNgxDatetime(): EnvironmentProviders',
-				description: 'Registers the Angular DatePipe dependency used by TimeService.',
+				signature: 'provideNgxDatetime(config?: DatetimeConfig): EnvironmentProviders',
+				description: 'Registers the Angular DatePipe dependency and datetime defaults used by TimeService.',
 				category: 'Bootstrap',
 				docType: 'Const',
 				sourceFile: 'provide-ngx-datetime.ts',
 				example: `import { provideNgxDatetime } from 'ngx-datetime';
 
 export const appConfig = {
-	providers: [provideNgxDatetime()],
+	providers: [
+		provideNgxDatetime({
+			defaultFormat: 'medium',
+			defaultTimezone: 'UTC',
+		}),
+	],
 };`,
 			},
 			{
@@ -191,7 +216,7 @@ buildReminder(date: Date) {
 				items: [
 					'Use TimeService when features need shared date formatting, ranges, or calendar math without introducing another date library.',
 					'The service returns new Date instances for transformations so callers can keep inputs immutable.',
-					'Formatting uses Angular DatePipe while other helpers rely on built-in Date and Intl APIs.',
+					'Formatting uses Angular DatePipe and provider defaults while other helpers rely on built-in Date and Intl APIs.',
 				],
 			},
 		],

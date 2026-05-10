@@ -26,11 +26,11 @@ export class LandingComponent {
 		{
 			title: 'Bootstrap',
 			description:
-				'Focused setup centered on provideNgxDatetime() with optional ngx-core metadata defaults.',
+				'Focused setup centered on provideNgxDatetime() with configurable date naming and formatting defaults.',
 			items: [
-				'provideNgxDatetime()',
+				'provideNgxDatetime(config)',
 				'DatePipe dependency registration',
-				'Works alongside provideNgxCore()',
+				'default format, timezone, locale, and week policy',
 			],
 		},
 		{
@@ -51,18 +51,16 @@ export const appConfig = {
 \tproviders: [provideNgxDatetime()],
 };`;
 
-	protected readonly configCopy = `import { provideNgxCore } from 'ngx-core';
-import { provideNgxDatetime } from 'ngx-datetime';
+	protected readonly configCopy = `import { provideNgxDatetime } from 'ngx-datetime';
 
 export const appConfig = {
 \tproviders: [
-\t\tprovideNgxCore({
-\t\t\tmeta: {
-\t\t\t\tapplyFromRoutes: true,
-\t\t\t\tdefaults: { links: {} },
-\t\t\t},
+\t\tprovideNgxDatetime({
+\t\t\tdefaultFormat: 'medium',
+\t\t\tdefaultTimezone: 'UTC',
+\t\t\tdefaultLocale: 'en-GB',
+\t\t\tfirstDayOfWeek: 1,
 \t\t}),
-\t\tprovideNgxDatetime(),
 \t],
 };`;
 

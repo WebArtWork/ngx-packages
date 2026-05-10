@@ -2,7 +2,7 @@
 import { isPlatformBrowser } from '@angular/common';
 import { Inject, inject, Injectable, Optional, PLATFORM_ID, signal } from '@angular/core';
 import { EmitterService } from '@wawjs/ngx-core';
-import { Config, CONFIG_TOKEN } from '../core/config.interface';
+import { Config, CONFIG_TOKEN } from '../config.interface';
 import { DEFAULT_NETWORK_CONFIG, NetworkConfig, NetworkStatus } from './network.interface';
 
 @Injectable({ providedIn: 'root' })

@@ -2,7 +2,7 @@
 
 Angular SSR-safe theme state package from Web Art Work.
 
-`ngx-ui` is focused on theme mode, density, and radius preferences through `ThemeService`.
+`ngx-ui` is focused on configurable theme mode, density, and radius preferences through `ThemeService`.
 
 ## License
 
@@ -20,7 +20,14 @@ npm i --save ngx-ui
 import { provideTheme } from 'ngx-ui';
 
 export const appConfig = {
-	providers: [provideTheme()],
+	providers: [
+		provideTheme({
+			mode: 'dark',
+			modes: ['light', 'dark'],
+			density: 'comfortable',
+			radius: 'rounded',
+		}),
+	],
 };
 ```
 
@@ -30,6 +37,8 @@ export const appConfig = {
 | --- | --- |
 | `ThemeService` | Theme mode, density, radius, persistence, and theme cycling |
 | `provideTheme` | Environment provider for automatic theme initialization |
+| `provideNgxUi` | Alias for `provideTheme()` following the package provider naming convention |
+| `ThemeConfig`, `THEME_CONFIG`, `DEFAULT_THEME_CONFIG` | Provider configuration helpers |
 | `ThemeMode`, `ThemeDensity`, `ThemeRadius` | Public theme types |
 
 ## Theme Service

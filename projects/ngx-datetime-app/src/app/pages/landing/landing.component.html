@@ -104,7 +104,7 @@
 				</div>
 				<p>
 					Use <code>provideNgxCore()</code> for app metadata and add
-					<code>provideNgxDatetime()</code> for the focused datetime feature.
+					<code>provideNgxDatetime()</code> for the focused datetime feature and its local defaults.
 				</p>
 				<div class="code-block">
 					<button
@@ -122,18 +122,16 @@
 					</button>
 					<pre
 						class="readme-content"
-					><code><span class="code-keyword">import</span> <span class="code-punctuation">&#123;</span> <span class="code-symbol">provideNgxCore</span> <span class="code-punctuation">&#125;</span> <span class="code-keyword">from</span> <span class="code-string">'ngx-core'</span><span class="code-punctuation">;</span>
-<span class="code-keyword">import</span> <span class="code-punctuation">&#123;</span> <span class="code-symbol">provideNgxDatetime</span> <span class="code-punctuation">&#125;</span> <span class="code-keyword">from</span> <span class="code-string">'ngx-datetime'</span><span class="code-punctuation">;</span>
+					><code><span class="code-keyword">import</span> <span class="code-punctuation">&#123;</span> <span class="code-symbol">provideNgxDatetime</span> <span class="code-punctuation">&#125;</span> <span class="code-keyword">from</span> <span class="code-string">'ngx-datetime'</span><span class="code-punctuation">;</span>
 
 <span class="code-keyword">export const</span> <span class="code-symbol">appConfig</span> <span class="code-operator">=</span> <span class="code-punctuation">&#123;</span>
   <span class="code-property">providers</span><span class="code-punctuation">:</span> <span class="code-punctuation">[</span>
-    <span class="code-function">provideNgxCore</span><span class="code-punctuation">(</span><span class="code-punctuation">&#123;</span>
-      <span class="code-property">meta</span><span class="code-punctuation">:</span> <span class="code-punctuation">&#123;</span>
-        <span class="code-property">applyFromRoutes</span><span class="code-punctuation">:</span> <span class="code-boolean">true</span><span class="code-punctuation">,</span>
-        <span class="code-property">defaults</span><span class="code-punctuation">:</span> <span class="code-punctuation">&#123;</span> <span class="code-property">links</span><span class="code-punctuation">:</span> <span class="code-punctuation">&#123;&#125;</span> <span class="code-punctuation">&#125;</span><span class="code-punctuation">,</span>
-      <span class="code-punctuation">&#125;</span><span class="code-punctuation">,</span>
+    <span class="code-function">provideNgxDatetime</span><span class="code-punctuation">(</span><span class="code-punctuation">&#123;</span>
+      <span class="code-property">defaultFormat</span><span class="code-punctuation">:</span> <span class="code-string">'medium'</span><span class="code-punctuation">,</span>
+      <span class="code-property">defaultTimezone</span><span class="code-punctuation">:</span> <span class="code-string">'UTC'</span><span class="code-punctuation">,</span>
+      <span class="code-property">defaultLocale</span><span class="code-punctuation">:</span> <span class="code-string">'en-GB'</span><span class="code-punctuation">,</span>
+      <span class="code-property">firstDayOfWeek</span><span class="code-punctuation">:</span> <span class="code-number">1</span><span class="code-punctuation">,</span>
     <span class="code-punctuation">&#125;</span><span class="code-punctuation">)</span><span class="code-punctuation">,</span>
-    <span class="code-function">provideNgxDatetime</span><span class="code-punctuation">()</span><span class="code-punctuation">,</span>
   <span class="code-punctuation">]</span><span class="code-punctuation">,</span>
 <span class="code-punctuation">&#125;;</span></code></pre>
 				</div>

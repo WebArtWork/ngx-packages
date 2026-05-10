@@ -1,7 +1,7 @@
 /*
  * Configuration
  */
-export * from './src/core/config.interface';
+export * from './src/config.interface';
 
 /*
  * Rtc

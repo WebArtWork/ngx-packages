@@ -38,16 +38,17 @@ export const serviceDocs: ServiceDoc[] = [
 		summary:
 			'ThemeService owns document-level appearance state for Angular applications. It persists values in localStorage when available, applies data attributes to the html element in the browser, and exposes Angular signals for mode, density, radius, and the active combination index.',
 		highlights: [
-			'Initializes once through provideTheme() so components do not need to call init() manually.',
+			'Initializes once through provideTheme(config?) so components do not need to call init() manually.',
 			'Applies data-mode, data-density, and data-radius on the document root in the browser.',
-			'Persists selected values to localStorage and restores them on the next visit.',
+			'Persists selected values to configurable localStorage keys and restores them on the next visit.',
 		],
 		config: [
-			'Use provideTheme() once in application providers.',
+			'Use provideTheme(config?) once in application providers.',
 			'Default values are dark mode, comfortable density, and rounded radius.',
+			'Configure modes, densities, radiuses, defaults, persistence, and storage keys through ThemeConfig.',
 			'Use html[data-mode], html[data-density], and html[data-radius] selectors in app styles.',
 		],
-		availableItems: ['provide-theme.ts', 'theme.service.ts', 'theme.type.ts'],
+		availableItems: ['provide-theme.ts', 'theme.interface.ts', 'theme.service.ts', 'theme.type.ts'],
 		properties: [
 			{
 				name: 'mode / density / radius',
@@ -82,20 +83,41 @@ export const serviceDocs: ServiceDoc[] = [
 				docType: 'Type',
 				sourceFile: 'theme.type.ts',
 			},
+			{
+				name: 'ThemeConfig',
+				signature: 'interface ThemeConfig',
+				description:
+					'Provider configuration for default theme values, option lists, persistence, and storage keys.',
+				category: 'Configuration',
+				docType: 'Interface',
+				sourceFile: 'theme.interface.ts',
+			},
 		],
 		methods: [
 			{
 				name: 'provideTheme',
-				signature: 'provideTheme(): EnvironmentProviders',
+				signature: 'provideTheme(config?: ThemeConfig): EnvironmentProviders',
 				description:
-					'Registers an environment initializer that injects ThemeService and runs init() during app bootstrap.',
+					'Registers ThemeConfig and an environment initializer that injects ThemeService and runs init() during app bootstrap.',
 				category: 'Providers',
 				sourceFile: 'provide-theme.ts',
 				example: `import { provideTheme } from 'ngx-ui';
 
 export const appConfig = {
-\tproviders: [provideTheme()],
+\tproviders: [
+\t\tprovideTheme({
+\t\t\tmode: 'dark',
+\t\t\tmodes: ['light', 'dark', 'contrast'],
+\t\t}),
+\t],
 };`,
+			},
+			{
+				name: 'provideNgxUi',
+				signature: 'provideNgxUi(config?: ThemeConfig): EnvironmentProviders',
+				description: 'Alias for provideTheme() that follows the package provider naming convention.',
+				category: 'Providers',
+				sourceFile: 'provide-theme.ts',
 			},
 			{
 				name: 'setMode',
@@ -204,7 +226,7 @@ export class ThemeToggleComponent {
 		code: `import { ThemeService, provideTheme } from 'ngx-ui';
 
 export const appConfig = {
-\tproviders: [provideTheme()],
+\tproviders: [provideTheme({ mode: 'dark' })],
 };
 
 readonly themeService = inject(ThemeService);

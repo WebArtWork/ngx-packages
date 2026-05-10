@@ -90,10 +90,11 @@
 					</button>
 					<pre
 						class="readme-content"
-					><code><span class="code-keyword">import</span> <span class="code-punctuation">&#123;</span> <span class="code-symbol">provideNgxCrud</span> <span class="code-punctuation">&#125;</span> <span class="code-keyword">from</span> <span class="code-string">'ngx-crud'</span><span class="code-punctuation">;</span>
+					><code><span class="code-keyword">import</span> <span class="code-punctuation">&#123;</span> <span class="code-symbol">provideNgxCore</span> <span class="code-punctuation">&#125;</span> <span class="code-keyword">from</span> <span class="code-string">'ngx-core'</span><span class="code-punctuation">;</span>
+<span class="code-keyword">import</span> <span class="code-punctuation">&#123;</span> <span class="code-symbol">provideNgxCrud</span> <span class="code-punctuation">&#125;</span> <span class="code-keyword">from</span> <span class="code-string">'ngx-crud'</span><span class="code-punctuation">;</span>
 
 <span class="code-keyword">export const</span> <span class="code-symbol">appConfig</span> <span class="code-operator">=</span> <span class="code-punctuation">&#123;</span>
-  <span class="code-property">providers</span><span class="code-punctuation">:</span> <span class="code-punctuation">[</span><span class="code-function">provideNgxCrud</span><span class="code-punctuation">()</span><span class="code-punctuation">]</span><span class="code-punctuation">,</span>
+  <span class="code-property">providers</span><span class="code-punctuation">:</span> <span class="code-punctuation">[</span><span class="code-function">provideNgxCore</span><span class="code-punctuation">()</span><span class="code-punctuation">,</span> <span class="code-function">provideNgxCrud</span><span class="code-punctuation">()</span><span class="code-punctuation">]</span><span class="code-punctuation">,</span>
 <span class="code-punctuation">&#125;;</span></code></pre>
 				</div>
 			</section>
@@ -123,13 +124,16 @@
 					</button>
 					<pre
 						class="readme-content"
-					><code><span class="code-keyword">import</span> <span class="code-punctuation">&#123;</span> <span class="code-symbol">provideNgxCrud</span> <span class="code-punctuation">&#125;</span> <span class="code-keyword">from</span> <span class="code-string">'ngx-crud'</span><span class="code-punctuation">;</span>
+					><code><span class="code-keyword">import</span> <span class="code-punctuation">&#123;</span> <span class="code-symbol">provideNgxCore</span> <span class="code-punctuation">&#125;</span> <span class="code-keyword">from</span> <span class="code-string">'ngx-core'</span><span class="code-punctuation">;</span>
+<span class="code-keyword">import</span> <span class="code-punctuation">&#123;</span> <span class="code-symbol">provideNgxCrud</span> <span class="code-punctuation">&#125;</span> <span class="code-keyword">from</span> <span class="code-string">'ngx-crud'</span><span class="code-punctuation">;</span>
 
 <span class="code-keyword">export const</span> <span class="code-symbol">appConfig</span> <span class="code-operator">=</span> <span class="code-punctuation">&#123;</span>
   <span class="code-property">providers</span><span class="code-punctuation">:</span> <span class="code-punctuation">[</span>
+    <span class="code-function">provideNgxCore</span><span class="code-punctuation">(</span><span class="code-punctuation">&#123;</span>
+      <span class="code-property">store</span><span class="code-punctuation">:</span> <span class="code-punctuation">&#123;</span> <span class="code-property">prefix</span><span class="code-punctuation">:</span> <span class="code-string">'waStore'</span> <span class="code-punctuation">&#125;</span><span class="code-punctuation">,</span>
+    <span class="code-punctuation">&#125;</span><span class="code-punctuation">)</span><span class="code-punctuation">,</span>
     <span class="code-function">provideNgxCrud</span><span class="code-punctuation">(</span><span class="code-punctuation">&#123;</span>
       <span class="code-property">http</span><span class="code-punctuation">:</span> <span class="code-punctuation">&#123;</span> <span class="code-property">url</span><span class="code-punctuation">:</span> <span class="code-string">'https://api.example.com'</span> <span class="code-punctuation">&#125;</span><span class="code-punctuation">,</span>
-      <span class="code-property">store</span><span class="code-punctuation">:</span> <span class="code-punctuation">&#123;</span> <span class="code-property">prefix</span><span class="code-punctuation">:</span> <span class="code-string">'waStore'</span> <span class="code-punctuation">&#125;</span><span class="code-punctuation">,</span>
       <span class="code-property">network</span><span class="code-punctuation">:</span> <span class="code-punctuation">&#123;</span> <span class="code-property">endpoints</span><span class="code-punctuation">:</span> <span class="code-punctuation">[</span><span class="code-string">'https://api.example.com/ping'</span><span class="code-punctuation">]</span> <span class="code-punctuation">&#125;</span><span class="code-punctuation">,</span>
     <span class="code-punctuation">&#125;</span><span class="code-punctuation">)</span><span class="code-punctuation">,</span>
   <span class="code-punctuation">]</span><span class="code-punctuation">,</span>
