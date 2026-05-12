@@ -5,20 +5,11 @@ import { Signal, WritableSignal } from '@angular/core';
  */
 export interface CrudDocument<Document> {
 	/** Unique identifier of the document. */
-	_id?: string;
-	/** Temporary unique identifier of the document for offline use */
-	_localId?: number;
+	_id: string;
 	/** Optional application identifier to which the document belongs. */
 	appId?: string;
 	/** Numerical position used for manual ordering. */
 	order?: number;
-	/** Flag indicating the document is creating */
-	__creating?: boolean;
-	/** Flag set when the document has been modified locally. */
-	__modified?: string[];
-	/** Flag set when the document has been deleted locally. */
-	__deleted?: boolean;
-	__options?: Record<string, CrudOptions<Document>>;
 }
 
 /**

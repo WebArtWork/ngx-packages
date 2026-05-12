@@ -37,21 +37,21 @@ export class LandingComponent {
 		{
 			title: 'CRUD runtime',
 			description:
-				'One extracted feature package that keeps data loading, mutation, retry, and cached document access together.',
+				'One base service per document interface, with a single documents signal as the source of truth.',
 			items: [
-				'CrudService',
-				'CrudComponent',
-				'CrudDocument, CrudOptions, CrudConfig, TableConfig',
+				'CrudService<Document>',
+				'required Mongo-compatible _id',
+				'computed() projections from documents',
 			],
 		},
 		{
 			title: 'Offline-aware behavior',
 			description:
-				'Queue writes while offline, restore cached documents, and resync once connectivity returns.',
+				'Apply writes locally first, persist a mutation queue, and resync when NetworkService.isOnline turns true.',
 			items: [
-				'create(), update(), unique(), delete() retry on reconnect',
-				'getSignal(), getSignals(), getFieldSignals()',
-				'isLoaded signal and prepareDocument(_id)',
+				'create(), update(), unique(), delete() work without subscribe',
+				'flushQueue() replays mutations in order',
+				'checkUser(userId) scopes cache to login state',
 			],
 		},
 		{

@@ -1,10 +1,21 @@
 <div class="app-shell">
 	<header class="topbar">
-		<a class="brand" routerLink="/" [attr.aria-label]="('Go to home page' | translate)()">
+		<a
+			class="brand"
+			routerLink="/"
+			[translate]="{
+				ariaLabel: 'Go to home page',
+			}"
+		>
 			<img src="logo.png" alt="ngx-translate" />
 		</a>
 
-		<nav class="topbar-nav" [attr.aria-label]="('Service navigation' | translate)()">
+		<nav
+			class="topbar-nav"
+			[translate]="{
+				ariaLabel: 'Service navigation',
+			}"
+		>
 			@for (service of services; track service.slug) {
 				<a
 					class="topbar-link"
@@ -19,10 +30,12 @@
 		<div class="topbar-actions">
 			<div
 				class="language-switcher"
-				[attr.aria-label]="('Language switcher' | translate)()"
 				role="group"
+				[translate]="{
+					ariaLabel: 'Language switcher',
+				}"
 			>
-				<span class="language-label">{{ ('Language' | translate)() }}</span>
+				<span class="language-label" translate>Language</span>
 
 				@for (language of languages(); track language.code) {
 					<button
@@ -30,8 +43,10 @@
 						class="language-button"
 						[class.language-button-active]="isLanguage(language.code)"
 						(click)="setLanguage(language.code)"
-						[attr.aria-label]="switchLanguageLabel(language)"
-						[attr.title]="language.nativeName || language.name"
+						[translate]="{
+							ariaLabel: switchLanguageKey(language),
+							title: language.name,
+						}"
 					>
 						@if (languageFlag(language); as flag) {
 							<img
@@ -48,21 +63,15 @@
 			<button
 				class="theme-toggle"
 				(click)="toggleTheme()"
-				[attr.aria-label]="
-					('Switch to' | translate)() +
-					' ' +
-					(themeService.mode() === 'light'
-						? ('dark' | translate)()
-						: ('light' | translate)()) +
-					' ' +
-					('mode' | translate)()
-				"
-				[attr.title]="('Toggle dark/light mode' | translate)()"
+				[translate]="{
+					ariaLabel: themeToggleKey(),
+					title: 'Toggle dark/light mode',
+				}"
 			>
 				@if (themeService.mode() === 'light') {
-					<span class="theme-icon">☀️</span>
+					<span class="theme-icon">&#9728;&#65039;</span>
 				} @else {
-					<span class="theme-icon">🌙</span>
+					<span class="theme-icon">&#127769;</span>
 				}
 			</button>
 		</div>

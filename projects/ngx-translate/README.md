@@ -5,7 +5,7 @@ Angular language and runtime translation package from Web Art Work.
 `ngx-translate` is SSR-safe and focused on two features:
 
 - `LanguageService` plus `provideLanguage(...)` for active language state, defaults, registry management, and optional persistence
-- `TranslateService` plus `provideTranslate(...)`, `TranslatePipe`, and `TranslateDirective` for signal-based runtime translations
+- `TranslateService` plus `provideTranslate(...)` and `TranslateDirective` for signal-based runtime translations
 
 ## License
 
@@ -14,20 +14,20 @@ Angular language and runtime translation package from Web Art Work.
 ## Installation
 
 ```bash
-npm i --save ngx-translate
+npm i --save @wawjs/ngx-translate
 ```
 
 ## Usage
 
 ```ts
-import { provideTranslate } from 'ngx-translate';
+import { provideTranslate } from '@wawjs/ngx-translate';
 
 export const appConfig = {
 	providers: [
 		provideTranslate({
 			defaultLanguage: 'en',
 			language: 'en',
-			languages: ['en', 'ua'],
+			languages: ['en', 'de', 'fr'],
 			folder: '/i18n/',
 			folders: ['/i18n/articles/', '/i18n/common/'],
 		}),
@@ -38,7 +38,7 @@ export const appConfig = {
 ## Language-Only Bootstrap
 
 ```ts
-import { provideLanguage } from 'ngx-translate';
+import { provideLanguage } from '@wawjs/ngx-translate';
 
 export const appConfig = {
 	providers: [
@@ -56,8 +56,7 @@ export const appConfig = {
 | ------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
 | `LanguageService`                                                                           | Active language state, registry management, validation, and persistence |
 | `TranslateService`                                                                          | Signal-based runtime translation loading and updates                    |
-| `TranslatePipe`                                                                             | Template pipe for reactive runtime translations                         |
-| `TranslateDirective`                                                                        | Directive that translates explicit or inline text                       |
+| `TranslateDirective`                                                                        | Directive that translates explicit text, inline text, and attributes    |
 | `provideLanguage`, `provideTranslate`                                                       | Environment providers for bootstrap                                     |
 | `Language`, `LanguageInput`, `ProvideLanguageConfig`, `ProvideTranslateConfig`, `Translate` | Public types                                                            |
 
@@ -108,13 +107,13 @@ Example:
 
 ```ts
 import { inject } from '@angular/core';
-import { TranslateService } from 'ngx-translate';
+import { TranslateService } from '@wawjs/ngx-translate';
 
 const _translateService = inject(TranslateService);
 
 const title = _translateService.translate('Create project');
 
-void _translateService.setLanguage('ua');
+void _translateService.setLanguage('de');
 ```
 
 ## Route/Page Extra JSON Bundles
@@ -124,7 +123,7 @@ You can merge additional JSON translation files for a specific page without repl
 ```ts
 import { ActivatedRoute } from '@angular/router';
 import { inject } from '@angular/core';
-import { TranslateService } from 'ngx-translate';
+import { TranslateService } from '@wawjs/ngx-translate';
 
 const _route = inject(ActivatedRoute);
 const _translateService = inject(TranslateService);
@@ -145,19 +144,24 @@ Notes:
 - Pass `replace: true` to replace cached translations for that language with only the loaded files.
 - Pass `forceReload: true` to refetch URLs that were already cached.
 
-## Translate Pipe
-
-```html
-<h1>{{ 'Create project' | translate }}</h1>
-```
-
 ## Translate Directive
 
 ```html
 <h1 translate>Create project</h1>
 <button translate>Save</button>
 <h2 translate="Create project"></h2>
+<span
+	[translate]="{
+		title: 'This is hello world title',
+		content: 'hello world',
+		ariaLabel: 'hello world label',
+	}"
+></span>
 ```
+
+Use `content` for the host text. Other object keys are translated and written as
+attributes; camelCase keys such as `ariaLabel` are written as dash-case
+attributes such as `aria-label`.
 
 ## Notes
 
@@ -172,7 +176,7 @@ Copy this into your project `AGENTS.md` when using `ngx-translate`:
 ```md
 - This project uses `ngx-translate`, an Angular utility library for runtime language and translation management.
 - Prefer bootstrapping with `provideTranslate({...})` when translations are needed, or `provideLanguage({...})` for language-only state.
-- Register app translations with `provideTranslate(...)` and use `TranslateService`, `TranslatePipe`, or `TranslateDirective` instead of creating a parallel translation bootstrap path.
+- Register app translations with `provideTranslate(...)` and use `TranslateService` or `TranslateDirective` instead of creating a parallel translation bootstrap path.
 - Prefer `LanguageService` for active language state, validation, defaults, and persistence before adding app-specific language utilities.
 - Keep SSR-safe behavior intact. Do not add unguarded direct access to browser storage for language persistence when the package already handles it.
 ```

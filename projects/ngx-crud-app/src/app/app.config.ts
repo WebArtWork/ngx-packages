@@ -31,7 +31,7 @@ export const appConfig: ApplicationConfig = {
 					title: 'ngx-crud',
 					titleSuffix: ' | Web Art Work',
 					description:
-						'Angular CRUD package from Web Art Work for offline-aware data flows, cached collections, and reusable CRUD list components.',
+						'Angular CRUD package from Web Art Work for signal-first collections, optimistic local writes, Mongo-compatible IDs, and offline queue replay.',
 					image: 'https://wawjs.wiki/logo.png',
 					links: {
 						canonical: 'https://wawjs.wiki/ngx-crud',

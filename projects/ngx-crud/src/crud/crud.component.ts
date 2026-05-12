@@ -168,9 +168,7 @@ export abstract class CrudComponent<
 	/**
 	 * Clears temporary metadata before document creation.
 	 */
-	protected preCreate(doc: Document): void {
-		delete doc.__creating;
-	}
+	protected preCreate(_doc: Document): void {}
 
 	/**
 	 * Function which controls whether the create functionality is available.

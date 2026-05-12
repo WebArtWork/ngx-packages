@@ -66,7 +66,7 @@ const _serviceDocs: ServiceDoc[] = [
 				description: 'Registers LanguageService initialization during app bootstrap.',
 				category: 'Providers',
 				sourceFile: 'provide-language.ts',
-				example: `import { provideLanguage } from 'ngx-translate';
+				example: `import { provideLanguage } from '@wawjs/ngx-translate';
 
 export const appConfig = {
 	providers: [
@@ -123,7 +123,7 @@ export const appConfig = {
 					'Validates and applies the active language, then persists it when enabled.',
 				category: 'State',
 				sourceFile: 'language.service.ts',
-				example: `import { LanguageService } from 'ngx-translate';
+				example: `import { LanguageService } from '@wawjs/ngx-translate';
 
 private readonly _languageService = inject(LanguageService);
 
@@ -183,7 +183,7 @@ async switchLanguage(code: string) {
 				],
 			},
 		],
-		code: `import { LanguageService, provideLanguage } from 'ngx-translate';
+		code: `import { LanguageService, provideLanguage } from '@wawjs/ngx-translate';
 
 export const appConfig = {
 	providers: [provideLanguage({ defaultLanguage: 'en' })],
@@ -211,7 +211,7 @@ async setGerman() {
 			'Register bootstrap with provideTranslate({ language, defaultLanguage, translations?, folder?, folders? }).',
 			'With folder/folders mode, language files are loaded as /i18n/{lang}.json and optional additional sources.',
 			'Language selection is handled by the Language feature and reused here.',
-			'The translate pipe and directive both build on top of this runtime service.',
+			'TranslateDirective builds on top of this runtime service and can translate host text plus attributes.',
 		],
 		availableItems: [
 			'provide-translate.ts',
@@ -219,7 +219,6 @@ async setGerman() {
 			'translate.interface.ts',
 			'translate.type.ts',
 			'translate.directive.ts',
-			'translate.pipe.ts',
 		],
 		methods: [
 			{
@@ -229,13 +228,13 @@ async setGerman() {
 				description: 'Registers TranslateService initialization during app bootstrap.',
 				category: 'Providers',
 				sourceFile: 'provide-translate.ts',
-				example: `import { provideTranslate } from 'ngx-translate';
+				example: `import { provideTranslate } from '@wawjs/ngx-translate';
 
 export const appConfig = {
 	providers: [
 		provideTranslate({
 			defaultLanguage: 'en',
-			languages: ['en', 'ua'],
+			languages: ['en', 'de', 'fr'],
 			folder: '/i18n/',
 			folders: ['/i18n/common/', '/i18n/articles/'],
 		}),
@@ -305,11 +304,42 @@ export const appConfig = {
 				sourceFile: 'translate.service.ts',
 			},
 			{
+				name: 'TranslateDirective',
+				signature:
+					'translate | translate="source" | [translate]="{ content, title, ariaLabel }"',
+				description:
+					'Translates inline host text, an explicit content key, or an object map where content updates textContent and other keys update attributes.',
+				details: [
+					'Object bindings require Angular property binding syntax: [translate]="{ title: \'Title key\', content: \'Content key\' }".',
+					'Attribute keys are normalized from camelCase to dash-case, so ariaLabel writes aria-label.',
+				],
+				category: 'Directive',
+				docType: 'Component',
+				sourceFile: 'translate.directive.ts',
+				example: `<span
+	[translate]="{
+		title: 'This is hello world title',
+		content: 'hello world',
+		ariaLabel: 'hello world label',
+	}"
+></span>`,
+			},
+			{
 				name: 'Translate',
 				signature: 'interface Translate { sourceText: string; text: string; }',
 				description: 'One translation entry for a specific source text.',
 				category: 'Contracts',
 				docType: 'Interface',
+				sourceFile: 'translate.interface.ts',
+			},
+			{
+				name: 'TranslateDirectiveValue',
+				signature:
+					'type TranslateDirectiveValue = string | Record<string, string>',
+				description:
+					'Directive input value for translating text content or a map of host attributes.',
+				category: 'Contracts',
+				docType: 'Type',
 				sourceFile: 'translate.interface.ts',
 			},
 			{
@@ -343,7 +373,7 @@ export const appConfig = {
 				],
 			},
 		],
-		code: `import { TranslateService } from 'ngx-translate';
+		code: `import { TranslateService } from '@wawjs/ngx-translate';
 
 private readonly _translateService = inject(TranslateService);
 

@@ -3,12 +3,12 @@
 		<p class="eyebrow">Angular CRUD Package</p>
 		<h1>ngx-crud</h1>
 		<p class="summary">
-			Offline-aware CRUD flows for Angular collections, with reusable service and component
-			base classes.
+			Signal-first CRUD flows for Angular collections, with optimistic local writes and
+			offline queue replay.
 		</p>
 		<p class="subsummary">
-			SSR-safe defaults, standalone-first bootstrapping, and focused helpers for cached
-			documents, retries, and CRUD list composition.
+			Each collection owns one documents signal. New documents get Mongo-compatible IDs,
+			changes persist locally, and queued mutations sync when connectivity returns.
 		</p>
 	</div>
 
@@ -31,8 +31,8 @@
 					<p class="label">Package</p>
 					<h3>ngx-crud</h3>
 					<p>
-						Focused Angular CRUD building blocks for collection syncing, retries, and
-						reusable list behavior without rebuilding the same service layer per app.
+						Focused Angular CRUD building blocks for signal-owned collections,
+						optimistic mutations, offline retry, and user-scoped cache invalidation.
 					</p>
 				</div>
 				<div>

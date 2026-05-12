@@ -9,7 +9,7 @@ export const routes: Routes = [
 			meta: {
 				title: 'ngx-crud',
 				description:
-					'Angular CRUD package from Web Art Work for offline-aware data flows, cached collections, and reusable CRUD list components.',
+					'Angular CRUD package from Web Art Work for signal-first collections, optimistic local writes, Mongo-compatible IDs, and offline queue replay.',
 			},
 		},
 	},

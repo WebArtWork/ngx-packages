@@ -79,6 +79,10 @@ export class TranslateService {
 
 		const translations = await this.loadTranslations(nextLanguage);
 
+		if (this._languageService.language() !== nextLanguage) {
+			return;
+		}
+
 		this._applyTranslations(translations);
 	}
 

@@ -18,6 +18,10 @@ export interface TranslateExtraLoadOptions {
 	forceReload?: boolean;
 }
 
+export type TranslateDirectiveConfig = Record<string, string>;
+
+export type TranslateDirectiveValue = string | TranslateDirectiveConfig;
+
 export interface ProvideTranslateConfig extends TranslateFileLoaderConfig, ProvideLanguageConfig {
 	translations?: TranslateConfigTranslations;
 }

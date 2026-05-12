@@ -1187,16 +1187,16 @@ async saveSettings() {
 		description:
 			'Reusable document data layer with local cache, signals, offline queueing, and lifecycle hooks.',
 		summary:
-			'CrudService is the heaviest abstraction in the library. Extend it for document collections that need cached reads, create/update/delete calls, offline retries, filtered list projections, and signal-based access patterns.',
+			'CrudService is a small signal-first data layer. Extend it for one document collection that needs cached reads, optimistic create/update/delete calls, and offline retry.',
 		highlights: [
 			'Restores cached docs from storage and replays pending mutations when the app comes back online.',
-			'Exposes Observable workflows plus per-document and per-query Angular signals.',
+			'Exposes one canonical documents signal for list-level computed state.',
+			'Creates Mongo-compatible _id values locally so offline-created documents keep stable identity.',
 			'Supports lifecycle middleware hooks before and after every CRUD operation.',
 		],
 		config: [
-			'CrudConfig controls collection name, identity field, appId injection, unauthorized cache behavior, replace(doc) normalization, and signalFields.',
+			'CrudConfig controls collection name, identity field, appId injection, and replace(doc) normalization.',
 			'By default the collection URL is /api/<name> with get/create/fetch/update/unique/delete endpoints.',
-			'When unauthorized is false, cache restore is tied to the current waw_user id in localStorage.',
 		],
 		availableItems: ['crud.service.ts', 'crud.interface.ts', 'crud.component.ts'],
 		properties: [
@@ -1211,12 +1211,12 @@ async saveSettings() {
 			},
 			{
 				name: 'documents',
-				signature: 'protected documents = signal<Signal<Document>[]>([])',
+				signature: 'Signal<Document[]>',
 				description:
-					'CrudComponent stores the currently displayed document signals here for table and list rendering.',
-				category: 'Component state',
-				docType: 'Component',
-				sourceFile: 'crud.component.ts',
+					'The canonical collection signal. Components and feature services should derive local state with computed().',
+				category: 'Signals',
+				docType: 'Service',
+				sourceFile: 'crud.service.ts',
 			},
 			{
 				name: 'page / perPage / configType',
@@ -1231,9 +1231,10 @@ async saveSettings() {
 				name: 'CrudDocument',
 				signature: 'interface CrudDocument<Document>',
 				description:
-					'Base document contract with identity, ordering, and offline mutation metadata used by CrudService.',
+					'Base document contract with a required Mongo-compatible identity used by CrudService.',
 				details: [
-					'Includes _id, _localId, appId, order, __modified, __deleted, and __options.',
+					'Includes _id, appId, and order.',
+					'CrudService assigns a Mongo-compatible _id before new documents enter the documents signal.',
 					'Use it as the base generic constraint for your app document model.',
 				],
 				category: 'Interfaces',
@@ -1296,6 +1297,15 @@ async saveSettings() {
 				sourceFile: 'crud.service.ts',
 			},
 			{
+				name: 'checkUser',
+				signature: 'checkUser(userId: string): Promise<void>',
+				description:
+					'Scopes the local collection cache to a user id and clears cached docs when the user changes.',
+				category: 'Cache',
+				docType: 'Service',
+				sourceFile: 'crud.service.ts',
+			},
+			{
 				name: 'addDoc / addDocs',
 				signature: 'addDoc(doc: Document): void / addDocs(docs: Document[]): void',
 				description: 'Insert or merge documents into the cache and keep signals in sync.',
@@ -1307,7 +1317,7 @@ async saveSettings() {
 				name: 'prepareDocument',
 				signature: 'prepareDocument(_id?: string): WritableSignal<Document>',
 				description:
-					'Returns a detached per-document signal or empty draft signal without injecting it into the collection, and hydrates it in the background when fetched by id.',
+					'Returns a per-document signal or empty draft signal without inserting it into the collection.',
 				category: 'Documents',
 				docType: 'Service',
 				sourceFile: 'crud.service.ts',
@@ -1335,7 +1345,7 @@ async saveSettings() {
 				signature:
 					'create(doc: Document, options?: CrudOptions<Document>): Observable<Document>',
 				description:
-					'Creates a document, stores local intent first, and retries automatically when offline.',
+					'Assigns a Mongo-compatible _id if needed, updates documents immediately, stores local intent, and retries automatically when offline.',
 				category: 'Requests',
 				docType: 'Service',
 				sourceFile: 'crud.service.ts',
@@ -1354,7 +1364,7 @@ async saveSettings() {
 				signature:
 					'updateAfterWhile(doc: Document, options?: CrudOptions<Document>): Observable<Document>',
 				description:
-					'Debounces update() through CoreService.afterWhile() for typing-heavy flows.',
+					'Compatibility alias for update().',
 				category: 'Requests',
 				docType: 'Service',
 				sourceFile: 'crud.service.ts',
@@ -1364,7 +1374,7 @@ async saveSettings() {
 				signature:
 					'update(doc: Document, options?: CrudOptions<Document>): Observable<Document>',
 				description:
-					'Marks the document modified, posts to /update, clears the modification mark on success, and syncs signals.',
+					'Updates the documents signal immediately, queues the mutation, and syncs with /update now or when online.',
 				category: 'Requests',
 				docType: 'Service',
 				sourceFile: 'crud.service.ts',
@@ -1374,7 +1384,7 @@ async saveSettings() {
 				signature:
 					'unique(doc: Document, options?: CrudOptions<Document>): Observable<Document>',
 				description:
-					'Runs a unique-field style update through /unique and stores the returned field value on the document.',
+					'Updates local state immediately and syncs the document through /unique.',
 				category: 'Requests',
 				docType: 'Service',
 				sourceFile: 'crud.service.ts',
@@ -1384,7 +1394,7 @@ async saveSettings() {
 				signature:
 					'delete(doc: Document, options?: CrudOptions<Document>): Observable<Document>',
 				description:
-					'Marks the document deleted, queues offline if needed, and removes it from the cache on success.',
+					'Removes the document from the signal immediately, queues offline if needed, and syncs /delete.',
 				category: 'Requests',
 				docType: 'Service',
 				sourceFile: 'crud.service.ts',
@@ -1393,19 +1403,18 @@ async saveSettings() {
 				name: 'getSignal / getSignals / getFieldSignals',
 				signature: 'signal helpers',
 				description:
-					'Expose per-document signals and field/value grouped signal collections.',
+					'Compatibility helpers for consumers that still need document-level or grouped signal references.',
 				category: 'Signals',
 				docType: 'Service',
 				sourceFile: 'crud.service.ts',
 			},
 			{
-				name: 'documents / documentSignals',
+				name: 'documents',
 				signature: 'read-only signals',
 				description:
-					'Expose the current collection as plain documents or per-document signals for computed projections in child services and components.',
+					'Expose the current collection as plain documents for computed projections in child services and components.',
 				details: [
-					'Use documents for list-level computed state.',
-					'Use documentSignals when row identity or fine-grained updates matter.',
+					'Use documents as the source of truth.',
 					'Prefer computed() in extending services or components instead of callback-driven projections.',
 				],
 				category: 'Signals',
@@ -1479,31 +1488,39 @@ async saveSettings() {
 		],
 		sections: [
 			{
-				title: 'Events emitted through EmitterService',
+				title: 'Connectivity events',
 				items: [
-					'<name>_get, _create, _update, _unique, _delete, _list, _changed during CRUD workflows.',
-					'Responds to global wipe by clearing docs and to wacom_online by replaying queued operations.',
+					'Uses an Angular effect to watch NetworkService.isOnline and replay the persisted mutation queue when connectivity returns.',
 				],
 			},
 			{
 				title: 'Offline behavior',
 				items: [
 					'create/update/unique/delete queue themselves when NetworkService reports offline.',
-					'Pending changes are persisted to storage in __modified / __deleted / __options.',
-					'When connectivity returns, the constructor drains queued callbacks registered in _onOnline.',
+					'Pending changes are persisted in a collection-level queue, not inside each document.',
+					'When connectivity returns, flushQueue() replays mutations in order.',
 				],
 			},
 		],
-		code: `import { CrudService, type CrudDocument } from 'ngx-crud';
+		code: `import { computed } from '@angular/core';
+import { CrudService, type CrudDocument } from 'ngx-crud';
 
 interface Project extends CrudDocument<Project> {
-\t_id?: string;
+\t_id: string;
 \tname?: string;
 }
 
 export class ProjectService extends CrudService<Project> {
+\treadonly sortedProjects = computed(() =>
+\t\t[...this.documents()].sort((a, b) => (a.name || '').localeCompare(b.name || '')),
+\t);
+
 \tconstructor() {
 \t\tsuper({ name: 'project' });
+\t}
+
+\tcreateProject(name: string): void {
+\t\tthis.create({ name } as Project);
 \t}
 }`,
 	},

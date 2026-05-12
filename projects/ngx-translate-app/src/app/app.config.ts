@@ -19,7 +19,11 @@ export const appConfig: ApplicationConfig = {
 			defaultLanguage: 'en',
 			languages: [
 				{ code: 'en', name: 'English', nativeName: 'English' },
-				{ code: 'ua', name: 'Ukrainian', nativeName: 'Українська' },
+				{
+					code: 'ua',
+					name: 'Ukrainian',
+					nativeName: '\u0423\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u0430',
+				},
 			],
 			folder: '/i18n/',
 		}),

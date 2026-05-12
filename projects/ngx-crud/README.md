@@ -27,7 +27,7 @@ export const appConfig = {
 
 `ngx-crud` uses shared services from sibling packages instead of carrying duplicate utility code:
 
-- `CoreService`, `EmitterService`, and `StoreService` come from `ngx-core`.
+- `StoreService` comes from `ngx-core`.
 - `HttpService` and `NetworkService` come from `ngx-http`.
 
 Use `provideNgxCore()` for core/store configuration. `provideNgxCrud()` keeps a CRUD-local config token and forwards HTTP/network setup to `provideNgxHttp()` so existing CRUD apps can keep a single CRUD provider for request setup.
@@ -44,9 +44,10 @@ Use `provideNgxCore()` for core/store configuration. `provideNgxCrud()` keeps a 
 
 ## Crud Service
 
-`CrudService` is designed to be extended by feature-specific services that manage a particular document type.
+`CrudService` is designed to be extended by feature-specific services that manage one document interface.
+New documents receive a Mongo-compatible `_id` before they enter the local signal state, so offline-created documents have stable identity.
 
-Prefer `documents` and `documentSignals` for new reads and derived collection state.
+Prefer the `documents` signal as the source of truth. Build local component and service projections with `computed()`.
 
 ### Core document methods
 
@@ -54,6 +55,7 @@ Prefer `documents` and `documentSignals` for new reads and derived collection st
 - `addDoc(doc)`
 - `addDocs(docs)`
 - `clearDocs()`
+- `checkUser(userId)`
 - `restoreDocs()`
 
 ### Signals and reactive helpers
@@ -109,8 +111,9 @@ Copy this into your project `AGENTS.md` when using `ngx-crud`:
 ```md
 - This project uses `ngx-crud`, an Angular utility library for CRUD data flows and reusable table behavior.
 - Prefer bootstrapping shared configuration with `provideNgxCore(...)` and CRUD HTTP/network setup with `provideNgxCrud(...)`.
-- `ngx-crud` depends on `ngx-core` for `CoreService`, `EmitterService`, and `StoreService`, and on `ngx-http` for `HttpService` and `NetworkService`; do not add duplicate utility services inside CRUD features.
-- Prefer extending `CrudService` for document collections that need fetch/create/update/delete flows, offline retry behavior, and reactive document access.
+- `ngx-crud` depends on `ngx-core` for `StoreService`, and on `ngx-http` for `HttpService` and `NetworkService`; do not add duplicate utility services inside CRUD features.
+- Prefer extending `CrudService` for document collections that need signal-first fetch/create/update/delete flows and offline retry behavior.
+- Call `checkUser(userId)` during login/bootstrap when a collection cache should be scoped to the current user.
 - Prefer `CrudComponent` with `TableConfig` for reusable CRUD tables before building one-off implementations.
 - Keep collection-specific behavior in child services by overriding `beforeCreate`, `afterCreate`, `beforeUpdate`, `afterUpdate`, and related hooks instead of forking the base library behavior.
 ```

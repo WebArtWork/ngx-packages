@@ -53,7 +53,6 @@ export class ServiceDetailComponent {
 		'interface',
 		'type',
 		'directive',
-		'pipe',
 		'const',
 	] as const;
 

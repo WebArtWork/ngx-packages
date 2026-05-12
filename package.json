@@ -1,11 +1,12 @@
 {
 	"name": "ngx-packages",
-	"version": "21.3.2",
+	"version": "21.3.3",
 	"scripts": {
 		"start": "ng serve ngx-core-app",
 		"build:apps": "node scripts/build-apps.mjs",
 		"build:libs": "node scripts/build-libs.mjs",
 		"publish": "node scripts/publish.mjs",
+		"publish:dry-run": "node scripts/publish.mjs --dry-run",
 		"start:ace": "ng serve ngx-ace-app",
 		"start:fabric": "ng serve ngx-fabric-app",
 		"start:core": "ng serve ngx-core-app",

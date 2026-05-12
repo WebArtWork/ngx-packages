@@ -19,7 +19,7 @@ export class LandingComponent {
 	private readonly _platformId = inject(PLATFORM_ID);
 
 	protected readonly copiedKey = signal('');
-	protected readonly installCommand = 'npm i --save ngx-translate';
+	protected readonly installCommand = 'npm i --save @wawjs/ngx-translate';
 
 	protected readonly services = serviceDocs;
 	protected readonly featureGroups: LandingFeatureGroup[] = [
@@ -48,20 +48,20 @@ export class LandingComponent {
 			description:
 				'Use the same translation runtime in templates, directives, and app shell controls.',
 			items: [
-				'TranslatePipe and TranslateDirective',
+				'TranslateService and TranslateDirective',
 				'language switchers and translated headers',
 				'lazy signals that fall back to source text',
 			],
 		},
 	];
 
-	protected readonly usageCopy = `import { provideTranslate } from 'ngx-translate';
+	protected readonly usageCopy = `import { provideTranslate } from '@wawjs/ngx-translate';
 
 export const appConfig = {
 	providers: [provideTranslate({ defaultLanguage: 'en' })],
 };`;
 
-	protected readonly configCopy = `import { provideTranslate } from 'ngx-translate';
+	protected readonly configCopy = `import { provideTranslate } from '@wawjs/ngx-translate';
 
 export const appConfig = {
 	providers: [

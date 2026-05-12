@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { Language, LanguageService, TranslatePipe, TranslateService } from 'ngx-translate';
+import { Language, LanguageService, TranslateDirective, TranslateService } from 'ngx-translate';
 import { ThemeService } from 'ngx-ui';
 import { serviceDocs } from './services/service-docs';
 
 @Component({
 	selector: 'app-root',
-	imports: [RouterLink, RouterLinkActive, RouterOutlet, TranslatePipe],
+	imports: [RouterLink, RouterLinkActive, RouterOutlet, TranslateDirective],
 	templateUrl: './app.component.html',
 	styleUrl: './app.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -42,8 +42,16 @@ export class AppComponent {
 		return language.code.toUpperCase();
 	}
 
-	protected switchLanguageLabel(language: Language): string {
-		return this.translateService.translate(`Switch language to ${language.name}`)();
+	protected switchLanguageKey(language: Language): string {
+		return `Switch language to ${language.name}`;
+	}
+
+	protected themeModeKey(): string {
+		return this.themeService.mode() === 'light' ? 'dark' : 'light';
+	}
+
+	protected themeToggleKey(): string {
+		return `Switch to ${this.themeModeKey()} mode`;
 	}
 
 	protected setLanguage(language: string): void {
