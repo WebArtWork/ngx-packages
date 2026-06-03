@@ -1,6 +1,6 @@
 {
 	"name": "@wawjs/ngx-core",
-	"version": "21.3.3",
+	"version": "21.3.4",
 	"description": "Angular common package with shared services, pipes, directives, and app-level configuration.",
 	"license": "MIT",
 	"repository": "WebArtWork/ngx-core",

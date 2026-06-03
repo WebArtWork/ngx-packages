@@ -1,6 +1,6 @@
 {
 	"name": "@wawjs/ngx-http",
-	"version": "21.3.3",
+	"version": "21.3.4",
 	"description": "Angular HTTP and connectivity package from Web Art Work.",
 	"license": "MIT",
 	"repository": "WebArtWork/ngx-http",
@@ -20,7 +20,7 @@
 		"@angular/forms": ">=21.0.0",
 		"@angular/platform-browser": ">=21.0.0",
 		"@angular/router": ">=21.0.0",
-		"@wawjs/ngx-core": ">=21.3.3",
+		"@wawjs/ngx-core": ">=21.3.4",
 		"rxjs": ">=7.5.0"
 	},
 	"engines": {

@@ -1,6 +1,6 @@
 {
 	"name": "@wawjs/ngx-datetime",
-	"version": "21.3.3",
+	"version": "21.3.4",
 	"description": "Angular date and time helpers package from Web Art Work.",
 	"license": "MIT",
 	"repository": "WebArtWork/ngx-datetime",

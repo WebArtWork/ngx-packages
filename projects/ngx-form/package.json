@@ -1,6 +1,6 @@
 {
 	"name": "@wawjs/ngx-form",
-	"version": "21.3.3",
+	"version": "21.3.4",
 	"description": "Dynamic form schema services and standalone Angular form renderer from Web Art Work.",
 	"license": "MIT",
 	"repository": "WebArtWork/ngx-form",
@@ -19,10 +19,10 @@
 		"@angular/common": ">=21.0.0",
 		"@angular/forms": ">=21.0.0",
 		"@angular/platform-browser": ">=21.0.0",
-		"@wawjs/ngx-core": ">=21.3.3",
-		"@wawjs/ngx-crud": ">=21.3.3",
-		"@wawjs/ngx-http": ">=21.3.3",
-		"@wawjs/ngx-ui": ">=21.3.3",
+		"@wawjs/ngx-core": ">=21.3.4",
+		"@wawjs/ngx-crud": ">=21.3.4",
+		"@wawjs/ngx-http": ">=21.3.4",
+		"@wawjs/ngx-ui": ">=21.3.4",
 		"rxjs": ">=7.5.0"
 	},
 	"engines": {

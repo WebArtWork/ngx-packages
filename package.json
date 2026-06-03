@@ -1,6 +1,6 @@
 {
 	"name": "ngx-packages",
-	"version": "21.3.3",
+	"version": "21.3.4",
 	"scripts": {
 		"start": "ng serve ngx-core-app",
 		"build:apps": "node scripts/build-apps.mjs",

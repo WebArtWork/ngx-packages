@@ -1,6 +1,6 @@
 {
 	"name": "@wawjs/ngx-map",
-	"version": "21.3.3",
+	"version": "21.3.4",
 	"description": "Angular map, address, and geocoding components from Web Art Work.",
 	"license": "MIT",
 	"repository": "WebArtWork/ngx-map",
@@ -21,9 +21,9 @@
 		"@angular/google-maps": ">=21.0.0",
 		"@angular/platform-browser": ">=21.0.0",
 		"@angular/router": ">=21.0.0",
-		"@wawjs/ngx-core": ">=21.3.3",
-		"@wawjs/ngx-http": ">=21.3.3",
-		"@wawjs/ngx-ui": ">=21.3.3",
+		"@wawjs/ngx-core": ">=21.3.4",
+		"@wawjs/ngx-http": ">=21.3.4",
+		"@wawjs/ngx-ui": ">=21.3.4",
 		"rxjs": ">=7.5.0"
 	},
 	"engines": {
