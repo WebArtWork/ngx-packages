@@ -1,0 +1,29 @@
+<div class="waw-address">
+	<winput
+		(wModelChange)="onSearchChange($event)"
+		(wKeydown)="onKeydown($event)"
+		[placeholder]="placeholder()"
+		(wFocus)="onFocus()"
+		[wModel]="search()"
+		(wBlur)="onBlur()"
+		[label]="label()"
+		[icons]="icons"
+		type="text"
+	/>
+
+	@if (focused() && predictions().length > 0) {
+		<div class="waw-address__dropdown">
+			@for (p of predictions(); track p.address) {
+				<button class="waw-address__item" type="button" (mousedown)="onPick(p)">
+					{{ p.address }}
+				</button>
+			}
+		</div>
+	}
+
+	@if (loading()) {
+		<div class="waw-address__loading" aria-live="polite">
+			<span class="material-icons" aria-hidden="true">hourglass_top</span>
+		</div>
+	}
+</div>

@@ -10,7 +10,11 @@ import {
 	signal,
 	WritableSignal,
 } from '@angular/core';
-import { TranslateDirectiveConfig, TranslateDirectiveValue } from './translate.interface';
+import {
+	TranslateDirectiveConfig,
+	TranslateDirectiveValue,
+	TranslateVars,
+} from './translate.interface';
 import { TranslateService } from './translate.service';
 
 @Directive({
@@ -34,6 +38,7 @@ export class TranslateDirective {
 	 * text/markup inside the host element.
 	 */
 	readonly translate = input<TranslateDirectiveValue>('');
+	readonly vars = input<TranslateVars | null | undefined>();
 
 	private readonly _el = inject(ElementRef<HTMLElement>);
 	private readonly _translateService = inject(TranslateService);
@@ -63,9 +68,10 @@ export class TranslateDirective {
 			if (!this._isBrowser) return;
 
 			const value = this.translate();
+			const vars = this.vars();
 
 			if (this._isConfig(value)) {
-				this._applyConfig(value);
+				this._applyConfig(value, vars);
 				return;
 			}
 
@@ -86,11 +92,17 @@ export class TranslateDirective {
 			}
 
 			// If no translation exists, service returns key (origin), so this keeps origin text.
-			this._el.nativeElement.textContent = this._lastSignal();
+			this._el.nativeElement.textContent = this._translateService.interpolate(
+				this._lastSignal(),
+				vars,
+			);
 		});
 	}
 
-	private _applyConfig(config: TranslateDirectiveConfig): void {
+	private _applyConfig(
+		config: TranslateDirectiveConfig,
+		vars: TranslateVars | null | undefined,
+	): void {
 		const nextAttributes = new Set<string>();
 
 		for (const key in config) {
@@ -100,7 +112,10 @@ export class TranslateDirective {
 				continue;
 			}
 
-			const translated = this._translateService.translate(sourceText)();
+			const translated = this._translateService.interpolate(
+				this._translateService.translate(sourceText)(),
+				vars,
+			);
 
 			if (key === 'content') {
 				this._el.nativeElement.textContent = translated;

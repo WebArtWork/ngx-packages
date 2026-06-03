@@ -1,0 +1,58 @@
+<section class="map-shell">
+	<header class="hero">
+		<div>
+			<p class="eyebrow">Map Package</p>
+			<h1>ngx-map</h1>
+			<p>
+				Google Maps display, marker interaction, address search, and Photon-backed geocoding
+				packaged for standalone Angular apps.
+			</p>
+		</div>
+
+		<div class="install">
+			<span>npm i --save &#64;wawjs/ngx-map &#64;angular/google-maps</span>
+		</div>
+	</header>
+
+	<div class="workspace">
+		<section class="panel map-panel" aria-label="Interactive map preview">
+			<lib-map
+				[center]="center()"
+				[markers]="markers()"
+				[placeMarkerOnClick]="true"
+				[zoom]="12"
+				height="520px"
+				(mapClick)="onMapClick($event)"
+			/>
+		</section>
+
+		<aside class="panel controls" aria-label="Map controls">
+			<div>
+				<h2>Address picker</h2>
+				<p>
+					Search through the configured Photon proxy or use the map icon to select a point
+					visually.
+				</p>
+			</div>
+
+			<lib-address
+				label="Address"
+				placeholder="Search address"
+				[address]="address()"
+				(wChange)="onAddress($event)"
+			/>
+
+			<div class="readout">
+				<h3>Selected address</h3>
+				<pre>{{ address() | json }}</pre>
+			</div>
+
+			@if (lastClick(); as click) {
+				<div class="coords">
+					<span>Last map click</span>
+					<strong>{{ click.lat.toFixed(6) }}, {{ click.lng.toFixed(6) }}</strong>
+				</div>
+			}
+		</aside>
+	</div>
+</section>

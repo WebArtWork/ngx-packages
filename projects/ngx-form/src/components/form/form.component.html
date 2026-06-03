@@ -1,0 +1,26 @@
+@let cfg = config(); @let subRaw = submition(); @let sub = subRaw || {};
+
+<div class="wform {{ cssClass }}">
+	@if (title) {
+	<h1 class="wform__title">{{ title }}</h1>
+	}
+
+	<form class="wform__body" (submit)="$event.preventDefault(); onSubmit()">
+		@for (component of visibleComponents(); track component.key ?? $index;
+		let i = $index) {
+		<form-component
+			class="wform__component {{ formId }} {{ formId + '_' + i }} {{ component.class || '' }}"
+			[formId]="formId"
+			[component]="component"
+			[config]="cfg"
+			[submition]="sub"
+			[model]="model"
+			[fieldTree]="fieldTree"
+			(wSubmit)="onSubmit()"
+			(wChange)="onLegacyChange()"
+			(wClick)="onClick()"
+			[index]="'' + i"
+		/>
+		}
+	</form>
+</div>

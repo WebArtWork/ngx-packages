@@ -1,0 +1,50 @@
+{
+	"name": "@wawjs/ngx-form",
+	"version": "21.3.3",
+	"description": "Dynamic form schema services and standalone Angular form renderer from Web Art Work.",
+	"license": "MIT",
+	"repository": "WebArtWork/ngx-form",
+	"funding": [
+		{
+			"type": "website",
+			"url": "http://wawjs.wiki/fund"
+		},
+		{
+			"type": "opencollective",
+			"url": "https://opencollective.com/wawjs"
+		}
+	],
+	"peerDependencies": {
+		"@angular/core": ">=21.0.0",
+		"@angular/common": ">=21.0.0",
+		"@angular/forms": ">=21.0.0",
+		"@angular/platform-browser": ">=21.0.0",
+		"@wawjs/ngx-core": ">=21.3.3",
+		"@wawjs/ngx-crud": ">=21.3.3",
+		"@wawjs/ngx-http": ">=21.3.3",
+		"@wawjs/ngx-ui": ">=21.3.3",
+		"rxjs": ">=7.5.0"
+	},
+	"engines": {
+		"node": ">=24",
+		"npm": ">=11"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"sideEffects": false,
+	"keywords": [
+		"angular",
+		"angular-library",
+		"ngx",
+		"typescript",
+		"ngx-form",
+		"provide-ngx-form",
+		"waw",
+		"web-art-work",
+		"forms",
+		"signals",
+		"dynamic-form",
+		"ssr"
+	]
+}

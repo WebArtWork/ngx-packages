@@ -1,4 +1,4 @@
-# ngx-rtc
+# @wawjs/ngx-rtc
 
 Angular WebRTC helper package from Web Art Work.
 
@@ -11,13 +11,13 @@ Angular WebRTC helper package from Web Art Work.
 ## Installation
 
 ```bash
-npm i --save ngx-rtc
+npm i --save @wawjs/ngx-rtc
 ```
 
 ## Usage
 
 ```ts
-import { provideNgxRtc } from 'ngx-rtc';
+import { provideNgxRtc } from '@wawjs/ngx-rtc';
 
 export const appConfig = {
 	providers: [provideNgxRtc()],
@@ -52,7 +52,7 @@ export const appConfig = {
 Example:
 
 ```ts
-import { RtcService } from 'ngx-rtc';
+import { RtcService } from '@wawjs/ngx-rtc';
 
 constructor(private rtcService: RtcService) {}
 
@@ -68,12 +68,15 @@ async connect(id: string) {
 
 `RtcService` guards browser-only APIs. Methods that require a browser runtime throw during SSR instead of touching WebRTC globals directly.
 
-## AGENTS.md
+## AI Coding Agents
 
-Copy this into your project `AGENTS.md` when using `ngx-rtc`:
+This package includes [AI.md](AI.md) with copyable instructions for Codex, Claude Code, Cursor, and other coding agents.
+
+Copy this into the consuming project's `AGENTS.md`, `CLAUDE.md`, or equivalent file:
 
 ```md
-- This project uses `ngx-rtc`, an Angular utility library for WebRTC peer and local media helpers.
+- This Angular project uses `@wawjs/ngx-rtc` for WebRTC peer and local media helpers.
+- Import public APIs from `@wawjs/ngx-rtc`.
 - Prefer bootstrapping with `provideNgxRtc()` in application providers.
 - Prefer `RtcService` for local stream initialization, peer management, offers, answers, and ICE candidate handling before adding direct WebRTC utilities.
 - Keep SSR-safe behavior intact. Do not add unguarded access to `navigator.mediaDevices`, `RTCPeerConnection`, or related browser-only globals outside the service.

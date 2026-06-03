@@ -1,0 +1,50 @@
+{
+	"name": "@wawjs/ngx-map",
+	"version": "21.3.3",
+	"description": "Angular map, address, and geocoding components from Web Art Work.",
+	"license": "MIT",
+	"repository": "WebArtWork/ngx-map",
+	"funding": [
+		{
+			"type": "website",
+			"url": "http://wawjs.wiki/fund"
+		},
+		{
+			"type": "opencollective",
+			"url": "https://opencollective.com/wawjs"
+		}
+	],
+	"peerDependencies": {
+		"@angular/core": ">=21.0.0",
+		"@angular/common": ">=21.0.0",
+		"@angular/forms": ">=21.0.0",
+		"@angular/google-maps": ">=21.0.0",
+		"@angular/platform-browser": ">=21.0.0",
+		"@angular/router": ">=21.0.0",
+		"@wawjs/ngx-core": ">=21.3.3",
+		"@wawjs/ngx-http": ">=21.3.3",
+		"@wawjs/ngx-ui": ">=21.3.3",
+		"rxjs": ">=7.5.0"
+	},
+	"engines": {
+		"node": ">=24",
+		"npm": ">=11"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"sideEffects": false,
+	"keywords": [
+		"angular",
+		"angular-library",
+		"ngx",
+		"typescript",
+		"ngx-map",
+		"google-maps",
+		"geocoding",
+		"photon",
+		"address",
+		"waw",
+		"web-art-work"
+	]
+}

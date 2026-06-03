@@ -5,7 +5,8 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const _rootDir = path.resolve(__dirname, '..');
-const _ngCliPath = path.join(_rootDir, 'node_modules', '@angular', 'cli', 'bin', 'ng.js');
+const _ngCommand = process.platform === 'win32' ? 'cmd.exe' : 'npx';
+const _ngArgs = process.platform === 'win32' ? ['/d', '/s', '/c', 'npx.cmd', 'ng'] : ['ng'];
 
 const _libs = [
 	'ngx-ace',
@@ -18,7 +19,9 @@ const _libs = [
 	'ngx-rtc',
 	'ngx-translate',
 	'ngx-tinymce',
-	'ngx-ui'
+	'ngx-ui',
+	'ngx-form',
+	'ngx-map'
 ];
 
 const _failedLibs = [];
@@ -26,7 +29,7 @@ const _failedLibs = [];
 for (const _lib of _libs) {
 	console.log(`\n=== Building ${_lib} ===`);
 
-	const _result = spawnSync(process.execPath, [_ngCliPath, 'build', _lib], {
+	const _result = spawnSync(_ngCommand, [..._ngArgs, 'build', _lib], {
 		cwd: _rootDir,
 		stdio: 'inherit',
 		shell: false

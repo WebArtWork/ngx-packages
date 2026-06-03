@@ -1,5 +1,6 @@
 import { execFileSync, spawnSync } from 'node:child_process';
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -7,7 +8,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const _rootDir = path.resolve(__dirname, '..');
 const _rootPackageJsonPath = path.join(_rootDir, 'package.json');
-const _ngCliPath = path.join(_rootDir, 'node_modules', '@angular', 'cli', 'bin', 'ng.js');
+const _ngCommand = process.platform === 'win32' ? 'cmd.exe' : 'npx';
+const _ngArgs = process.platform === 'win32' ? ['/d', '/s', '/c', 'npx.cmd', 'ng'] : ['ng'];
 const _libraryNames = [
 	'ngx-core',
 	'ngx-http',
@@ -19,7 +21,9 @@ const _libraryNames = [
 	'ngx-rtc',
 	'ngx-translate',
 	'ngx-tinymce',
-	'ngx-ui'
+	'ngx-ui',
+	'ngx-form',
+	'ngx-map'
 ];
 const _libraries = _libraryNames.map((_projectName) => ({
 	projectName: _projectName,
@@ -103,6 +107,10 @@ Options:
   --otp <code>       Pass an npm one-time password.
   --registry <url>   Publish to a specific npm registry.
   --access <value>   Pass npm publish access, usually public or restricted.
+
+Authentication:
+  Set NODE_AUTH_TOKEN or NPM_TOKEN in the environment. The script writes it to a
+  temporary npm userconfig and passes that config only to npm publish.
 `);
 }
 
@@ -122,7 +130,7 @@ function _runNpm(_args, _cwd) {
 }
 
 function _buildLibrary(_projectName) {
-	const _result = spawnSync(process.execPath, [_ngCliPath, 'build', _projectName], {
+	const _result = spawnSync(_ngCommand, [..._ngArgs, 'build', _projectName], {
 		cwd: _rootDir,
 		stdio: 'inherit',
 		shell: false
@@ -180,10 +188,6 @@ function _incrementPatchVersion(_version) {
 function _validateSetup(_publishVersion) {
 	if (!existsSync(_rootPackageJsonPath)) {
 		throw new Error(`Missing root package file: ${_rootPackageJsonPath}`);
-	}
-
-	if (!existsSync(_ngCliPath)) {
-		throw new Error(`Missing Angular CLI entry point: ${_ngCliPath}`);
 	}
 
 	_incrementPatchVersion(_publishVersion);
@@ -258,6 +262,10 @@ function _createPublishArgs(_library, _options) {
 		_args.push('--access', _options.access);
 	}
 
+	if (_options.userConfigPath) {
+		_args.push('--userconfig', _options.userConfigPath);
+	}
+
 	return _args;
 }
 
@@ -281,6 +289,52 @@ function _publishLibraries(_options) {
 	}
 
 	return _failedLibraries;
+}
+
+function _normalizeRegistry(_registry) {
+	const _value = _registry || 'https://registry.npmjs.org/';
+	return _value.endsWith('/') ? _value : `${_value}/`;
+}
+
+function _registryAuthKey(_registry) {
+	const _url = new URL(_normalizeRegistry(_registry));
+	return `//${_url.host}${_url.pathname}:_authToken`;
+}
+
+function _createNpmUserConfig(_options) {
+	const _token = process.env.NODE_AUTH_TOKEN || process.env.NPM_TOKEN;
+
+	if (!_token) {
+		return null;
+	}
+
+	const _registry = _normalizeRegistry(_options.registry);
+	const _dir = mkdtempSync(path.join(tmpdir(), 'ngx-packages-npm-'));
+	const _userConfigPath = path.join(_dir, '.npmrc');
+	const _content = [
+		`registry=${_registry}`,
+		`${_registryAuthKey(_registry)}=${_token}`,
+		'always-auth=true',
+		''
+	].join('\n');
+
+	writeFileSync(_userConfigPath, _content);
+
+	return {
+		dir: _dir,
+		userConfigPath: _userConfigPath
+	};
+}
+
+function _removeNpmUserConfig(_config) {
+	if (!_config) {
+		return;
+	}
+
+	rmSync(_config.dir, {
+		force: true,
+		recursive: true
+	});
 }
 
 function _printFailures(_title, _failedLibraries) {
@@ -318,7 +372,22 @@ try {
 		process.exit(1);
 	}
 
-	const _publishFailures = _publishLibraries(_options);
+	const _npmConfig = _createNpmUserConfig(_options);
+	const _publishOptions = {
+		..._options,
+		userConfigPath: _npmConfig?.userConfigPath || ''
+	};
+	let _publishFailures;
+
+	try {
+		if (_npmConfig) {
+			console.log('Using npm auth token from NODE_AUTH_TOKEN/NPM_TOKEN via temporary userconfig.');
+		}
+
+		_publishFailures = _publishLibraries(_publishOptions);
+	} finally {
+		_removeNpmUserConfig(_npmConfig);
+	}
 
 	if (_publishFailures.length > 0) {
 		_printFailures('Some libraries were not published automatically. Source versions were not bumped.', _publishFailures);

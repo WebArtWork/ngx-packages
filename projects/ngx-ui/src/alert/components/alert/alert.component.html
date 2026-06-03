@@ -1,0 +1,78 @@
+@if (text) {
+<div
+	class="max-w-full opacity-100 transition-all duration-300 ease-in-out"
+	[class.opacity-0]="delete_animation"
+	[ngClass]="class"
+>
+	<div
+		#alertRef
+		class="relative pointer-events-auto select-none text-sm min-h-10 max-w-full px-4 py-2 border shadow-sm animate-alert-bounce-in-up"
+		[class]="
+			'rounded-lg ' +
+			(type === 'info' ? 'bg-sky-200/90 border-sky-200/90 text-slate-800' : '') +
+			(type === 'success' ? 'bg-emerald-200/90 border-emerald-200/90 text-slate-800' : '') +
+			(type === 'warning' ? 'bg-amber-200/90 border-amber-200/90 text-slate-800' : '') +
+			(type === 'error' ? 'bg-rose-200/90 border-rose-200/90 text-slate-800' : '') +
+			(type === 'question' ? 'bg-yellow-200/90 border-yellow-200/90 text-slate-800' : '')
+		"
+	>
+		@if (progress) {
+		<div class="absolute left-0 bottom-0 w-full">
+			<span
+				class="block h-[2px] w-full rounded-full animate-alert-progress"
+				[class]="
+					(type === 'info' ? 'bg-sky-300' : '') +
+					(type === 'success' ? ' bg-emerald-300' : '') +
+					(type === 'warning' ? ' bg-amber-300' : '') +
+					(type === 'error' ? ' bg-rose-300' : '') +
+					(type === 'question' ? ' bg-yellow-300' : '')
+				"
+				[ngStyle]="{ 'animation-duration': (timeout + 350) / 1000 + 's' }"
+			></span>
+		</div>
+		}
+
+		<div class="flex items-center gap-3 w-full">
+			<div class="flex-1 min-w-0 flex items-center justify-between gap-3">
+				<div class="flex items-center gap-2 min-w-0">
+					@if (icon) {
+					<div [class]="icon" aria-hidden="true"></div>
+					}
+					<div
+						class="min-w-0 break-words text-[14px] leading-4 animate-alert-slide-in"
+					>
+						{{ text }}
+					</div>
+				</div>
+
+				@if (type === "question") {
+				<div class="flex items-center gap-2 flex-none">
+					@for (button of buttons; track button.text) {
+					<button
+						wbutton
+						type="button"
+						(wClick)="remove(button.callback)"
+						class="!h-8 !px-3 !text-xs"
+					>
+						{{ button.text }}
+					</button>
+					}
+				</div>
+				}
+			</div>
+
+			@if (closable) {
+			<button
+				wbutton
+				type="button"
+				class="material-icons flex-none !h-7 !w-7 !rounded-full !p-0 opacity-60 hover:opacity-100"
+				(wClick)="remove()"
+				aria-label="Close alert"
+			>
+				close
+			</button>
+			}
+		</div>
+	</div>
+</div>
+}

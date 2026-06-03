@@ -34,10 +34,11 @@ const _serviceDocs: ServiceDoc[] = [
 		slug: 'datetime',
 		name: 'Datetime',
 		description:
-			'Date and time utility feature built around TimeService for formatting, ranges, arithmetic, and comparisons.',
+			'Date and time feature built around picker components plus TimeService utilities for formatting, ranges, arithmetic, and comparisons.',
 		summary:
-			'Datetime exposes TimeService as a lightweight helper for common date handling in Angular apps. It centralizes naming, formatting, timezone conversion, period boundaries, date arithmetic, differences, and calendar helpers instead of scattering ad hoc date logic across components.',
+			'Datetime exposes compact picker components and TimeService as reusable date handling primitives for Angular apps. It centralizes calendar UI, picker modes, naming, formatting, timezone conversion, period boundaries, date arithmetic, differences, and calendar helpers instead of scattering ad hoc date logic across components.',
 		highlights: [
+			'Provides two standalone components for inline calendars and date/time/range picker inputs.',
 			'Provides day/month naming plus DatePipe-based formatting through one injectable service.',
 			'Includes start/end helpers for day, week, month, and year ranges.',
 			'Covers add/subtract operations, differences, same-day checks, ISO week numbers, and month week counts.',
@@ -47,8 +48,34 @@ const _serviceDocs: ServiceDoc[] = [
 			'TimeService is provided in root and uses Angular DatePipe internally for formatting.',
 			'Configure day/month names, default format, timezone, locale, and first-day-of-week policy through DatetimeConfig.',
 		],
-		availableItems: ['datetime.interface.ts', 'provide-ngx-datetime.ts', 'time.service.ts'],
+		availableItems: [
+			'datetime-calendar.component.ts',
+			'datetime-picker.component.ts',
+			'datetime-picker.interface.ts',
+			'datetime.interface.ts',
+			'provide-ngx-datetime.ts',
+			'time.service.ts',
+		],
 		properties: [
+			{
+				name: 'DatetimePickerMode',
+				signature:
+					"type DatetimePickerMode = 'date' | 'time' | 'datetime' | 'date-range' | 'datetime-range'",
+				description:
+					'Mode union used by DatetimePickerComponent to switch between single, time-only, datetime, and range workflows.',
+				category: 'Picker',
+				docType: 'Type',
+				sourceFile: 'datetime-picker.interface.ts',
+			},
+			{
+				name: 'DatetimeRangeValue / DatetimePickerValue',
+				signature: 'range and picker value types',
+				description:
+					'Typed values emitted by calendar and picker components for single-date and range selection.',
+				category: 'Picker',
+				docType: 'Type',
+				sourceFile: 'datetime-picker.interface.ts',
+			},
 			{
 				name: 'DatetimeConfig',
 				signature: 'interface DatetimeConfig',
@@ -61,8 +88,7 @@ const _serviceDocs: ServiceDoc[] = [
 			{
 				name: 'DATETIME_CONFIG / DEFAULT_DATETIME_CONFIG',
 				signature: 'InjectionToken<DatetimeConfig> and default config const',
-				description:
-					'Configuration token and defaults consumed by TimeService.',
+				description: 'Configuration token and defaults consumed by TimeService.',
 				category: 'Configuration',
 				docType: 'Const',
 				sourceFile: 'datetime.interface.ts',
@@ -70,9 +96,54 @@ const _serviceDocs: ServiceDoc[] = [
 		],
 		methods: [
 			{
+				name: 'DatetimeCalendarComponent',
+				signature:
+					'<ngx-datetime-calendar [(value)]="date" [(rangeValue)]="range" selectionMode="single | range" />',
+				description:
+					'Inline calendar component with month navigation, single selection, range selection, disabled dates, min/max bounds, and locale-aware weekday ordering.',
+				category: 'Components',
+				docType: 'Component',
+				sourceFile: 'datetime-calendar.component.ts',
+				example: `import { DatetimeCalendarComponent } from 'ngx-datetime';
+
+@Component({
+	imports: [DatetimeCalendarComponent],
+	template: \`<ngx-datetime-calendar [(value)]="date" />\`,
+})
+export class CalendarExample {
+	date = signal(new Date());
+}`,
+			},
+			{
+				name: 'DatetimePickerComponent',
+				signature:
+					'<ngx-datetime-picker mode="date | time | datetime | date-range | datetime-range" [(value)]="value" />',
+				description:
+					'Input and popover picker component that reuses DatetimeCalendarComponent and supports ControlValueAccessor forms integration.',
+				category: 'Components',
+				docType: 'Component',
+				sourceFile: 'datetime-picker.component.ts',
+				example: `import { DatetimePickerComponent } from 'ngx-datetime';
+
+@Component({
+	imports: [DatetimePickerComponent],
+	template: \`
+		<ngx-datetime-picker
+			mode="datetime-range"
+			label="Schedule"
+			[(value)]="range"
+		/>
+	\`,
+})
+export class PickerExample {
+	range = signal({ start: null, end: null });
+}`,
+			},
+			{
 				name: 'provideNgxDatetime',
 				signature: 'provideNgxDatetime(config?: DatetimeConfig): EnvironmentProviders',
-				description: 'Registers the Angular DatePipe dependency and datetime defaults used by TimeService.',
+				description:
+					'Registers the Angular DatePipe dependency and datetime defaults used by TimeService.',
 				category: 'Bootstrap',
 				docType: 'Const',
 				sourceFile: 'provide-ngx-datetime.ts',
@@ -214,13 +285,14 @@ buildReminder(date: Date) {
 			{
 				title: 'Feature role',
 				items: [
+					'Use DatetimePickerComponent for input/popover workflows and DatetimeCalendarComponent when the calendar should stay inline.',
 					'Use TimeService when features need shared date formatting, ranges, or calendar math without introducing another date library.',
 					'The service returns new Date instances for transformations so callers can keep inputs immutable.',
 					'Formatting uses Angular DatePipe and provider defaults while other helpers rely on built-in Date and Intl APIs.',
 				],
 			},
 		],
-		code: `import { TimeService } from 'ngx-datetime';
+		code: `import { DatetimePickerComponent, TimeService } from 'ngx-datetime';
 
 private readonly _timeService = inject(TimeService);
 

@@ -1,4 +1,4 @@
-# ngx-translate
+# @wawjs/ngx-translate
 
 Angular language and runtime translation package from Web Art Work.
 
@@ -86,6 +86,7 @@ export const appConfig = {
 - file loading from `/i18n/{language}.json`
 - optional multi-folder loading such as `/i18n/common/{language}.json` and `/i18n/articles/{language}.json`
 - signal-based translation updates
+- variable interpolation with `{{name}}` placeholders
 - source-text fallback when no translation exists
 - optional persisted language selection
 
@@ -99,6 +100,7 @@ export const appConfig = {
 - `loadExtraTranslations(paths: string[], options?)`
 - `loadExtraTranslation(path: string, options?)`
 - `translate(text: string)`
+- `interpolate(text: string, vars?)`
 - `setMany(translations: Translate[])`
 - `setOne(translation: Translate)`
 - `get()`
@@ -112,6 +114,9 @@ import { TranslateService } from '@wawjs/ngx-translate';
 const _translateService = inject(TranslateService);
 
 const title = _translateService.translate('Create project');
+const message = _translateService.interpolate('Phrase has counter {{count}}', {
+	count: 5,
+});
 
 void _translateService.setLanguage('de');
 ```
@@ -149,7 +154,7 @@ Notes:
 ```html
 <h1 translate>Create project</h1>
 <button translate>Save</button>
-<h2 translate="Create project"></h2>
+<h2 translate="phrase" [vars]="{ count: 5 }"></h2>
 <span
 	[translate]="{
 		title: 'This is hello world title',
@@ -159,9 +164,21 @@ Notes:
 ></span>
 ```
 
+If the active translation contains placeholders such as
+`Phrase has counter {{count}}`, bind `[vars]="{ count: 5 }"` to render
+`Phrase has counter 5`. The same variables are applied to translated host text
+and translated attributes. Missing variables keep their original `{{name}}`
+placeholder so incomplete translation data stays visible.
+
 Use `content` for the host text. Other object keys are translated and written as
 attributes; camelCase keys such as `ariaLabel` are written as dash-case
 attributes such as `aria-label`.
+
+## Translate Pipe
+
+```html
+{{ 'phrase' | translate: { count: 5 } }}
+```
 
 ## Notes
 
@@ -169,12 +186,15 @@ attributes such as `aria-label`.
 - Translation payloads can come from inline config, `folder`, `folders`, and route/page extra JSON files.
 - Missing translations safely fall back to the source text.
 
-## AGENTS.md
+## AI Coding Agents
 
-Copy this into your project `AGENTS.md` when using `ngx-translate`:
+This package includes [AI.md](AI.md) with copyable instructions for Codex, Claude Code, Cursor, and other coding agents.
+
+Copy this into the consuming project's `AGENTS.md`, `CLAUDE.md`, or equivalent file:
 
 ```md
-- This project uses `ngx-translate`, an Angular utility library for runtime language and translation management.
+- This Angular project uses `@wawjs/ngx-translate` for runtime language state and signal-based translations.
+- Import public APIs from `@wawjs/ngx-translate`.
 - Prefer bootstrapping with `provideTranslate({...})` when translations are needed, or `provideLanguage({...})` for language-only state.
 - Register app translations with `provideTranslate(...)` and use `TranslateService` or `TranslateDirective` instead of creating a parallel translation bootstrap path.
 - Prefer `LanguageService` for active language state, validation, defaults, and persistence before adding app-specific language utilities.

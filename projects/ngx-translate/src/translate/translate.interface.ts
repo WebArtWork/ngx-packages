@@ -5,6 +5,8 @@ export interface Translate {
 	text: string;
 }
 
+export type TranslateVars = Record<string, unknown>;
+
 export type TranslateConfigTranslations = Record<string, Translate[]>;
 
 export interface TranslateFileLoaderConfig {

@@ -1,4 +1,4 @@
-# ngx-http
+# @wawjs/ngx-http
 
 Angular HTTP and connectivity package from Web Art Work.
 
@@ -11,13 +11,13 @@ Angular HTTP and connectivity package from Web Art Work.
 ## Installation
 
 ```bash
-npm i --save ngx-http
+npm i --save @wawjs/ngx-http
 ```
 
 ## Usage
 
 ```ts
-import { provideNgxHttp } from 'ngx-http';
+import { provideNgxHttp } from '@wawjs/ngx-http';
 
 export const appConfig = {
 	providers: [
@@ -80,7 +80,7 @@ export const appConfig = {
 Example:
 
 ```ts
-import { HttpService } from 'ngx-http';
+import { HttpService } from '@wawjs/ngx-http';
 
 constructor(private httpService: HttpService) {}
 
@@ -113,7 +113,7 @@ loadProfile() {
 Example:
 
 ```ts
-import { NetworkService } from 'ngx-http';
+import { NetworkService } from '@wawjs/ngx-http';
 
 constructor(private networkService: NetworkService) {}
 
@@ -123,15 +123,18 @@ async ngOnInit() {
 }
 ```
 
-## AGENTS.md
+## AI Coding Agents
 
-Copy this into your project `AGENTS.md` when using `ngx-http`:
+This package includes [AI.md](AI.md) with copyable instructions for Codex, Claude Code, Cursor, and other coding agents.
+
+Copy this into the consuming project's `AGENTS.md`, `CLAUDE.md`, or equivalent file:
 
 ```md
-- This project uses `ngx-http`, an Angular utility library for API calls and network monitoring.
+- This Angular project uses `@wawjs/ngx-http` for API calls and network monitoring.
+- Import public APIs from `@wawjs/ngx-http`.
 - Prefer bootstrapping with `provideNgxHttp({...})` in application providers.
 - Put shared API base URL, default headers, and network probe settings in `provideNgxHttp()` instead of scattering them across components.
 - Prefer `HttpService` for API calls and shared header/base URL handling before introducing another app-specific wrapper.
 - Prefer `NetworkService` for connectivity state and latency checks before adding duplicate online/offline utilities.
-- Keep SSR-safe behavior intact. Do not add unguarded browser-only network logic when `ngx-http` already provides the needed abstraction.
+- Keep SSR-safe behavior intact. Do not add unguarded browser-only network logic when `@wawjs/ngx-http` already provides the needed abstraction.
 ```

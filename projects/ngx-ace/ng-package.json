@@ -4,5 +4,6 @@
 	"lib": {
 		"entryFile": "public-api.ts"
 	},
+	"assets": ["AI.md"],
 	"allowedNonPeerDependencies": ["ace-builds"]
 }

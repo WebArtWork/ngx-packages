@@ -34,8 +34,8 @@ export class LandingComponent {
 			description:
 				'Requested feature areas exist as placeholders so implementation can be filled in later.',
 			items: [
-				'core, ui, translate, http, socket, crud',
-				'rtc, datetime, ace, fabric, tinymce',
+				'core, ui, form, map, translate, http',
+				'socket, crud, rtc, datetime, ace, fabric, tinymce',
 				'empty feature files for future work',
 			],
 		},

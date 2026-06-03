@@ -1,6 +1,7 @@
 {
 	"name": "@wawjs/ngx-translate",
 	"version": "21.3.3",
+	"description": "Angular language and runtime translation package from Web Art Work.",
 	"license": "MIT",
 	"repository": "WebArtWork/ngx-translate",
 	"funding": [

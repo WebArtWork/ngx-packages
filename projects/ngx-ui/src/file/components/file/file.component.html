@@ -1,0 +1,102 @@
+@let _label = label(); @let _ph = placeholder(); @let _files = files(); @let
+_disabled = isDisabled(); @let _dragging = isDragging();
+
+<div class="wfile" [class._disabled]="_disabled">
+	@if (_label) {
+	<div class="wfile__label">{{ _label | translate }}</div>
+	}
+
+	<input
+		#fileInput
+		type="file"
+		[attr.accept]="accept()"
+		[attr.multiple]="multiple() ? '' : null"
+		(change)="onPicked(fileInput)"
+		hidden
+	/>
+
+	<div
+		class="wfile__body"
+		[class._dragging]="_dragging"
+		(dragover)="onDragOver($event)"
+		(dragleave)="onDragLeave()"
+		(drop)="onDrop($event)"
+	>
+		@if (!_files.length || view() === 'dropzone') {
+		<div
+			class="wfile__dropzone"
+			role="button"
+			tabindex="0"
+			(click)="triggerPick(fileInput)"
+			(keydown.enter)="triggerPick(fileInput)"
+			(keydown.space)="triggerPick(fileInput); $event.preventDefault()"
+		>
+			@if (!_files.length) {
+			<ng-container [ngTemplateOutlet]="tEmpty() || emptyTpl" />
+			<ng-template #emptyTpl>
+				<div class="wfile__empty">{{ _ph | translate }}</div>
+			</ng-template>
+			} @else {
+			<div class="wfile__empty">
+				{{ 'Drop more files or click to browse' | translate }}
+			</div>
+			}
+		</div>
+		}
+
+		@if (_files.length) {
+		<div class="wfile__list">
+			@for (file of _files; track file.name + file.size + file.lastModified;
+			let i = $index) {
+			<ng-container
+				[ngTemplateOutlet]="tItem() || itemTpl"
+				[ngTemplateOutletContext]="{ $implicit: file, index: i }"
+			/>
+
+			<ng-template #itemTpl let-file let-index="index">
+				<div class="wfile__item">
+					<span class="wfile__name">{{ file.name }}</span>
+					<span class="wfile__meta">{{ fileSize(file) }}</span>
+
+					@if (clearable()) {
+					<button
+						type="button"
+						class="wfile__remove material-icons"
+						(click)="removeAt(index); $event.stopPropagation()"
+						[disabled]="_disabled"
+						aria-label="Remove file"
+					>
+						close
+					</button>
+					}
+				</div>
+			</ng-template>
+			}
+		</div>
+		}
+
+		<div class="wfile__actions">
+			<wbutton
+				type="primary"
+				[disableSubmit]="true"
+				[disabled]="_disabled"
+				(wClick)="triggerPick(fileInput)"
+			>
+				<span class="material-icons">upload_file</span>
+				<span>{{ 'Browse' | translate }}</span>
+			</wbutton>
+
+			@if (clearable() && _files.length) {
+			<wbutton
+				type="light"
+				[disableSubmit]="true"
+				[disabled]="_disabled"
+				(wClick)="clear()"
+			>
+				<span class="material-icons">close</span>
+				<span>{{ 'Clear' | translate }}</span>
+			</wbutton>
+			}
+		</div>
+	</div>
+</div>

@@ -1,170 +1,84 @@
-<section class="landing-shell">
-	<div class="landing-hero">
-		<p class="eyebrow">Angular Theme Library</p>
-		<h1>ngx-ui</h1>
-		<p class="summary">
-			SSR-safe Angular theming primitives for dark/light mode, density, radius, and
-			document-level UI state.
-		</p>
-		<p class="subsummary">
-			Extracted from ngx-core into a focused package so theme behavior can evolve
-			independently from the wider utility library.
-		</p>
-	</div>
-
-	<article class="readme-card">
-		<header class="readme-header">
-			<div>
-				<p class="kicker">landing.ts</p>
-				<h2>Project Overview</h2>
-			</div>
-			<div class="window-actions" aria-hidden="true">
-				<span></span>
-				<span></span>
-				<span></span>
-			</div>
-		</header>
-
-		<div class="panel-content">
-			<section class="section-grid">
-				<div>
-					<p class="label">Package</p>
-					<h3>ngx-ui</h3>
-					<p>
-						Focused Angular theme utilities with browser-only APIs guarded so SSR stays
-						intact.
-					</p>
-				</div>
-				<div>
-					<p class="label">License</p>
-					<h3>MIT</h3>
-					<p>Published as a public package and designed for reuse across multiple apps.</p>
-				</div>
-			</section>
-
-			<section class="doc-section">
-				<div class="section-heading">
-					<p class="label">Installation</p>
-					<h3>Install the package</h3>
-				</div>
-				<div class="code-block">
-					<button
-						type="button"
-						class="copy-button"
-						(click)="copy('install', installCommand)"
-						[attr.aria-label]="
-							copiedKey() === 'install' ? 'Copied' : 'Copy installation command'
-						"
-					>
-						<svg viewBox="0 0 24 24" aria-hidden="true">
-							<path d="M9 9h10v10H9zM5 5h10v2H7v8H5z" fill="currentColor" />
-						</svg>
-						<span>{{ copiedKey() === 'install' ? 'Copied' : 'Copy' }}</span>
-					</button>
-					<pre class="readme-content"><code><span class="code-prompt">$</span> {{ installCommand }}</code></pre>
-				</div>
-			</section>
-
-			<section class="doc-section">
-				<div class="section-heading">
-					<p class="label">Usage</p>
-					<h3>Bootstrap with <code>provideTheme()</code></h3>
-				</div>
-				<div class="code-block">
-					<button
-						type="button"
-						class="copy-button"
-						(click)="copy('usage', usageCopy)"
-						[attr.aria-label]="
-							copiedKey() === 'usage' ? 'Copied' : 'Copy usage example'
-						"
-					>
-						<svg viewBox="0 0 24 24" aria-hidden="true">
-							<path d="M9 9h10v10H9zM5 5h10v2H7v8H5z" fill="currentColor" />
-						</svg>
-						<span>{{ copiedKey() === 'usage' ? 'Copied' : 'Copy' }}</span>
-					</button>
-					<pre
-						class="readme-content"
-					><code><span class="code-keyword">import</span> <span class="code-punctuation">&#123;</span> <span class="code-symbol">provideTheme</span> <span class="code-punctuation">&#125;</span> <span class="code-keyword">from</span> <span class="code-string">'ngx-ui'</span><span class="code-punctuation">;</span>
-
-<span class="code-keyword">export const</span> <span class="code-symbol">appConfig</span> <span class="code-operator">=</span> <span class="code-punctuation">&#123;</span>
-  <span class="code-property">providers</span><span class="code-punctuation">:</span> <span class="code-punctuation">[</span><span class="code-function">provideTheme</span><span class="code-punctuation">()</span><span class="code-punctuation">]</span><span class="code-punctuation">,</span>
-<span class="code-punctuation">&#125;;</span></code></pre>
-				</div>
-			</section>
-
-			<section class="doc-section">
-				<div class="section-heading">
-					<p class="label">Configuration</p>
-					<h3>Drive the theme service directly</h3>
-				</div>
-				<p>
-					Set mode, density, and radius through one service instead of scattering theme
-					state across components and ad hoc storage helpers.
-				</p>
-				<div class="code-block">
-					<button
-						type="button"
-						class="copy-button"
-						(click)="copy('config', configCopy)"
-						[attr.aria-label]="
-							copiedKey() === 'config' ? 'Copied' : 'Copy configuration example'
-						"
-					>
-						<svg viewBox="0 0 24 24" aria-hidden="true">
-							<path d="M9 9h10v10H9zM5 5h10v2H7v8H5z" fill="currentColor" />
-						</svg>
-						<span>{{ copiedKey() === 'config' ? 'Copied' : 'Copy' }}</span>
-					</button>
-					<pre
-						class="readme-content"
-					><code><span class="code-keyword">import</span> <span class="code-punctuation">&#123;</span> <span class="code-symbol">provideTheme</span> <span class="code-punctuation">&#125;</span> <span class="code-keyword">from</span> <span class="code-string">'ngx-ui'</span><span class="code-punctuation">;</span>
-
-<span class="code-keyword">export const</span> <span class="code-symbol">appConfig</span> <span class="code-operator">=</span> <span class="code-punctuation">&#123;</span>
-  <span class="code-property">providers</span><span class="code-punctuation">:</span> <span class="code-punctuation">[</span>
-    <span class="code-function">provideTheme</span><span class="code-punctuation">(</span><span class="code-punctuation">&#123;</span>
-      <span class="code-property">mode</span><span class="code-punctuation">:</span> <span class="code-string">'dark'</span><span class="code-punctuation">,</span>
-      <span class="code-property">modes</span><span class="code-punctuation">:</span> <span class="code-punctuation">[</span><span class="code-string">'light'</span><span class="code-punctuation">,</span> <span class="code-string">'dark'</span><span class="code-punctuation">,</span> <span class="code-string">'contrast'</span><span class="code-punctuation">]</span><span class="code-punctuation">,</span>
-      <span class="code-property">density</span><span class="code-punctuation">:</span> <span class="code-string">'comfortable'</span><span class="code-punctuation">,</span>
-      <span class="code-property">radius</span><span class="code-punctuation">:</span> <span class="code-string">'rounded'</span><span class="code-punctuation">,</span>
-    <span class="code-punctuation">&#125;</span><span class="code-punctuation">)</span><span class="code-punctuation">,</span>
-  <span class="code-punctuation">]</span><span class="code-punctuation">,</span>
-<span class="code-punctuation">&#125;;</span></code></pre>
-				</div>
-			</section>
-
-			<section class="doc-section">
-				<div class="section-heading">
-					<p class="label">Features</p>
-					<h3>What ngx-ui includes</h3>
-				</div>
-				<div class="service-list">
-					@for (feature of featureGroups; track feature.title) {
-						<article class="service-item">
-							<h4>{{ feature.title }}</h4>
-							<p>{{ feature.description }}</p>
-							<p>{{ feature.items.join(' | ') }}</p>
-						</article>
-					}
-				</div>
-			</section>
-
-			<section class="doc-section">
-				<div class="section-heading">
-					<p class="label">Reference</p>
-					<h3>Documented feature pages</h3>
-				</div>
-				<p>The detailed page below documents the Theme API and its bootstrap pattern.</p>
-				<div class="service-list">
-					@for (service of services; track service.name) {
-						<a class="service-item" [routerLink]="['/services', service.slug]">
-							<h4>{{ service.name }}</h4>
-							<p>{{ service.description }}</p>
-						</a>
-					}
-				</div>
-			</section>
+<section class="ui-shell">
+	<header class="hero">
+		<div>
+			<p class="eyebrow">Component Surface</p>
+			<h1>ngx-ui</h1>
+			<p>
+				Theme, controls, overlays, table, icons, and the file picker now live in
+				one package.
+			</p>
 		</div>
-	</article>
+
+		<div class="hero-actions">
+			<icon-theme [showText]="true" />
+			<icon-burger
+				[state]="burgerOpen() ? 'cross' : 'three-lines'"
+				(updated)="burgerOpen.set(!burgerOpen())"
+			/>
+		</div>
+	</header>
+
+	<div class="grid">
+		<section class="panel controls">
+			<h2>Inputs</h2>
+			<winput
+				label="Search"
+				placeholder="Type a query"
+				[wModel]="search()"
+				(wChange)="search.set(($event ?? '') + '')"
+				[clearable]="true"
+			/>
+
+			<wselect
+				label="Status"
+				[items]="statusItems"
+				bindLabel="name"
+				bindValue="_id"
+				[wModel]="selectedStatus()"
+				(wChange)="onStatusChange($event)"
+				[clearable]="true"
+			/>
+
+			<div class="button-row">
+				<wbutton type="primary" [disableSubmit]="true" (wClick)="showAlert()">
+					<span class="material-icons">notifications</span>
+					Alert
+				</wbutton>
+				<wbutton type="light" [disableSubmit]="true" (wClick)="showModal()">
+					<span class="material-icons">open_in_new</span>
+					Modal
+				</wbutton>
+			</div>
+		</section>
+
+		<section class="panel">
+			<h2>File picker</h2>
+			<ngx-file
+				[multiple]="true"
+				[wFiles]="selectedFiles()"
+				(wChange)="onFiles($event)"
+			/>
+
+			@if (selectedFiles().length) {
+			<p class="meta">
+				{{ selectedFiles().length }} file(s) selected:
+				{{ selectedFiles()[0].name }}
+			</p>
+			}
+		</section>
+
+		<section class="panel">
+			<h2>Material icon</h2>
+			<div class="icon-row">
+				<material-icon icon="dashboard" name="Dashboard" />
+				<material-icon icon="upload_file" name="Files" [counter]="selectedFiles().length" />
+				<material-icon icon="settings" name="Settings" />
+			</div>
+		</section>
+
+		<section class="panel table-panel">
+			<h2>Table</h2>
+			<wtable [rows]="rows" [columns]="columns" [config]="tableConfig" title="UI modules" />
+		</section>
+	</div>
 </section>

@@ -1,0 +1,74 @@
+:host {
+	display: block;
+}
+
+.form-shell {
+	width: min(1120px, calc(100vw - 32px));
+	margin: 0 auto;
+	padding: 44px 0 72px;
+}
+
+.hero,
+.panel {
+	border: 1px solid var(--panel-border);
+	border-radius: var(--radius-md);
+	background: var(--panel-bg);
+	box-shadow: var(--shadow);
+}
+
+.hero {
+	padding: 26px;
+	margin-bottom: 18px;
+}
+
+.eyebrow {
+	margin: 0 0 8px;
+	color: var(--c-primary);
+	font-size: 0.76rem;
+	font-weight: 700;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+	margin: 0;
+}
+
+.hero p {
+	max-width: 760px;
+	margin-top: 12px;
+	color: var(--text-muted);
+	line-height: 1.7;
+}
+
+.grid {
+	display: grid;
+	grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+	gap: 18px;
+}
+
+.panel {
+	display: grid;
+	align-content: start;
+	gap: 16px;
+	padding: 20px;
+}
+
+pre {
+	overflow: auto;
+	min-height: 240px;
+	margin: 0;
+	padding: 16px;
+	border-radius: var(--radius);
+	background: #0f2530;
+	color: #d9f2ff;
+	font: 500 0.9rem/1.6 var(--font-code);
+}
+
+@media (max-width: 860px) {
+	.grid {
+		grid-template-columns: 1fr;
+	}
+}

@@ -17,7 +17,64 @@ import { AceConfigInterface } from './ace.interfaces';
 	selector: 'ace',
 	exportAs: 'ngxAce',
 	templateUrl: './ace.component.html',
-	styleUrl: './ace.component.scss',
+	styles: [
+		`
+			:host {
+				display: block;
+				width: 100%;
+				height: 100%;
+				min-width: 0;
+				min-height: 0;
+			}
+
+			:host(.flex) {
+				display: flex;
+				flex-direction: inherit;
+				align-items: inherit;
+				min-width: 0;
+				min-height: 0;
+				-webkit-box-direction: inherit;
+				-webkit-box-orient: inherit;
+			}
+
+			.ace-host {
+				display: block;
+				width: 100%;
+				height: 100%;
+				min-width: 0;
+				min-height: 0;
+			}
+
+			.ace-host.ace_editor {
+				width: 100% !important;
+				height: 100% !important;
+			}
+
+			:host(.flex) > .ace-host {
+				flex: 1 1 auto;
+				min-width: 0;
+				min-height: 0;
+				-webkit-box-flex: 1;
+			}
+
+			.ace-host.ace--disabled {
+				opacity: 0.6;
+				pointer-events: none;
+			}
+
+			.ace-host.ace--disabled .ace_cursor {
+				display: none !important;
+			}
+
+			.ace-host.ace--disabled .ace_active-line {
+				background: transparent !important;
+			}
+
+			.ace-host.ace--disabled .ace_scroller {
+				cursor: not-allowed;
+			}
+		`,
+	],
 	encapsulation: ViewEncapsulation.None,
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [AceDirective],

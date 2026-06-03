@@ -1,0 +1,55 @@
+<section class="form-shell">
+	<header class="hero">
+		<p class="eyebrow">Dynamic Form Package</p>
+		<h1>ngx-form</h1>
+		<p>
+			Schema-driven form rendering using templates supplied by the consuming app.
+			This demo wires ngx-form to ngx-ui controls.
+		</p>
+	</header>
+
+	<div class="grid">
+		<section class="panel">
+			<wform
+				[config]="schema"
+				[submition]="initial"
+				(wChange)="latest.set($event)"
+				(wSubmit)="latest.set($event)"
+			/>
+		</section>
+
+		<section class="panel">
+			<h2>Live model</h2>
+			<pre>{{ latest() | json }}</pre>
+		</section>
+	</div>
+</section>
+
+<ng-template #inputTpl let-ctx>
+	<winput
+		[formField]="ctx.field"
+		[label]="ctx.props.label || ''"
+		[placeholder]="ctx.props.placeholder || ''"
+		[clearable]="true"
+	/>
+</ng-template>
+
+<ng-template #selectTpl let-ctx>
+	<wselect
+		[formField]="ctx.field"
+		[label]="ctx.props.label || ''"
+		[placeholder]="ctx.props.placeholder || ''"
+		[items]="ctx.props.items || []"
+		bindLabel="name"
+		bindValue="_id"
+		[clearable]="true"
+	/>
+</ng-template>
+
+<ng-template #fileTpl let-ctx>
+	<ngx-file
+		[label]="ctx.props.label || ''"
+		[multiple]="ctx.props.multiple === true"
+		(wChange)="setModelValue(ctx, $event)"
+	/>
+</ng-template>

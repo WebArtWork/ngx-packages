@@ -7,6 +7,7 @@ import {
 	ProvideTranslateConfig,
 	Translate,
 	TranslateExtraLoadOptions,
+	TranslateVars,
 } from './translate.interface';
 import { Translates } from './translate.type';
 
@@ -195,6 +196,22 @@ export class TranslateService {
 		}
 
 		return this._signalTranslates[text];
+	}
+
+	interpolate(text: string, vars?: TranslateVars | null): string {
+		if (!vars) {
+			return text;
+		}
+
+		return text.replace(/\{\{\s*(\w+)\s*\}\}/g, (match, key: string) => {
+			const value = vars[key];
+
+			if (value === undefined) {
+				return match;
+			}
+
+			return value === null ? '' : String(value);
+		});
 	}
 
 	/**
@@ -503,4 +520,5 @@ export class TranslateService {
 
 		this._signalTranslates[sourceText].set(text);
 	}
+
 }

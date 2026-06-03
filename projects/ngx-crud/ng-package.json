@@ -3,5 +3,6 @@
 	"dest": "../../dist/ngx-crud",
 	"lib": {
 		"entryFile": "public-api.ts"
-	}
+	},
+	"assets": ["AI.md"]
 }

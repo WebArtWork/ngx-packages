@@ -1,0 +1,127 @@
+:host {
+	display: inline-flex;
+	align-items: stretch;
+}
+
+/* Works for <wbutton> template button and for directive when ButtonStylesComponent is present */
+.wbutton {
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--sp-2);
+
+	user-select: none;
+	white-space: nowrap;
+
+	border-radius: var(--radius-btn);
+	font-family: var(--ff-base);
+	letter-spacing: var(--letter-spacing);
+	font-weight: 500;
+	font-size: 0.875rem;
+	line-height: 1;
+
+	padding: var(--sp-3) var(--sp-6);
+
+	border: 1px solid transparent;
+
+	transition:
+		background-color var(--motion) var(--easing),
+		color var(--motion) var(--easing),
+		border-color var(--motion) var(--easing),
+		box-shadow var(--motion-fast) var(--easing),
+		transform var(--motion-fast) var(--easing);
+
+	&:focus-visible {
+		outline: none;
+		box-shadow: var(--focus-ring);
+	}
+
+	&:disabled,
+	&[aria-disabled='true'] {
+		opacity: 0.6;
+		cursor: not-allowed;
+		pointer-events: none;
+	}
+}
+
+/* ===== Modifiers (token-driven) ===== */
+
+.wbutton--primary {
+	background: var(--c-primary);
+	color: var(--c-text-secondary);
+
+	&:hover {
+		background: var(--c-primary-hover);
+	}
+}
+
+.wbutton--secondary {
+	background: var(--c-secondary);
+	color: var(--c-text-secondary);
+
+	&:hover {
+		background: var(--c-secondary-hover);
+	}
+}
+
+/* If you later add dedicated status tokens, swap these mappings accordingly */
+.wbutton--success {
+	background: var(--c-primary);
+	color: var(--c-text-secondary);
+
+	&:hover {
+		background: var(--c-primary-hover);
+	}
+}
+
+.wbutton--danger {
+	background: var(--c-secondary);
+	color: var(--c-text-secondary);
+
+	&:hover {
+		background: var(--c-secondary-hover);
+	}
+}
+
+.wbutton--warning,
+.wbutton--info {
+	background: var(--c-bg-tertiary);
+	color: var(--c-text-secondary);
+	border-color: var(--c-border);
+
+	&:hover {
+		background: var(--c-bg-secondary);
+	}
+}
+
+.wbutton--light {
+	background: var(--c-bg-secondary);
+	color: var(--c-text-secondary);
+	border-color: var(--c-border);
+
+	&:hover {
+		background: var(--c-bg-tertiary);
+	}
+}
+
+.wbutton--dark {
+	background: var(--c-text-secondary);
+	color: var(--c-bg-secondary);
+
+	&:hover {
+		filter: brightness(0.95);
+	}
+}
+
+.wbutton--link {
+	background: transparent;
+	color: var(--c-text-secondary);
+	padding: 0;
+	border-color: transparent;
+	border-radius: 0;
+
+	&:hover {
+		text-decoration: underline;
+	}
+}

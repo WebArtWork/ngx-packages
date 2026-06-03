@@ -15,7 +15,32 @@ import type { FabricConfigInterface } from './fabric.interfaces';
 	selector: 'fabric',
 	exportAs: 'ngxFabric',
 	templateUrl: './fabric.component.html',
-	styleUrl: './fabric.component.scss',
+	styles: [
+		`
+			fabric.flex {
+				display: flex;
+				flex: 1 1 auto;
+				min-width: 0;
+				min-height: 0;
+			}
+
+			fabric {
+				display: block;
+			}
+
+			fabric.fabric {
+				position: relative;
+				width: 100%;
+				height: 100%;
+			}
+
+			fabric.fabric canvas {
+				display: block;
+				width: 100%;
+				height: 100%;
+			}
+		`,
+	],
 	encapsulation: ViewEncapsulation.None,
 	imports: [FabricDirective],
 })

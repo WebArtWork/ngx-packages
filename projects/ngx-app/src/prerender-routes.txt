@@ -1,6 +1,8 @@
 /
 /features/core
 /features/ui
+/features/form
+/features/map
 /features/translate
 /features/http
 /features/socket

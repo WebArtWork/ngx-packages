@@ -1,85 +1,122 @@
-import { isPlatformBrowser } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, PLATFORM_ID, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
-import { serviceDocs } from '../../services/service-docs';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import {
+	AlertService,
+	BurgerComponent,
+	ButtonComponent,
+	FileComponent,
+	InputComponent,
+	MaterialComponent,
+	ModalService,
+	SelectComponent,
+	TableComponent,
+	ThemeComponent,
+	ThemeService,
+} from 'ngx-ui';
+import { SelectValue } from 'ngx-ui';
 
-interface LandingFeatureGroup {
-	title: string;
-	description: string;
-	items: string[];
+interface UiRow {
+	_id: string;
+	name: string;
+	status: string;
+	owner: string;
 }
 
 @Component({
-	imports: [RouterLink],
+	imports: [
+		BurgerComponent,
+		ButtonComponent,
+		FileComponent,
+		InputComponent,
+		MaterialComponent,
+		SelectComponent,
+		TableComponent,
+		ThemeComponent,
+	],
 	templateUrl: './landing.component.html',
 	styleUrl: './landing.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LandingComponent {
-	private readonly _platformId = inject(PLATFORM_ID);
+	private readonly _alertService = inject(AlertService);
+	private readonly _modalService = inject(ModalService);
+	protected readonly themeService = inject(ThemeService);
 
-	protected readonly copiedKey = signal('');
-	protected readonly installCommand = 'npm i --save ngx-ui';
+	protected readonly search = signal('');
+	protected readonly selectedStatus = signal<string | null>('ready');
+	protected readonly selectedFiles = signal<File[]>([]);
+	protected readonly burgerOpen = signal(false);
 
-	protected readonly services = serviceDocs;
-	protected readonly featureGroups: LandingFeatureGroup[] = [
-		{
-			title: 'Bootstrap',
-			description:
-				'Standalone-first setup centered on provideTheme() so configurable theme state initializes once during app startup.',
-			items: ['provideTheme(config)', 'provideNgxUi(config)', 'SSR-safe startup defaults'],
-		},
-		{
-			title: 'Mode switching',
-			description:
-				'Use one service to keep light and dark state in sync with the document and persisted storage.',
-			items: ['ThemeService.mode()', 'setMode()', 'localStorage persistence'],
-		},
-		{
-			title: 'Density and radius',
-			description:
-				'Theme controls go beyond mode so design systems can expose compact spacing and alternate corner styles.',
-			items: ['setDensity()', 'setRadius()', 'html[data-density] and html[data-radius]'],
-		},
-		{
-			title: 'Theme cycling',
-			description:
-				'Preview every supported mode, density, and radius combination from one utility method.',
-			items: ['themeIndex signal', 'nextTheme()', 'design-system previews'],
-		},
+	protected readonly statusItems = [
+		{ _id: 'ready', name: 'Ready' },
+		{ _id: 'review', name: 'Review' },
+		{ _id: 'blocked', name: 'Blocked' },
 	];
 
-	protected readonly usageCopy = `import { provideTheme } from 'ngx-ui';
+	protected readonly columns = ['name', 'status', 'owner'];
+	protected readonly rows: UiRow[] = [
+		{ _id: '1', name: 'Button', status: 'Ready', owner: 'ngx-ui' },
+		{ _id: '2', name: 'File picker', status: 'Ready', owner: 'ngx-ui' },
+		{ _id: '3', name: 'Dynamic form renderer', status: 'Review', owner: 'ngx-form' },
+	];
 
-export const appConfig = {
-\tproviders: [provideTheme()],
-};`;
+	protected readonly tableConfig = {
+		allDocs: true,
+		perPage: -1,
+		buttons: [
+			{
+				icon: 'visibility',
+				click: (row: UiRow) => this.showAlert(`${row.name} selected`),
+			},
+		],
+	};
 
-	protected readonly configCopy = `import { provideTheme } from 'ngx-ui';
+	protected onFiles(files: File[]): void {
+		this.selectedFiles.set(files);
+	}
 
-export const appConfig = {
-\tproviders: [
-\t\tprovideTheme({
-\t\t\tmode: 'dark',
-\t\t\tmodes: ['light', 'dark', 'contrast'],
-\t\t\tdensity: 'comfortable',
-\t\t\tradius: 'rounded',
-\t\t}),
-\t],
-};`;
+	protected onStatusChange(value: SelectValue): void {
+		this.selectedStatus.set(typeof value === 'string' ? value : null);
+	}
 
-	protected copy(key: string, value: string): void {
-		if (!isPlatformBrowser(this._platformId) || !navigator?.clipboard) {
-			return;
-		}
+	protected showAlert(text = 'ngx-ui alert is wired'): void {
+		this._alertService.info({ text });
+	}
 
-		navigator.clipboard.writeText(value).then(() => {
-			this.copiedKey.set(key);
-			setTimeout(() => {
-				if (this.copiedKey() === key) {
-					this.copiedKey.set('');
-				}
-			}, 1500);
+	protected showModal(): void {
+		this._modalService.show({
+			component: DemoModalComponent,
+			size: 'small',
+			title: 'Modal',
 		});
 	}
+}
+
+@Component({
+	imports: [ButtonComponent],
+	template: `
+		<div class="demo-modal">
+			<h2>Modal content</h2>
+			<p>ModalService can render package-local standalone components.</p>
+			<wbutton type="primary" [disableSubmit]="true" (wClick)="close()">
+				Close
+			</wbutton>
+		</div>
+	`,
+	styles: [
+		`
+			.demo-modal {
+				display: grid;
+				gap: 14px;
+			}
+
+			h2,
+			p {
+				margin: 0;
+			}
+		`,
+	],
+	changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class DemoModalComponent {
+	close: () => void = () => {};
 }

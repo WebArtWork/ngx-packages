@@ -1,8 +1,8 @@
-# ngx-datetime
+# @wawjs/ngx-datetime
 
 Angular date and time helpers package from Web Art Work.
 
-`ngx-datetime` extracts the time utilities from the older all-in-one package into a focused Angular package built around `TimeService`.
+`ngx-datetime` extracts the time utilities from the older all-in-one package into a focused Angular package built around `TimeService`, `DatetimeCalendarComponent`, and `DatetimePickerComponent`.
 
 ## License
 
@@ -11,13 +11,13 @@ Angular date and time helpers package from Web Art Work.
 ## Installation
 
 ```bash
-npm i --save ngx-datetime
+npm i --save @wawjs/ngx-datetime
 ```
 
 ## Usage
 
 ```ts
-import { provideNgxDatetime } from 'ngx-datetime';
+import { provideNgxDatetime } from '@wawjs/ngx-datetime';
 
 export const appConfig = {
 	providers: [
@@ -34,11 +34,46 @@ export const appConfig = {
 
 ## Available Features
 
-| Name | Description |
-| --- | --- |
-| `TimeService` | Date formatting, timezone conversion, range helpers, date math, and week/month calculations |
-| `provideNgxDatetime` | Environment provider for package setup |
-| `DatetimeConfig`, `DATETIME_CONFIG`, `DEFAULT_DATETIME_CONFIG` | Provider configuration helpers |
+| Name                                                              | Description                                                                                 |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `DatetimeCalendarComponent`                                       | Inline calendar with single and range selection                                             |
+| `DatetimePickerComponent`                                         | Input/popover picker for date, time, datetime, date range, and datetime range values        |
+| `DatetimePickerMode`, `DatetimeRangeValue`, `DatetimePickerValue` | Picker mode and value types                                                                 |
+| `TimeService`                                                     | Date formatting, timezone conversion, range helpers, date math, and week/month calculations |
+| `provideNgxDatetime`                                              | Environment provider for package setup                                                      |
+| `DatetimeConfig`, `DATETIME_CONFIG`, `DEFAULT_DATETIME_CONFIG`    | Provider configuration helpers                                                              |
+
+## Picker Components
+
+Use `DatetimePickerComponent` for input-style workflows and `DatetimeCalendarComponent` when the calendar should render inline.
+
+```ts
+import { Component, signal } from '@angular/core';
+import { DatetimePickerComponent } from '@wawjs/ngx-datetime';
+
+@Component({
+	imports: [DatetimePickerComponent],
+	template: `
+		<ngx-datetime-picker
+			mode="datetime-range"
+			label="Schedule"
+			placeholder="Select range"
+			[(value)]="range"
+		/>
+	`,
+})
+export class ExampleComponent {
+	range = signal({ start: null, end: null });
+}
+```
+
+Supported picker modes:
+
+- `date`
+- `time`
+- `datetime`
+- `date-range`
+- `datetime-range`
 
 ## Time Service
 
@@ -91,7 +126,7 @@ export const appConfig = {
 Example:
 
 ```ts
-import { TimeService } from 'ngx-datetime';
+import { TimeService } from '@wawjs/ngx-datetime';
 
 constructor(private timeService: TimeService) {}
 
@@ -104,13 +139,17 @@ ngOnInit() {
 }
 ```
 
-## AGENTS.md
+## AI Coding Agents
 
-Copy this into your project `AGENTS.md` when using `ngx-datetime`:
+This package includes [AI.md](AI.md) with copyable instructions for Codex, Claude Code, Cursor, and other coding agents.
+
+Copy this into the consuming project's `AGENTS.md`, `CLAUDE.md`, or equivalent file:
 
 ```md
-- This project uses `ngx-datetime`, an Angular utility library for date and time helpers.
+- This Angular project uses `@wawjs/ngx-datetime` for date/time helpers, calendar helpers, and date/time picker components.
+- Import public APIs from `@wawjs/ngx-datetime`.
 - Prefer registering the package with `provideNgxDatetime()` in application providers.
 - Prefer `TimeService` for date formatting, timezone conversion, date arithmetic, and calendar boundary helpers before adding duplicate app utilities.
+- Prefer `DatetimeCalendarComponent` and `DatetimePickerComponent` for date picking before building one-off date widgets.
 - Keep date logic centralized in `TimeService` instead of scattering custom helpers across components.
 ```

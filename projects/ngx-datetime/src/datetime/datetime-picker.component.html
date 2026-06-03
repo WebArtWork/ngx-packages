@@ -1,0 +1,81 @@
+<div class="ngx-datetime-picker">
+	@if (label()) {
+		<label class="picker-label">{{ label() }}</label>
+	}
+
+	<div class="input-row">
+		<button
+			type="button"
+			class="picker-trigger"
+			[disabled]="isDisabled()"
+			[attr.aria-expanded]="isOpen()"
+			(click)="toggle()"
+		>
+			<span [class.placeholder]="!displayValue()">
+				{{ displayValue() || placeholder() || 'Select value' }}
+			</span>
+		</button>
+		<button
+			type="button"
+			class="clear-button"
+			[disabled]="isDisabled()"
+			(click)="clear()"
+			aria-label="Clear datetime value"
+		>
+			×
+		</button>
+	</div>
+
+	@if (isOpen()) {
+		<div class="picker-panel">
+			@if (includesDate()) {
+				<ngx-datetime-calendar
+					[selectionMode]="isRangeMode() ? 'range' : 'single'"
+					[value]="calendarValue()"
+					(valueChange)="value.set($event)"
+					[rangeValue]="rangeValue()"
+					(rangeValueChange)="value.set($event)"
+					[activeDate]="activeDate()"
+					(activeDateChange)="activeDate.set($event)"
+					[locale]="locale()"
+					[min]="min()"
+					[max]="max()"
+					[disabledDates]="disabledDates()"
+					(selected)="selectDate($event)"
+					(rangeSelected)="selectRange($event)"
+				/>
+			}
+
+			@if (includesTime()) {
+				<div class="time-fields" [class.range-times]="isRangeMode()">
+					<label>
+						<span>{{ isRangeMode() ? 'Start time' : 'Time' }}</span>
+						<input
+							type="time"
+							[ngModel]="startTime()"
+							(ngModelChange)="
+								isRangeMode() ? updateStartTime($event) : updateSingleTime($event)
+							"
+						/>
+					</label>
+
+					@if (isRangeMode()) {
+						<label>
+							<span>End time</span>
+							<input
+								type="time"
+								[ngModel]="endTime()"
+								(ngModelChange)="updateEndTime($event)"
+							/>
+						</label>
+					}
+				</div>
+			}
+
+			<footer class="panel-actions">
+				<button type="button" class="text-button" (click)="close()">Cancel</button>
+				<button type="button" class="primary-button" (click)="apply()">Apply</button>
+			</footer>
+		</div>
+	}
+</div>

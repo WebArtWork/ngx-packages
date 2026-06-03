@@ -244,6 +244,45 @@ h4 {
 	gap: 16px;
 }
 
+.picker-demo-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 16px;
+}
+
+.picker-demo {
+	position: relative;
+	min-height: 150px;
+	padding: 18px;
+	border: 1px solid var(--panel-border);
+	border-radius: var(--radius-md);
+	background: var(--panel-subtle);
+}
+
+.picker-demo p {
+	margin: 14px 0 0;
+	color: var(--text-muted);
+	font: 600 0.82rem/1.5 var(--font-code);
+	overflow-wrap: anywhere;
+}
+
+.picker-code {
+	margin-top: 16px;
+}
+
+.picker-demo ::ng-deep ngx-datetime-picker {
+	--ngx-datetime-surface: var(--panel-bg);
+	--ngx-datetime-text: var(--text-main);
+	--ngx-datetime-muted: var(--text-muted);
+	--ngx-datetime-soft: var(--text-soft);
+	--ngx-datetime-border: var(--panel-border);
+	--ngx-datetime-hover: var(--surface-header-start);
+	--ngx-datetime-accent: var(--accent-strong);
+	--ngx-datetime-accent-hover: var(--accent);
+	--ngx-datetime-range: color-mix(in srgb, var(--accent-strong) 18%, transparent);
+	--ngx-datetime-focus: var(--accent);
+}
+
 .doc-section code {
 	color: var(--code-text);
 	font-family: var(--font-code);
@@ -265,7 +304,8 @@ h4 {
 	}
 
 	.section-grid,
-	.service-list {
+	.service-list,
+	.picker-demo-grid {
 		grid-template-columns: 1fr;
 	}
 

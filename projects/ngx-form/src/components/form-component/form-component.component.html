@@ -1,0 +1,43 @@
+@if (hasChildren()) {
+<div class="wformc {{ component().class || '' }}">
+	@for (child of (component().components ?? []); track child.key ?? $index;
+	let i = $index) { @if (!child.hidden) {
+	<form-component
+		class="wformc__item {{ formId() }} {{ formId() + '_' + index() + '_' + i }} {{ child.class || '' }}"
+		[formId]="formId()"
+		[component]="child"
+		[config]="config()"
+		[submition]="submition()"
+		[model]="model()"
+		[fieldTree]="fieldTree()"
+		(wSubmit)="wSubmit.emit(submition() || {})"
+		(wChange)="wChange.emit()"
+		(wClick)="wClick.emit()"
+		[index]="index() + '_' + i"
+	/>
+	} }
+</div>
+} @else if (component().name && template()) {
+<div class="wformc">
+	<ng-container
+		[ngTemplateOutlet]="template()"
+		[ngTemplateOutletContext]="{
+			$implicit: {
+				props: component().props || {},
+				config: config(),
+				component: component(),
+				wFormId: formId(),
+				wFormKey: effectiveKey(),
+				wSubmit: submit.bind(this),
+				wChange: change.bind(this),
+				wClick: click.bind(this),
+				model: model(),
+				fieldTree: fieldTree(),
+				field: field,
+				submition: submition() || {},
+				key: effectiveKey()
+			}
+		}"
+	/>
+</div>
+}

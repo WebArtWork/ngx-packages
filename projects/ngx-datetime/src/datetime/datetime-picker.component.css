@@ -1,0 +1,144 @@
+:host {
+	display: block;
+	color: var(--ngx-datetime-text, #1f2937);
+	font-family: var(--ngx-datetime-font-family, inherit);
+}
+
+.ngx-datetime-picker {
+	position: relative;
+	display: grid;
+	gap: 8px;
+	width: min(100%, 360px);
+}
+
+.picker-label {
+	color: var(--ngx-datetime-muted, #6b7280);
+	font-size: 0.82rem;
+	font-weight: 700;
+}
+
+.input-row {
+	display: grid;
+	grid-template-columns: 1fr 40px;
+	gap: 8px;
+}
+
+.picker-trigger,
+.clear-button,
+.text-button,
+.primary-button {
+	border: 1px solid var(--ngx-datetime-border, #d1d5db);
+	background: var(--ngx-datetime-surface, #ffffff);
+	color: inherit;
+	font: inherit;
+	cursor: pointer;
+}
+
+.picker-trigger {
+	min-height: 42px;
+	padding: 0 12px;
+	border-radius: 8px;
+	text-align: left;
+}
+
+.picker-trigger span {
+	display: block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.placeholder {
+	color: var(--ngx-datetime-soft, #9ca3af);
+}
+
+.clear-button {
+	display: grid;
+	place-items: center;
+	min-height: 42px;
+	border-radius: 8px;
+	font-size: 1.25rem;
+	line-height: 1;
+}
+
+.picker-panel {
+	position: absolute;
+	top: calc(100% + 8px);
+	left: 0;
+	z-index: 20;
+	display: grid;
+	gap: 14px;
+	width: min(340px, calc(100vw - 32px));
+	padding: 14px;
+	border: 1px solid var(--ngx-datetime-border, #d1d5db);
+	border-radius: 8px;
+	background: var(--ngx-datetime-surface, #ffffff);
+	box-shadow: 0 20px 45px rgb(15 23 42 / 18%);
+}
+
+.time-fields {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 10px;
+}
+
+.time-fields.range-times {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.time-fields label {
+	display: grid;
+	gap: 6px;
+	color: var(--ngx-datetime-muted, #6b7280);
+	font-size: 0.78rem;
+	font-weight: 700;
+}
+
+.time-fields input {
+	min-height: 38px;
+	padding: 0 10px;
+	border: 1px solid var(--ngx-datetime-border, #d1d5db);
+	border-radius: 8px;
+	background: var(--ngx-datetime-surface, #ffffff);
+	color: var(--ngx-datetime-text, #1f2937);
+	font: inherit;
+}
+
+.panel-actions {
+	display: flex;
+	justify-content: end;
+	gap: 8px;
+}
+
+.text-button,
+.primary-button {
+	min-height: 36px;
+	padding: 0 12px;
+	border-radius: 8px;
+	font-weight: 700;
+}
+
+.primary-button {
+	border-color: var(--ngx-datetime-accent, #2563eb);
+	background: var(--ngx-datetime-accent, #2563eb);
+	color: var(--ngx-datetime-accent-text, #ffffff);
+}
+
+button:hover:not(:disabled) {
+	background: var(--ngx-datetime-hover, #f3f4f6);
+}
+
+.primary-button:hover:not(:disabled) {
+	background: var(--ngx-datetime-accent-hover, #1d4ed8);
+}
+
+button:disabled {
+	color: var(--ngx-datetime-disabled, #d1d5db);
+	cursor: not-allowed;
+}
+
+button:focus-visible,
+input:focus-visible {
+	outline: 2px solid var(--ngx-datetime-focus, #1d4ed8);
+	outline-offset: 2px;
+}

@@ -1,0 +1,43 @@
+<section class="ngx-datetime-calendar" aria-label="Calendar">
+	<header class="calendar-header">
+		<button
+			type="button"
+			class="nav-button"
+			(click)="previousMonth()"
+			aria-label="Previous month"
+		>
+			‹
+		</button>
+		<p class="month-label" aria-live="polite">{{ monthLabel() }}</p>
+		<button type="button" class="nav-button" (click)="nextMonth()" aria-label="Next month">
+			›
+		</button>
+	</header>
+
+	<div class="weekdays" role="row">
+		@for (day of weekDays(); track day) {
+			<span role="columnheader">{{ day }}</span>
+		}
+	</div>
+
+	<div class="day-grid" role="grid">
+		@for (day of calendarDays(); track day.date.getTime()) {
+			<button
+				type="button"
+				role="gridcell"
+				class="day-button"
+				[class.outside-month]="!day.inCurrentMonth"
+				[class.today]="day.isToday"
+				[class.selected]="day.isSelected"
+				[class.range-start]="day.isRangeStart"
+				[class.range-end]="day.isRangeEnd"
+				[class.in-range]="day.isInRange"
+				[disabled]="day.isDisabled"
+				[attr.aria-selected]="day.isSelected"
+				(click)="selectDay(day)"
+			>
+				{{ day.label }}
+			</button>
+		}
+	</div>
+</section>

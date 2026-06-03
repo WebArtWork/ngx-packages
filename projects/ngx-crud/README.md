@@ -1,4 +1,4 @@
-# ngx-crud
+# @wawjs/ngx-crud
 
 Angular CRUD and offline-aware data flow package from Web Art Work.
 
@@ -11,14 +11,14 @@ Angular CRUD and offline-aware data flow package from Web Art Work.
 ## Installation
 
 ```bash
-npm i --save ngx-crud
+npm i --save @wawjs/ngx-crud
 ```
 
 ## Usage
 
 ```ts
-import { provideNgxCore } from 'ngx-core';
-import { provideNgxCrud } from 'ngx-crud';
+import { provideNgxCore } from '@wawjs/ngx-core';
+import { provideNgxCrud } from '@wawjs/ngx-crud';
 
 export const appConfig = {
 	providers: [provideNgxCore(), provideNgxCrud()],
@@ -82,7 +82,7 @@ Example:
 
 ```ts
 import { Injectable } from '@angular/core';
-import { CrudDocument, CrudService } from 'ngx-crud';
+import { CrudDocument, CrudService } from '@wawjs/ngx-crud';
 
 export interface Work extends CrudDocument<Work> {
 	name: string;
@@ -104,14 +104,17 @@ export class WorkService extends CrudService<Work> {
 
 `CrudComponent` is the reusable UI building block for table-style CRUD flows. It is paired with `TableConfig` so actions, pagination, and row buttons can stay declarative.
 
-## AGENTS.md
+## AI Coding Agents
 
-Copy this into your project `AGENTS.md` when using `ngx-crud`:
+This package includes [AI.md](AI.md) with copyable instructions for Codex, Claude Code, Cursor, and other coding agents.
+
+Copy this into the consuming project's `AGENTS.md`, `CLAUDE.md`, or equivalent file:
 
 ```md
-- This project uses `ngx-crud`, an Angular utility library for CRUD data flows and reusable table behavior.
+- This Angular project uses `@wawjs/ngx-crud` for signal-first CRUD data flows, document collections, offline-aware behavior, and reusable table-style CRUD UI.
+- Import public APIs from `@wawjs/ngx-crud`.
 - Prefer bootstrapping shared configuration with `provideNgxCore(...)` and CRUD HTTP/network setup with `provideNgxCrud(...)`.
-- `ngx-crud` depends on `ngx-core` for `StoreService`, and on `ngx-http` for `HttpService` and `NetworkService`; do not add duplicate utility services inside CRUD features.
+- `@wawjs/ngx-crud` depends on `@wawjs/ngx-core` and `@wawjs/ngx-http`; do not add duplicate utility services inside CRUD features.
 - Prefer extending `CrudService` for document collections that need signal-first fetch/create/update/delete flows and offline retry behavior.
 - Call `checkUser(userId)` during login/bootstrap when a collection cache should be scoped to the current user.
 - Prefer `CrudComponent` with `TableConfig` for reusable CRUD tables before building one-off implementations.

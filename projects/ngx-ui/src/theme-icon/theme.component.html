@@ -1,0 +1,43 @@
+<div
+	[class.icon-theme--with-text]="showText()"
+	(click)="nextTheme()"
+	class="icon-theme"
+>
+	<!-- Icon box -->
+	<span
+		[style.height]="resolvedHeight()"
+		[style.width]="resolvedWidth()"
+		class="icon-theme__box"
+	>
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			class="icon-theme__svg"
+			viewBox="0 0 24 24"
+			aria-hidden="true"
+		>
+			<path
+				[attr.d]="radiusPath()"
+				[attr.stroke]="color()"
+				stroke-linejoin="round"
+				stroke-linecap="round"
+				stroke-width="0.6"
+				fill="none"
+			/>
+		</svg>
+
+		<span class="material-icons icon-theme__mode" [style.color]="color()">
+			{{ resolvedMode() === 'dark' ? 'dark_mode' : 'light_mode' }}
+		</span>
+	</span>
+
+	@if (showText()) {
+	<span
+		class="icon-theme__text"
+		[translate]="
+      ((resolvedMode()) | titlecase) + ' ' +
+	  ((resolvedDensityName()) | titlecase) + ' ' +
+      ((resolvedRadiusName()) | titlecase)
+    "
+	></span>
+	}
+</div>

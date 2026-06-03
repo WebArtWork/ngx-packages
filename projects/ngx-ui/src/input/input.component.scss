@@ -1,0 +1,67 @@
+.winput {
+	display: grid;
+	gap: 6px;
+
+	&__label {
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: var(--c-text-primary);
+	}
+
+	&__control {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--sp-2);
+		border: 1px solid var(--c-border);
+		border-radius: var(--radius);
+		background: var(--c-bg-secondary);
+		padding: 10px 12px;
+		box-shadow: var(--shadow-sm);
+		transition:
+			border-color var(--motion-fast) var(--easing),
+			box-shadow var(--motion-fast) var(--easing),
+			background-color var(--motion-fast) var(--easing);
+
+		&:focus-within {
+			box-shadow: var(--focus-ring);
+			border-color: color-mix(
+				in srgb,
+				var(--c-primary) 40%,
+				var(--c-border)
+			);
+		}
+
+		&._disabled {
+			opacity: 0.6;
+			pointer-events: none;
+		}
+
+		&._textarea {
+			align-items: stretch;
+		}
+	}
+
+	&__field {
+		flex: 1 1 auto;
+		min-width: 0;
+		border: 0;
+		outline: 0;
+		background: transparent;
+		color: var(--c-text-primary);
+		font: inherit;
+
+		&::placeholder {
+			color: var(--c-placeholder);
+		}
+	}
+
+	&__hint {
+		font-size: 0.8rem;
+		color: var(--c-text-muted);
+	}
+
+	&__error {
+		font-size: 0.8rem;
+		color: var(--c-secondary);
+	}
+}

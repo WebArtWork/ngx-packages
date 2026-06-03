@@ -1,6 +1,7 @@
 {
 	"name": "@wawjs/ngx-http",
 	"version": "21.3.3",
+	"description": "Angular HTTP and connectivity package from Web Art Work.",
 	"license": "MIT",
 	"repository": "WebArtWork/ngx-http",
 	"funding": [

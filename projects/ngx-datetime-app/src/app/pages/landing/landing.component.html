@@ -104,7 +104,8 @@
 				</div>
 				<p>
 					Use <code>provideNgxCore()</code> for app metadata and add
-					<code>provideNgxDatetime()</code> for the focused datetime feature and its local defaults.
+					<code>provideNgxDatetime()</code> for the focused datetime feature and its local
+					defaults.
 				</p>
 				<div class="code-block">
 					<button
@@ -150,6 +151,81 @@
 							<p>{{ feature.items.join(' | ') }}</p>
 						</article>
 					}
+				</div>
+			</section>
+
+			<section class="doc-section">
+				<div class="section-heading">
+					<p class="label">Pickers</p>
+					<h3>One picker API, five modes</h3>
+				</div>
+				<div class="picker-demo-grid">
+					<article class="picker-demo">
+						<ngx-datetime-picker
+							mode="date"
+							label="Date picker"
+							placeholder="Select date"
+							[value]="dateValue()"
+							(valueChange)="dateValue.set($event)"
+						/>
+						<p>{{ formatDemoValue(dateValue()) }}</p>
+					</article>
+					<article class="picker-demo">
+						<ngx-datetime-picker
+							mode="time"
+							label="Time picker"
+							placeholder="Select time"
+							[value]="timeValue()"
+							(valueChange)="timeValue.set($event)"
+						/>
+						<p>{{ formatDemoValue(timeValue()) }}</p>
+					</article>
+					<article class="picker-demo">
+						<ngx-datetime-picker
+							mode="datetime"
+							label="Datetime picker"
+							placeholder="Select date and time"
+							[value]="datetimeValue()"
+							(valueChange)="datetimeValue.set($event)"
+						/>
+						<p>{{ formatDemoValue(datetimeValue()) }}</p>
+					</article>
+					<article class="picker-demo">
+						<ngx-datetime-picker
+							mode="date-range"
+							label="Date range picker"
+							placeholder="Select date range"
+							[value]="dateRangeValue()"
+							(valueChange)="dateRangeValue.set($event)"
+						/>
+						<p>{{ formatDemoValue(dateRangeValue()) }}</p>
+					</article>
+					<article class="picker-demo">
+						<ngx-datetime-picker
+							mode="datetime-range"
+							label="Datetime range picker"
+							placeholder="Select datetime range"
+							[value]="datetimeRangeValue()"
+							(valueChange)="datetimeRangeValue.set($event)"
+						/>
+						<p>{{ formatDemoValue(datetimeRangeValue()) }}</p>
+					</article>
+				</div>
+				<div class="code-block picker-code">
+					<button
+						type="button"
+						class="copy-button"
+						(click)="copy('picker', pickerCopy)"
+						[attr.aria-label]="
+							copiedKey() === 'picker' ? 'Copied' : 'Copy picker example'
+						"
+					>
+						<svg viewBox="0 0 24 24" aria-hidden="true">
+							<path d="M9 9h10v10H9zM5 5h10v2H7v8H5z" fill="currentColor" />
+						</svg>
+						<span>{{ copiedKey() === 'picker' ? 'Copied' : 'Copy' }}</span>
+					</button>
+					<pre class="readme-content"><code>{{ pickerCopy }}</code></pre>
 				</div>
 			</section>
 

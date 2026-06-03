@@ -1,0 +1,55 @@
+@keyframes alert-bounce-in-up {
+	0% {
+		opacity: 0;
+		transform: translateY(200px);
+	}
+	50% {
+		opacity: 1;
+		transform: translateY(-10px);
+	}
+	70% {
+		transform: translateY(5px);
+	}
+	to {
+		transform: translateY(0);
+	}
+}
+
+@keyframes alert-progress {
+	from {
+		width: 100%;
+	}
+	to {
+		width: 0%;
+	}
+}
+
+/* minimal utility classes for animations */
+.animate-alert-bounce-in-up {
+	animation: alert-bounce-in-up 0.7s ease-in-out both;
+}
+
+.animate-alert-progress {
+	animation-name: alert-progress;
+	animation-timing-function: linear;
+	animation-fill-mode: both;
+}
+
+.animate-alert-slide-in {
+	/* your old `iziT-slideIn` depended on a global keyframe.
+	   keep the hook but fall back gracefully if not present */
+	animation: iziT-slideIn 1s cubic-bezier(0.16, 0.81, 0.32, 1) both;
+}
+
+/* pause progress bar when hovering the alert card */
+.animate-alert-bounce-in-up:hover .animate-alert-progress {
+	animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.animate-alert-bounce-in-up,
+	.animate-alert-slide-in,
+	.animate-alert-progress {
+		animation: none !important;
+	}
+}

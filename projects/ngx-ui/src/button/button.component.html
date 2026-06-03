@@ -1,0 +1,13 @@
+<button
+	[type]="resolveType()"
+	[disabled]="isBlocked"
+	(click)="clicked($event)"
+	[class]="
+		'wbutton ' +
+		baseClasses + ' ' +
+		typeClass() + ' ' +
+		(extraClass() || '')
+	"
+>
+	<ng-content></ng-content>
+</button>

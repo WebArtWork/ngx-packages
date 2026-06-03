@@ -1,0 +1,112 @@
+:host {
+	display: block;
+	color: var(--ngx-datetime-text, #1f2937);
+	font-family: var(--ngx-datetime-font-family, inherit);
+}
+
+.ngx-datetime-calendar {
+	display: grid;
+	gap: 12px;
+	width: 100%;
+	min-width: 280px;
+}
+
+.calendar-header {
+	display: grid;
+	grid-template-columns: 36px 1fr 36px;
+	align-items: center;
+	gap: 8px;
+}
+
+.month-label {
+	margin: 0;
+	font-size: 0.95rem;
+	font-weight: 700;
+	text-align: center;
+}
+
+.nav-button,
+.day-button {
+	border: 1px solid transparent;
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	cursor: pointer;
+}
+
+.nav-button {
+	display: inline-grid;
+	place-items: center;
+	width: 36px;
+	height: 36px;
+	border-color: var(--ngx-datetime-border, #d1d5db);
+	border-radius: 8px;
+	font-size: 1.5rem;
+	line-height: 1;
+}
+
+.nav-button:hover {
+	background: var(--ngx-datetime-hover, #f3f4f6);
+}
+
+.weekdays,
+.day-grid {
+	display: grid;
+	grid-template-columns: repeat(7, minmax(0, 1fr));
+	gap: 4px;
+}
+
+.weekdays span {
+	display: grid;
+	place-items: center;
+	min-height: 28px;
+	color: var(--ngx-datetime-muted, #6b7280);
+	font-size: 0.74rem;
+	font-weight: 700;
+	text-transform: uppercase;
+}
+
+.day-button {
+	position: relative;
+	display: grid;
+	place-items: center;
+	aspect-ratio: 1;
+	min-width: 0;
+	border-radius: 8px;
+	font-size: 0.9rem;
+}
+
+.day-button:hover:not(:disabled) {
+	background: var(--ngx-datetime-hover, #f3f4f6);
+}
+
+.day-button.outside-month {
+	color: var(--ngx-datetime-soft, #9ca3af);
+}
+
+.day-button.today {
+	border-color: var(--ngx-datetime-accent, #2563eb);
+}
+
+.day-button.in-range {
+	background: var(--ngx-datetime-range, #dbeafe);
+	border-radius: 4px;
+}
+
+.day-button.selected,
+.day-button.range-start,
+.day-button.range-end {
+	background: var(--ngx-datetime-accent, #2563eb);
+	color: var(--ngx-datetime-accent-text, #ffffff);
+}
+
+.day-button:disabled {
+	color: var(--ngx-datetime-disabled, #d1d5db);
+	cursor: not-allowed;
+}
+
+.nav-button:focus-visible,
+.day-button:focus-visible {
+	outline: 2px solid var(--ngx-datetime-focus, #1d4ed8);
+	outline-offset: 2px;
+}

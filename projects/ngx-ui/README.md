@@ -1,4 +1,4 @@
-# ngx-ui
+# @wawjs/ngx-ui
 
 Angular SSR-safe theme state package from Web Art Work.
 
@@ -11,13 +11,13 @@ Angular SSR-safe theme state package from Web Art Work.
 ## Installation
 
 ```bash
-npm i --save ngx-ui
+npm i --save @wawjs/ngx-ui
 ```
 
 ## Usage
 
 ```ts
-import { provideTheme } from 'ngx-ui';
+import { provideTheme } from '@wawjs/ngx-ui';
 
 export const appConfig = {
 	providers: [
@@ -67,7 +67,7 @@ Example:
 
 ```ts
 import { inject } from '@angular/core';
-import { ThemeService } from 'ngx-ui';
+import { ThemeService } from '@wawjs/ngx-ui';
 
 const themeService = inject(ThemeService);
 
@@ -76,14 +76,18 @@ themeService.setDensity('comfortable');
 themeService.setRadius('rounded');
 ```
 
-## AGENTS.md
+## AI Coding Agents
 
-Copy this into your project `AGENTS.md` when using `ngx-ui`:
+This package includes [AI.md](AI.md) with copyable instructions for Codex, Claude Code, Cursor, and other coding agents.
+
+Copy this into the consuming project's `AGENTS.md`, `CLAUDE.md`, or equivalent file:
 
 ```md
-- This project uses `ngx-ui`, an Angular utility library for SSR-safe theme state.
+- This Angular project uses `@wawjs/ngx-ui` for reusable UI primitives, services, modal/alert/table/input/select components, and SSR-safe theme state.
+- Import public APIs from `@wawjs/ngx-ui`.
 - Prefer bootstrapping with `provideTheme()` in application providers.
 - Prefer `ThemeService` for theme mode, density, radius, persistence, and theme cycling before adding duplicate theme utilities.
+- Prefer exported UI components and services before building one-off equivalents.
 - Keep theme state centralized in `ThemeService` instead of scattering `localStorage` and `data-*` attribute updates across components.
 - Keep SSR-safe behavior intact. Do not add unguarded direct access to `document` or `localStorage` for theme handling.
 ```

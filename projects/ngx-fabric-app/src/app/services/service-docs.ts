@@ -54,6 +54,9 @@ export const serviceDocs: ServiceDoc[] = [
 			'fabric.component.scss',
 			'fabric.directive.ts',
 			'fabric.interfaces.ts',
+			'fabric-crop-modal.component.ts',
+			'fabric-crop-modal.service.ts',
+			'fabric-crop.interfaces.ts',
 		],
 		properties: [
 			{
@@ -121,6 +124,24 @@ export const appConfig = {
 				category: 'Events',
 				docType: 'Type',
 				sourceFile: 'fabric.interfaces.ts',
+			},
+			{
+				name: 'FabricCropModalOptions',
+				signature: 'interface FabricCropModalOptions',
+				description:
+					'Modal configuration for image cropping. Accepts a base64 string or Blob, output format/quality, optional aspect ratio, and an onCrop callback.',
+				category: 'Crop modal',
+				docType: 'Interface',
+				sourceFile: 'fabric-crop.interfaces.ts',
+			},
+			{
+				name: 'FabricCropResult',
+				signature: 'interface FabricCropResult',
+				description:
+					'Result returned by the crop modal with the cropped base64 string, output dimensions, format, and source crop rectangle.',
+				category: 'Crop modal',
+				docType: 'Interface',
+				sourceFile: 'fabric-crop.interfaces.ts',
 			},
 		],
 		methods: [
@@ -219,6 +240,41 @@ export const appConfig = {
 				category: 'Helpers',
 				docType: 'Directive',
 				sourceFile: 'fabric.directive.ts',
+			},
+			{
+				name: 'FabricCropModalService',
+				signature: 'open(options: FabricCropModalOptions): Modal',
+				description:
+					'Opens the ngx-ui modal cropper, places the supplied image onto a Fabric canvas, and returns the cropped base64 through onCrop.',
+				details: [
+					'Supports base64 strings and Blob/File objects from file drop flows.',
+					'Provides scale, output format, and common aspect ratio controls inside the modal.',
+					'Uses @wawjs/ngx-ui ModalService and ButtonComponent through the published package boundary.',
+				],
+				category: 'Crop modal',
+				docType: 'Service',
+				sourceFile: 'fabric-crop-modal.service.ts',
+				example: `import { Component, inject } from '@angular/core';
+import { FabricCropModalService } from 'ngx-fabric';
+
+@Component({
+\ttemplate: '<button (click)="crop(fileBase64)">Crop</button>',
+})
+export class DemoComponent {
+\tprivate readonly _cropModal = inject(FabricCropModalService);
+\tfileBase64 = '';
+
+\tcrop(image: string): void {
+\t\tthis._cropModal.open({
+\t\t\timage,
+\t\t\taspectRatio: 1,
+\t\t\tformat: 'png',
+\t\t\tonCrop: result => {
+\t\t\t\tthis.fileBase64 = result.base64;
+\t\t\t},
+\t\t});
+\t}
+}`,
 			},
 		],
 		sections: [

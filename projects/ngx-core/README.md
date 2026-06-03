@@ -1,4 +1,4 @@
-# ngx-core
+# @wawjs/ngx-core
 
 Angular common package with shared services, pipes, directives, and app-level configuration.
 
@@ -11,19 +11,19 @@ Angular common package with shared services, pipes, directives, and app-level co
 ## Installation
 
 ```bash
-npm i --save ngx-core
+npm i --save @wawjs/ngx-core
 ```
 
 If your app also needs HTTP, CRUD, sockets, RTC, or datetime helpers, install the companion packages alongside `ngx-core`.
 
 ```bash
-npm i --save ngx-http ngx-crud ngx-socket ngx-rtc ngx-datetime
+npm i --save @wawjs/ngx-http @wawjs/ngx-crud @wawjs/ngx-socket @wawjs/ngx-rtc @wawjs/ngx-datetime
 ```
 
 ## Usage
 
 ```ts
-import { provideNgxCore } from 'ngx-core';
+import { provideNgxCore } from '@wawjs/ngx-core';
 
 export const appConfig = {
 	providers: [provideNgxCore()],
@@ -37,7 +37,7 @@ export const appConfig = {
 You can pass an optional configuration object to `provideNgxCore()` to override library defaults.
 
 ```ts
-import { provideNgxCore, type Config } from 'ngx-core';
+import { provideNgxCore, type Config } from '@wawjs/ngx-core';
 
 export const appConfig = {
 	providers: [
@@ -117,7 +117,7 @@ export const appConfig = {
 Example:
 
 ```ts
-import { CoreService } from 'ngx-core';
+import { CoreService } from '@wawjs/ngx-core';
 
 constructor(private coreService: CoreService) {}
 
@@ -152,7 +152,7 @@ ngOnInit() {
 Example:
 
 ```ts
-import { EmitterService } from 'ngx-core';
+import { EmitterService } from '@wawjs/ngx-core';
 
 constructor(private emitterService: EmitterService) {}
 
@@ -184,7 +184,7 @@ login(uid: string) {
 Example:
 
 ```ts
-import { StoreService } from 'ngx-core';
+import { StoreService } from '@wawjs/ngx-core';
 
 constructor(private storeService: StoreService) {}
 
@@ -219,7 +219,7 @@ async saveProfile() {
 Example:
 
 ```ts
-import { MetaService } from 'ngx-core';
+import { MetaService } from '@wawjs/ngx-core';
 
 constructor(private metaService: MetaService) {}
 
@@ -262,7 +262,7 @@ Route metadata example:
 Example:
 
 ```ts
-import { UtilService } from 'ngx-core';
+import { UtilService } from '@wawjs/ngx-core';
 
 constructor(private utilService: UtilService) {}
 
@@ -285,7 +285,7 @@ isValidEmail(email: string) {
 Example:
 
 ```ts
-import { DomService } from 'ngx-core';
+import { DomService } from '@wawjs/ngx-core';
 
 constructor(private domService: DomService) {}
 
@@ -310,27 +310,25 @@ It is SSR-safe and marks OnPush components for check after emission.
 
 Some legacy features from the old all-in-one package now live in dedicated packages:
 
-- `ngx-http`: `provideNgxHttp`, `HttpService`, `NetworkService`
-- `ngx-crud`: `provideNgxCrud`, `CrudService`, `CrudComponent`
-- `ngx-socket`: `provideNgxSocket`, `SocketService`
-- `ngx-rtc`: `provideNgxRtc`, `RtcService`
-- `ngx-datetime`: `provideNgxDatetime`, `TimeService`
+- `@wawjs/ngx-http`: `provideNgxHttp`, `HttpService`, `NetworkService`
+- `@wawjs/ngx-crud`: `provideNgxCrud`, `CrudService`, `CrudComponent`
+- `@wawjs/ngx-socket`: `provideNgxSocket`, `SocketService`
+- `@wawjs/ngx-rtc`: `provideNgxRtc`, `RtcService`
+- `@wawjs/ngx-datetime`: `provideNgxDatetime`, `TimeService`
 
-## AGENTS.md
+## AI Coding Agents
 
-Copy this into your project `AGENTS.md` when using `ngx-core`:
+This package includes [AI.md](AI.md) with copyable instructions for Codex, Claude Code, Cursor, and other coding agents.
+
+Copy this into the consuming project's `AGENTS.md`, `CLAUDE.md`, or equivalent file:
 
 ```md
-- This project uses `ngx-core`, an Angular utility library for shared services, directives, pipes, and app-level configuration.
+- This Angular project uses `@wawjs/ngx-core` for shared services, directives, pipes, app configuration, metadata, storage, DOM helpers, and utility helpers.
+- Import public APIs from `@wawjs/ngx-core`.
 - Prefer bootstrapping with `provideNgxCore({...})` in application providers.
 - Put library-wide configuration in `provideNgxCore()` instead of scattering it across components. Common config areas include `store` and `meta`, with shared `http` and `network` config available for companion packages.
-- Prefer the library services before adding duplicate app utilities:
-  - `StoreService` for persisted local storage values.
-  - `MetaService` for title, description, robots, image, and link tags.
-  - `EmitterService`, `CoreService`, `DomService`, and `UtilService` when their built-in behavior matches the need.
-- Prefer importing the specific ngx-core directives and pipes you need instead of wrapping the whole library again in another shared abstraction.
+- Prefer `StoreService`, `MetaService`, `EmitterService`, `CoreService`, `DomService`, and `UtilService` when their built-in behavior matches the need.
+- Prefer importing the specific standalone directives and pipes you need instead of wrapping the library in another shared abstraction.
 - For metadata, prefer configuring defaults in `provideNgxCore({ meta: ... })` and using `MetaService` or route metadata. If route-driven updates are expected, prefer `meta.applyFromRoutes = true`; use `MetaGuard` only when that flow specifically needs a guard.
-- Keep SSR-safe behavior intact. Do not add unguarded direct access to browser-only globals such as `window`, `document`, or storage when ngx-core already provides a guarded service for that area.
-- When changing app behavior, prefer configuring or composing ngx-core services first before modifying library source.
-- Common reusable building blocks exported by the library include `clickOutside` and array/search/safe/pagination-style pipes.
+- Keep SSR-safe behavior intact. Do not add unguarded direct access to browser-only globals such as `window`, `document`, or storage when `@wawjs/ngx-core` already provides a guarded service for that area.
 ```

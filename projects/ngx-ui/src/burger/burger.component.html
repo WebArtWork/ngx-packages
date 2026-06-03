@@ -1,0 +1,18 @@
+<div
+	class="burger"
+	[class.burger--cross]="_classes()['burger--cross']"
+	[class.burger--one]="_classes()['burger--one']"
+	[class.burger--two]="_classes()['burger--two']"
+	[class.burger--three]="_classes()['burger--three']"
+	(mouseenter)="onHover(true)"
+	(mouseleave)="onHover(false)"
+>
+	<button
+		aria-label="Toggle menu"
+		class="burger__btn"
+		(click)="toggle()"
+		type="button"
+	>
+		<span class="burger__bar"></span>
+	</button>
+</div>

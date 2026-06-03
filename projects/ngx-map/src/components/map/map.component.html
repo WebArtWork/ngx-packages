@@ -1,0 +1,19 @@
+<div class="waw-map" [style.height]="height()" [style.width]="width()">
+	<google-map
+		(mapClick)="onMapClick($event)"
+		[center]="centerResolved()"
+		class="waw-map__canvas"
+		[options]="options()"
+		[height]="height()"
+		[width]="width()"
+		[zoom]="zoom()"
+	>
+		@for (marker of markersResolved(); track marker.id) {
+			<map-marker
+				(mapClick)="markerSelected.emit(marker)"
+				[options]="markerOptions(marker)"
+				[position]="marker.position"
+			/>
+		}
+	</google-map>
+</div>

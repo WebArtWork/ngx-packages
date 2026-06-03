@@ -32,6 +32,8 @@ export interface ServiceDoc {
 const _featureNames = [
 	'core',
 	'ui',
+	'form',
+	'map',
 	'translate',
 	'http',
 	'socket',

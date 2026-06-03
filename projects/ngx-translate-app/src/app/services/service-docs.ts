@@ -206,6 +206,7 @@ async setGerman() {
 			'translate(text) lazily creates a signal that falls back to the source text.',
 			'setLanguage() switches through LanguageService, lazy-loads payloads, and applies them without stale state.',
 			'Works with inline translations, folder/folders file loaders, and route/page extra JSON bundles.',
+			'Interpolates {{name}} placeholders with directive vars, pipe vars, or TranslateService.interpolate().',
 		],
 		config: [
 			'Register bootstrap with provideTranslate({ language, defaultLanguage, translations?, folder?, folders? }).',
@@ -246,6 +247,16 @@ export const appConfig = {
 				signature: 'translate(text: string): WritableSignal<string>',
 				description:
 					'Returns the translation signal for a source text, creating it lazily if needed.',
+				sourceFile: 'translate.service.ts',
+			},
+			{
+				name: 'interpolate',
+				signature: 'interpolate(text: string, vars?: TranslateVars | null): string',
+				description:
+					'Replaces {{name}} placeholders in translated text with matching variable values.',
+				details: [
+					'Missing variables keep their original placeholder text.',
+				],
 				sourceFile: 'translate.service.ts',
 			},
 			{
@@ -306,12 +317,13 @@ export const appConfig = {
 			{
 				name: 'TranslateDirective',
 				signature:
-					'translate | translate="source" | [translate]="{ content, title, ariaLabel }"',
+					'translate | translate="source" [vars]="vars" | [translate]="{ content, title, ariaLabel }"',
 				description:
-					'Translates inline host text, an explicit content key, or an object map where content updates textContent and other keys update attributes.',
+					'Translates inline host text, an explicit content key, or an object map where content updates textContent and other keys update attributes. Optional vars interpolate {{name}} placeholders.',
 				details: [
 					'Object bindings require Angular property binding syntax: [translate]="{ title: \'Title key\', content: \'Content key\' }".',
 					'Attribute keys are normalized from camelCase to dash-case, so ariaLabel writes aria-label.',
+					'Vars are applied to translated host text and translated attributes.',
 				],
 				category: 'Directive',
 				docType: 'Component',
@@ -322,6 +334,7 @@ export const appConfig = {
 		content: 'hello world',
 		ariaLabel: 'hello world label',
 	}"
+	[vars]="{ count: 5 }"
 ></span>`,
 			},
 			{
@@ -338,6 +351,15 @@ export const appConfig = {
 					'type TranslateDirectiveValue = string | Record<string, string>',
 				description:
 					'Directive input value for translating text content or a map of host attributes.',
+				category: 'Contracts',
+				docType: 'Type',
+				sourceFile: 'translate.interface.ts',
+			},
+			{
+				name: 'TranslateVars',
+				signature: 'type TranslateVars = Record<string, unknown>',
+				description:
+					'Variable map used to interpolate {{name}} placeholders in translated text.',
 				category: 'Contracts',
 				docType: 'Type',
 				sourceFile: 'translate.interface.ts',

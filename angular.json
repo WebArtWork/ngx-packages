@@ -825,6 +825,132 @@
 				}
 			}
 		},
+		"ngx-form-app": {
+			"projectType": "application",
+			"root": "projects/ngx-form-app",
+			"sourceRoot": "projects/ngx-form-app/src",
+			"prefix": "app",
+			"architect": {
+				"build": {
+					"builder": "@angular/build:application",
+					"options": {
+						"browser": "projects/ngx-form-app/src/main.ts",
+						"server": "projects/ngx-form-app/src/main.server.ts",
+						"index": "projects/ngx-form-app/src/index.html",
+						"tsConfig": "projects/ngx-form-app/tsconfig.app.json",
+						"prerender": {
+							"discoverRoutes": true,
+							"routesFile": "projects/ngx-form-app/src/prerender-routes.txt"
+						},
+						"assets": [
+							{
+								"glob": "**/*",
+								"input": "projects/ngx-form-app/src/assets"
+							}
+						],
+						"styles": ["projects/ngx-form-app/src/styles.scss"]
+					},
+					"configurations": {
+						"production": {
+							"budgets": [
+								{
+									"type": "initial",
+									"maximumWarning": "500kB",
+									"maximumError": "1MB"
+								},
+								{
+									"type": "anyComponentStyle",
+									"maximumWarning": "8kB",
+									"maximumError": "12kB"
+								}
+							],
+							"outputHashing": "all"
+						},
+						"development": {
+							"optimization": false,
+							"extractLicenses": false,
+							"sourceMap": true
+						}
+					},
+					"defaultConfiguration": "production"
+				},
+				"serve": {
+					"builder": "@angular/build:dev-server",
+					"configurations": {
+						"production": {
+							"buildTarget": "ngx-form-app:build:production"
+						},
+						"development": {
+							"buildTarget": "ngx-form-app:build:development"
+						}
+					},
+					"defaultConfiguration": "development"
+				}
+			}
+		},
+		"ngx-map-app": {
+			"projectType": "application",
+			"root": "projects/ngx-map-app",
+			"sourceRoot": "projects/ngx-map-app/src",
+			"prefix": "app",
+			"architect": {
+				"build": {
+					"builder": "@angular/build:application",
+					"options": {
+						"browser": "projects/ngx-map-app/src/main.ts",
+						"server": "projects/ngx-map-app/src/main.server.ts",
+						"index": "projects/ngx-map-app/src/index.html",
+						"tsConfig": "projects/ngx-map-app/tsconfig.app.json",
+						"prerender": {
+							"discoverRoutes": true,
+							"routesFile": "projects/ngx-map-app/src/prerender-routes.txt"
+						},
+						"assets": [
+							{
+								"glob": "**/*",
+								"input": "projects/ngx-map-app/src/assets"
+							}
+						],
+						"styles": ["projects/ngx-map-app/src/styles.scss"]
+					},
+					"configurations": {
+						"production": {
+							"budgets": [
+								{
+									"type": "initial",
+									"maximumWarning": "500kB",
+									"maximumError": "1MB"
+								},
+								{
+									"type": "anyComponentStyle",
+									"maximumWarning": "8kB",
+									"maximumError": "12kB"
+								}
+							],
+							"outputHashing": "all"
+						},
+						"development": {
+							"optimization": false,
+							"extractLicenses": false,
+							"sourceMap": true
+						}
+					},
+					"defaultConfiguration": "production"
+				},
+				"serve": {
+					"builder": "@angular/build:dev-server",
+					"configurations": {
+						"production": {
+							"buildTarget": "ngx-map-app:build:production"
+						},
+						"development": {
+							"buildTarget": "ngx-map-app:build:development"
+						}
+					},
+					"defaultConfiguration": "development"
+				}
+			}
+		},
 		"ngx-core": {
 			"projectType": "library",
 			"root": "projects/ngx-core",
@@ -940,6 +1066,29 @@
 				}
 			}
 		},
+		"ngx-map": {
+			"projectType": "library",
+			"root": "projects/ngx-map",
+			"sourceRoot": "projects/ngx-map/src",
+			"prefix": "lib",
+			"architect": {
+				"build": {
+					"builder": "@angular/build:ng-packagr",
+					"options": {
+						"project": "projects/ngx-map/ng-package.json"
+					},
+					"configurations": {
+						"production": {
+							"tsConfig": "projects/ngx-map/tsconfig.lib.prod.json"
+						},
+						"development": {
+							"tsConfig": "projects/ngx-map/tsconfig.lib.json"
+						}
+					},
+					"defaultConfiguration": "production"
+				}
+			}
+		},
 		"ngx-crud": {
 			"projectType": "library",
 			"root": "projects/ngx-crud",
@@ -1049,6 +1198,29 @@
 						},
 						"development": {
 							"tsConfig": "projects/ngx-tinymce/tsconfig.lib.json"
+						}
+					},
+					"defaultConfiguration": "production"
+				}
+			}
+		},
+		"ngx-form": {
+			"projectType": "library",
+			"root": "projects/ngx-form",
+			"sourceRoot": "projects/ngx-form/src",
+			"prefix": "lib",
+			"architect": {
+				"build": {
+					"builder": "@angular/build:ng-packagr",
+					"options": {
+						"project": "projects/ngx-form/ng-package.json"
+					},
+					"configurations": {
+						"production": {
+							"tsConfig": "projects/ngx-form/tsconfig.lib.prod.json"
+						},
+						"development": {
+							"tsConfig": "projects/ngx-form/tsconfig.lib.json"
 						}
 					},
 					"defaultConfiguration": "production"

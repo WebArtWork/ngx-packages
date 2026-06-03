@@ -1,0 +1,55 @@
+@let _name = name(); @let _icon = icon(); @if (hasRouterLink()) {
+<a
+	[routerLinkActiveOptions]="routerLinkActiveOptions()"
+	[class._activeClass]="activeClass()"
+	routerLinkActive="_activeLink"
+	[class.mi__iconOnly]="!_name"
+	[routerLink]="routerLink()"
+	class="mi"
+>
+	<span class="mi__iconWrap">
+		<span class="mi__icon material-icons">{{ _icon }}</span>
+
+		@if (showCounter()) {
+		<span
+			class="mi__badge"
+			[attr.aria-label]="'Notifications: ' + counterText()"
+		>
+			{{ counterText() }}
+		</span>
+		}
+	</span>
+
+	@if (_name) {
+	<span class="mi__name" [translate]="_name"></span>
+	}
+</a>
+} @else {
+<span
+	[class._activeClass]="activeClass()"
+	[class.mi__iconOnly]="!_name"
+	class="mi"
+	role="button"
+	tabindex="0"
+	[attr.aria-label]="!_name ? (ariaLabel() || _icon) : null"
+	(click)="onAction()"
+	(keydown)="onKeydown($event)"
+>
+	<span class="mi__iconWrap">
+		<span class="mi__icon material-icons">{{ _icon }}</span>
+
+		@if (showCounter()) {
+		<span
+			[attr.aria-label]="'Notifications: ' + counterText()"
+			class="mi__badge"
+		>
+			{{ counterText() }}
+		</span>
+		}
+	</span>
+
+	@if (_name) {
+	<span class="mi__name" [translate]="_name"></span>
+	}
+</span>
+}
