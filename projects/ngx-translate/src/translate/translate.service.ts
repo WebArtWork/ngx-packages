@@ -1,17 +1,18 @@
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable, PLATFORM_ID, signal, WritableSignal } from '@angular/core';
+import { PLATFORM_ID, Service, WritableSignal, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { LanguageService } from '../language/language.service';
 import {
 	ProvideTranslateConfig,
 	Translate,
 	TranslateExtraLoadOptions,
+	TranslatePayload,
 	TranslateVars,
 } from './translate.interface';
 import { Translates } from './translate.type';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class TranslateService {
 	private static readonly _DEFAULT_FOLDER = '/i18n/';
 
@@ -306,16 +307,13 @@ export class TranslateService {
 	}
 
 	private async _loadLanguageInternal(language: string): Promise<Translate[]> {
-		const inlineTranslations = this._config.translations?.[language];
+		const inlineTranslations = this._mapInlineTranslations(language);
 		const fileUrls = this._createLanguageUrls(language);
 		const fileTranslations = this._isBrowser
 			? await this._loadTranslationsFromUrls(fileUrls, language)
 			: [];
 		const mergedWithFiles = this._mergeTranslations([], fileTranslations);
-		const normalizedInline = Array.isArray(inlineTranslations)
-			? inlineTranslations.map(translation => ({ ...translation }))
-			: [];
-		const merged = this._mergeTranslations(mergedWithFiles, normalizedInline);
+		const merged = this._mergeTranslations(mergedWithFiles, inlineTranslations);
 
 		this._translationsByLanguage.set(
 			language,
@@ -395,7 +393,7 @@ export class TranslateService {
 		language: string,
 	): Promise<Map<string, Translate[]>> {
 		const results = await Promise.allSettled(
-			urls.map(url => firstValueFrom(this._http.get<Record<string, string>>(url))),
+			urls.map(url => this._loadTranslationPayloadByUrl(url, language)),
 		);
 		const payloadsByUrl = new Map<string, Translate[]>();
 
@@ -404,7 +402,7 @@ export class TranslateService {
 			const url = urls[i];
 
 			if (result.status === 'fulfilled') {
-				payloadsByUrl.set(url, this._mapJsonToTranslations(result.value || {}));
+				payloadsByUrl.set(url, result.value);
 			} else {
 				console.warn(
 					`[ngx-translate:translate] Failed to load translations for "${language}" from "${url}".`,
@@ -415,6 +413,24 @@ export class TranslateService {
 		}
 
 		return payloadsByUrl;
+	}
+
+	private async _loadTranslationPayloadByUrl(
+		url: string,
+		language: string,
+	): Promise<Translate[]> {
+		const payload = await firstValueFrom(this._http.get<TranslatePayload>(url));
+		let sourcePayload: TranslatePayload | undefined;
+
+		if (this._isStringArray(payload) && !this._isDefaultLanguage(language)) {
+			const sourceUrl = this._resolveDefaultLanguageUrl(url, language);
+
+			if (sourceUrl) {
+				sourcePayload = await firstValueFrom(this._http.get<TranslatePayload>(sourceUrl));
+			}
+		}
+
+		return this._mapPayloadToTranslations(payload, language, url, sourcePayload);
 	}
 
 	private _getExtraTranslationsCacheByUrl(language: string): Map<string, Translate[]> {
@@ -448,7 +464,38 @@ export class TranslateService {
 		return merged;
 	}
 
-	private _mapJsonToTranslations(payload: Record<string, string>): Translate[] {
+	private _mapInlineTranslations(language: string): Translate[] {
+		const payload = this._config.translations?.[language];
+
+		if (!payload) {
+			return [];
+		}
+
+		const sourcePayload = this._isDefaultLanguage(language)
+			? payload
+			: this._config.translations?.[this._defaultLanguageForTranslations()];
+
+		return this._mapPayloadToTranslations(payload, language, 'inline translations', sourcePayload);
+	}
+
+	private _mapPayloadToTranslations(
+		payload: TranslatePayload,
+		language: string,
+		sourceDescription: string,
+		sourcePayload?: TranslatePayload,
+	): Translate[] {
+		if (this._isStringArray(payload)) {
+			return this._mapArrayToTranslations(payload, language, sourceDescription, sourcePayload);
+		}
+
+		if (this._isTranslateArray(payload)) {
+			return payload.map(translation => ({ ...translation }));
+		}
+
+		return this._mapDictionaryToTranslations(payload);
+	}
+
+	private _mapDictionaryToTranslations(payload: Record<string, string>): Translate[] {
 		const translations: Translate[] = [];
 
 		for (const sourceText in payload) {
@@ -459,6 +506,116 @@ export class TranslateService {
 		}
 
 		return translations;
+	}
+
+	private _mapArrayToTranslations(
+		payload: readonly string[],
+		language: string,
+		sourceDescription: string,
+		sourcePayload?: TranslatePayload,
+	): Translate[] {
+		const sourceTexts = this._resolveArraySourceTexts(
+			payload,
+			language,
+			sourceDescription,
+			sourcePayload,
+		);
+
+		if (!sourceTexts.length) {
+			return [];
+		}
+
+		if (sourceTexts.length !== payload.length) {
+			console.warn(
+				`[ngx-translate:translate] Array translation length mismatch for "${language}" from "${sourceDescription}". Source has ${sourceTexts.length} entries, target has ${payload.length}.`,
+			);
+		}
+
+		return sourceTexts.map((sourceText, index) => ({
+			sourceText,
+			text: payload[index] ?? sourceText,
+		}));
+	}
+
+	private _resolveArraySourceTexts(
+		payload: readonly string[],
+		language: string,
+		sourceDescription: string,
+		sourcePayload?: TranslatePayload,
+	): readonly string[] {
+		if (this._isDefaultLanguage(language)) {
+			return payload;
+		}
+
+		if (this._isStringArray(sourcePayload)) {
+			return sourcePayload;
+		}
+
+		console.warn(
+			`[ngx-translate:translate] Array translations for "${language}" from "${sourceDescription}" require a default language string array.`,
+		);
+
+		return [];
+	}
+
+	private _isDefaultLanguage(language: string): boolean {
+		const defaultLanguage = this._defaultLanguageForTranslations();
+
+		return !!defaultLanguage && language === defaultLanguage;
+	}
+
+	private _defaultLanguageForTranslations(): string {
+		return (this._languageService.defaultLanguage() || this._config.defaultLanguage || '').trim();
+	}
+
+	private _resolveDefaultLanguageUrl(url: string, language: string): string {
+		const defaultLanguage = this._defaultLanguageForTranslations();
+
+		if (!defaultLanguage || defaultLanguage === language) {
+			return '';
+		}
+
+		const escapedLanguage = this._escapeRegExp(language);
+		const fileNamePattern = new RegExp(`${escapedLanguage}\\.json$`);
+
+		if (fileNamePattern.test(url)) {
+			return url.replace(fileNamePattern, `${defaultLanguage}.json`);
+		}
+
+		const segmentPattern = new RegExp(`(^|/)${escapedLanguage}(?=/|$)`);
+
+		if (segmentPattern.test(url)) {
+			return url.replace(segmentPattern, `$1${defaultLanguage}`);
+		}
+
+		console.warn(
+			`[ngx-translate:translate] Could not resolve default language URL for array translations from "${url}".`,
+		);
+
+		return '';
+	}
+
+	private _escapeRegExp(value: string): string {
+		return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+	}
+
+	private _isStringArray(payload: unknown): payload is readonly string[] {
+		return Array.isArray(payload) && payload.every(item => typeof item === 'string');
+	}
+
+	private _isTranslateArray(payload: unknown): payload is readonly Translate[] {
+		return (
+			Array.isArray(payload) &&
+			payload.every(
+				item =>
+					!!item &&
+					typeof item === 'object' &&
+					'sourceText' in item &&
+					'text' in item &&
+					typeof item.sourceText === 'string' &&
+					typeof item.text === 'string',
+			)
+		);
 	}
 
 	private _normalizeFolder(folder: string): string {

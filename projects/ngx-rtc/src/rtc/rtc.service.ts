@@ -1,12 +1,12 @@
 import { isPlatformBrowser } from '@angular/common';
-import { Injectable, PLATFORM_ID, inject } from '@angular/core';
+import { PLATFORM_ID, Service, inject } from '@angular/core';
 
 /**
  * RtcService handles WebRTC peer connections and local media stream setup.
  * It provides functionality to initialize the user's camera/microphone,
  * manage multiple peer connections, and handle offer/answer negotiation.
  */
-@Injectable({ providedIn: 'root' })
+@Service()
 export class RtcService {
 	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 	private _peers = new Map<string, RTCPeerConnection>();

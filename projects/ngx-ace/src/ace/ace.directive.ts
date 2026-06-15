@@ -53,17 +53,17 @@ export class AceDirective implements OnInit, OnDestroy {
 	readonly config = input<AceConfigInterface | undefined>(undefined);
 
 	// -------- outputs --------
-	readonly blur = output();
-	readonly focus = output();
+	readonly blur = output<unknown>();
+	readonly focus = output<unknown>();
 
-	readonly copy = output();
-	readonly paste = output();
+	readonly copy = output<unknown>();
+	readonly paste = output<unknown>();
 
-	readonly change = output();
+	readonly change = output<unknown>();
 
-	readonly changeCursor = output();
-	readonly changeSession = output();
-	readonly changeSelection = output();
+	readonly changeCursor = output<unknown>();
+	readonly changeSession = output<unknown>();
+	readonly changeSelection = output<unknown>();
 
 	constructor() {
 		if (!isPlatformBrowser(this._platformId)) return;

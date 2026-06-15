@@ -2,18 +2,16 @@ import {
 	Directive,
 	DoCheck,
 	ElementRef,
-	EventEmitter,
-	Inject,
-	Input,
 	KeyValueDiffer,
 	KeyValueDiffers,
 	NgZone,
-	OnChanges,
 	OnDestroy,
 	OnInit,
-	Optional,
-	Output,
-	SimpleChanges,
+	OutputEmitterRef,
+	effect,
+	inject,
+	input,
+	output,
 } from '@angular/core';
 import {
 	Canvas,
@@ -36,7 +34,7 @@ type FabricLoadFromJSONReviver = Parameters<Canvas['loadFromJSON']>[1];
 	selector: '[fabric]',
 	exportAs: 'ngxFabric',
 })
-export class FabricDirective implements OnInit, OnDestroy, DoCheck, OnChanges {
+export class FabricDirective implements OnInit, OnDestroy, DoCheck {
 	private _instance: Canvas | StaticCanvas | null = null;
 	private _resizeObserver: ResizeObserver | null = null;
 	private _objectsJSON: string | object | null = null;
@@ -44,89 +42,106 @@ export class FabricDirective implements OnInit, OnDestroy, DoCheck, OnChanges {
 	private _initialWidth: number | null = null;
 	private _initialHeight: number | null = null;
 	private _configDiff: KeyValueDiffer<string, unknown> | null = null;
+	private _lastDisabled = false;
 
-	@Input()
-	set zoom(zoom: number | null | undefined) {
-		if (zoom !== null && zoom !== undefined) {
-			this.setZoom(zoom);
-		}
+	readonly zoom = input<number | null | undefined>(undefined);
+	readonly width = input<number | null | undefined>(undefined);
+	readonly height = input<number | null | undefined>(undefined);
+	readonly disabled = input(false);
+	readonly config = input<FabricConfigInterface | undefined>(undefined, {
+		alias: 'fabric',
+	});
+
+	readonly drop = output<unknown>();
+	readonly dragover = output<unknown>();
+	readonly dragenter = output<unknown>();
+	readonly dragleave = output<unknown>();
+	readonly mouseup = output<unknown>();
+	readonly mousedown = output<unknown>();
+	readonly mouseover = output<unknown>();
+	readonly mouseout = output<unknown>();
+	readonly mousemove = output<unknown>();
+	readonly mousewheel = output<unknown>();
+	readonly mousedblclick = output<unknown>();
+	readonly mouseupBefore = output<unknown>();
+	readonly mousedownBefore = output<unknown>();
+	readonly mousemoveBefore = output<unknown>();
+	readonly mouseUp = output<unknown>();
+	readonly mouseDown = output<unknown>();
+	readonly mouseOver = output<unknown>();
+	readonly mouseOut = output<unknown>();
+	readonly mouseMove = output<unknown>();
+	readonly mouseWheel = output<unknown>();
+	readonly mouseDblclick = output<unknown>();
+	readonly mouseUpBefore = output<unknown>();
+	readonly mouseDownBefore = output<unknown>();
+	readonly mouseMoveBefore = output<unknown>();
+	readonly pathCreated = output<unknown>();
+	readonly alterRender = output<unknown>();
+	readonly objectAdded = output<unknown>();
+	readonly objectMoved = output<unknown>();
+	readonly objectScaled = output<unknown>();
+	readonly objectSkewed = output<unknown>();
+	readonly objectRotated = output<unknown>();
+	readonly objectRemoved = output<unknown>();
+	readonly objectModified = output<unknown>();
+	readonly objectSelected = output<unknown>();
+	readonly objectMoving = output<unknown>();
+	readonly objectScaling = output<unknown>();
+	readonly objectSkewing = output<unknown>();
+	readonly objectRotating = output<unknown>();
+	readonly selectionCleared = output<unknown>();
+	readonly selectionCreated = output<unknown>();
+	readonly selectionUpdated = output<unknown>();
+	readonly beforeTransform = output<unknown>();
+	readonly beforeSelectionCleared = output<unknown>();
+
+	private readonly _zone = inject(NgZone);
+	private readonly _elementRef = inject<ElementRef<HTMLCanvasElement>>(ElementRef);
+	private readonly _differs = inject(KeyValueDiffers);
+	private readonly _defaults = inject(FABRIC_CONFIG, { optional: true });
+
+	constructor() {
+		effect(() => {
+			const zoom = this.zoom();
+			if (zoom !== null && zoom !== undefined) {
+				this.setZoom(zoom);
+			}
+		});
+
+		effect(() => {
+			const width = this.width();
+			if (width !== null && width !== undefined) {
+				this.setWidth(width);
+			}
+		});
+
+		effect(() => {
+			const height = this.height();
+			if (height !== null && height !== undefined) {
+				this.setHeight(height);
+			}
+		});
+
+		effect(() => {
+			const disabled = this.disabled();
+			if (this._instance && disabled !== this._lastDisabled) {
+				this.ngOnDestroy();
+				this.ngOnInit();
+				return;
+			}
+
+			this._lastDisabled = disabled;
+		});
 	}
-
-	@Input()
-	set width(width: number | null | undefined) {
-		if (width !== null && width !== undefined) {
-			this.setWidth(width);
-		}
-	}
-
-	@Input()
-	set height(height: number | null | undefined) {
-		if (height !== null && height !== undefined) {
-			this.setHeight(height);
-		}
-	}
-
-	@Input() disabled = false;
-	@Input('fabric') config?: FabricConfigInterface;
-
-	@Output() drop = new EventEmitter<unknown>();
-	@Output() dragover = new EventEmitter<unknown>();
-	@Output() dragenter = new EventEmitter<unknown>();
-	@Output() dragleave = new EventEmitter<unknown>();
-	@Output() mouseup = new EventEmitter<unknown>();
-	@Output() mousedown = new EventEmitter<unknown>();
-	@Output() mouseover = new EventEmitter<unknown>();
-	@Output() mouseout = new EventEmitter<unknown>();
-	@Output() mousemove = new EventEmitter<unknown>();
-	@Output() mousewheel = new EventEmitter<unknown>();
-	@Output() mousedblclick = new EventEmitter<unknown>();
-	@Output() mouseupBefore = new EventEmitter<unknown>();
-	@Output() mousedownBefore = new EventEmitter<unknown>();
-	@Output() mousemoveBefore = new EventEmitter<unknown>();
-	@Output() mouseUp = new EventEmitter<unknown>();
-	@Output() mouseDown = new EventEmitter<unknown>();
-	@Output() mouseOver = new EventEmitter<unknown>();
-	@Output() mouseOut = new EventEmitter<unknown>();
-	@Output() mouseMove = new EventEmitter<unknown>();
-	@Output() mouseWheel = new EventEmitter<unknown>();
-	@Output() mouseDblclick = new EventEmitter<unknown>();
-	@Output() mouseUpBefore = new EventEmitter<unknown>();
-	@Output() mouseDownBefore = new EventEmitter<unknown>();
-	@Output() mouseMoveBefore = new EventEmitter<unknown>();
-	@Output() pathCreated = new EventEmitter<unknown>();
-	@Output() alterRender = new EventEmitter<unknown>();
-	@Output() objectAdded = new EventEmitter<unknown>();
-	@Output() objectMoved = new EventEmitter<unknown>();
-	@Output() objectScaled = new EventEmitter<unknown>();
-	@Output() objectSkewed = new EventEmitter<unknown>();
-	@Output() objectRotated = new EventEmitter<unknown>();
-	@Output() objectRemoved = new EventEmitter<unknown>();
-	@Output() objectModified = new EventEmitter<unknown>();
-	@Output() objectSelected = new EventEmitter<unknown>();
-	@Output() objectMoving = new EventEmitter<unknown>();
-	@Output() objectScaling = new EventEmitter<unknown>();
-	@Output() objectSkewing = new EventEmitter<unknown>();
-	@Output() objectRotating = new EventEmitter<unknown>();
-	@Output() selectionCleared = new EventEmitter<unknown>();
-	@Output() selectionCreated = new EventEmitter<unknown>();
-	@Output() selectionUpdated = new EventEmitter<unknown>();
-	@Output() beforeTransform = new EventEmitter<unknown>();
-	@Output() beforeSelectionCleared = new EventEmitter<unknown>();
-
-	constructor(
-		private readonly _zone: NgZone,
-		private readonly _elementRef: ElementRef<HTMLCanvasElement>,
-		private readonly _differs: KeyValueDiffers,
-		@Optional() @Inject(FABRIC_CONFIG) private readonly _defaults: FabricConfigInterface | null,
-	) {}
 
 	private _configObject(): Record<string, unknown> {
-		return (this.config ?? {}) as Record<string, unknown>;
+		return (this.config() ?? {}) as Record<string, unknown>;
 	}
 
 	ngOnInit(): void {
 		const params = new FabricConfig(this._defaults ?? {});
-		params.assign(this.config);
+		params.assign(this.config());
 
 		Object.keys(params).forEach(key => {
 			if (params[key] === undefined) {
@@ -135,7 +150,8 @@ export class FabricDirective implements OnInit, OnDestroy, DoCheck, OnChanges {
 		});
 
 		this._zone.runOutsideAngular(() => {
-			this._instance = this.disabled
+			this._lastDisabled = this.disabled();
+			this._instance = this._lastDisabled
 				? new StaticCanvas(
 						this._elementRef.nativeElement,
 						params as unknown as StaticCanvasOptions,
@@ -164,10 +180,8 @@ export class FabricDirective implements OnInit, OnDestroy, DoCheck, OnChanges {
 
 			this._instance?.on(fabricEvent as never, (event: unknown) => {
 				this._zone.run(() => {
-					const emitter = this[eventName] as EventEmitter<unknown>;
-					if (emitter.observers.length) {
-						emitter.emit(event);
-					}
+					const emitter = this[eventName] as OutputEmitterRef<unknown>;
+					emitter.emit(event);
 				});
 			});
 		});
@@ -214,17 +228,6 @@ export class FabricDirective implements OnInit, OnDestroy, DoCheck, OnChanges {
 	ngDoCheck(): void {
 		const changes = this._configDiff?.diff(this._configObject());
 		if (changes) {
-			this.ngOnDestroy();
-			this.ngOnInit();
-		}
-	}
-
-	ngOnChanges(changes: SimpleChanges): void {
-		if (
-			this._instance &&
-			changes['disabled'] &&
-			changes['disabled'].currentValue !== changes['disabled'].previousValue
-		) {
 			this.ngOnDestroy();
 			this.ngOnInit();
 		}

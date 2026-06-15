@@ -1,3 +1,4 @@
+import { InputIconAction } from './input.interface';
 import { InputType } from './input.type';
 
 export const inputDefaults = {
@@ -12,5 +13,5 @@ export const inputDefaults = {
 	wClass: '',
 	autocomplete: undefined as string | null | undefined,
 	error: null as string | null,
-	icons: [] as any[],
+	icons: [] as InputIconAction[],
 };

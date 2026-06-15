@@ -1,5 +1,4 @@
 import {
-	ChangeDetectionStrategy,
 	Component,
 	computed,
 	input,
@@ -10,7 +9,6 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { TranslateDirective } from '@wawjs/ngx-translate';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [TranslateDirective, RouterLinkActive, RouterLink],
 	selector: 'material-icon',
 	templateUrl: './material.component.html',

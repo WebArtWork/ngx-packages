@@ -1,6 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
 import {
-	ChangeDetectionStrategy,
 	Component,
 	ElementRef,
 	Signal,
@@ -17,8 +16,9 @@ import {
 	viewChild,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import type { Field } from '@angular/forms/signals';
 import { ClickOutsideDirective, CoreService } from '@wawjs/ngx-core';
-import { TranslateDirective, TranslatePipe } from '@wawjs/ngx-translate';
+import { TranslateDirective } from '@wawjs/ngx-translate';
 import { InputComponent } from '../input/input.component';
 import { selectDefaults } from './select.const';
 import {
@@ -31,11 +31,9 @@ import { SelectId, SelectValue } from './select.type';
 
 @Component({
 	selector: 'wselect',
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [
 		NgTemplateOutlet,
 		TranslateDirective,
-		TranslatePipe,
 		InputComponent,
 		ClickOutsideDirective,
 	],
@@ -70,10 +68,14 @@ export class SelectComponent implements ControlValueAccessor {
 	readonly buttons = input<SelectButton[]>(selectDefaults.buttons);
 
 	/* ===== Signal Forms (canonical: formField) ===== */
-	readonly formField = input<any | null>(null, { alias: 'formField' });
+	readonly formField = input<Field<SelectValue> | null>(null, {
+		alias: 'formField',
+	});
 
 	/** Back-compat alias for older templates/docs */
-	readonly field = input<any | null>(null, { alias: 'field' });
+	readonly field = input<Field<SelectValue> | null>(null, {
+		alias: 'field',
+	});
 
 	private readonly _resolvedField = computed(
 		() => this.formField() ?? this.field(),

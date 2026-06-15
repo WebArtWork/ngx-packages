@@ -1,9 +1,9 @@
 import { isPlatformBrowser } from '@angular/common';
-import { inject, Injectable, PLATFORM_ID, signal } from '@angular/core';
+import { PLATFORM_ID, Service, inject, signal } from '@angular/core';
 import { DEFAULT_LANGUAGES } from './language.const';
 import { Language, LanguageInput, ProvideLanguageConfig } from './language.interface';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class LanguageService {
 	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 	private static readonly _LANGUAGE_STORE_KEY = 'translate.language';

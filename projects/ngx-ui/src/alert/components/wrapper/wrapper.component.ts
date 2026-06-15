@@ -1,5 +1,4 @@
-import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
 	selector: 'lib-wrapper',
@@ -32,14 +31,21 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 			}
 		`,
 	],
-	imports: [CommonModule],
-	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 /**
  * Container component that provides placeholder elements for alert instances
  * rendered in different screen positions.
  */
 export class WrapperComponent {
+	readonly baseClasses = [
+		'fixed',
+		'w-full',
+		'pointer-events-none',
+		'flex',
+		'flex-col',
+		'z-[99999]',
+	] as const;
+
 	readonly positions = [
 		{ id: 'topLeft', class: 'alert-lib-wrapper__alert--top-left' },
 		{ id: 'top', class: 'alert-lib-wrapper__alert--top' },

@@ -1,4 +1,4 @@
-import { computed, inject, Injectable } from '@angular/core';
+import { Service, computed, inject } from '@angular/core';
 import { CrudConfig, CrudService } from '@wawjs/ngx-crud';
 import { NGX_FORM_CONFIG } from '../config.interface';
 import { Formcomponent } from '../interfaces/component.interface';
@@ -12,7 +12,7 @@ function formcomponentCrudConfig(): CrudConfig<Formcomponent> {
 	};
 }
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class FormcomponentService extends CrudService<Formcomponent> {
 	private readonly _ngxFormConfig = inject(NGX_FORM_CONFIG);
 

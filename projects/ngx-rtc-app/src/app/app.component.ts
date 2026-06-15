@@ -1,15 +1,15 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { NgOptimizedImage } from '@angular/common';
+import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { Language, LanguageService, TranslatePipe, TranslateService } from 'ngx-translate';
+import { Language, LanguageService, TranslateService } from 'ngx-translate';
 import { ThemeService } from 'ngx-ui';
 import { serviceDocs } from './services/service-docs';
 
 @Component({
 	selector: 'app-root',
-	imports: [RouterLink, RouterLinkActive, RouterOutlet, TranslatePipe],
+	imports: [NgOptimizedImage, RouterLink, RouterLinkActive, RouterOutlet],
 	templateUrl: './app.component.html',
 	styleUrl: './app.component.scss',
-	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
 	private readonly _languageFlagByCode: Record<string, string> = {
@@ -21,6 +21,15 @@ export class AppComponent {
 	protected readonly languageService = inject(LanguageService);
 	protected readonly translateService = inject(TranslateService);
 	protected readonly services = serviceDocs;
+
+	protected translate(text: string): string {
+		return this.translateService.translate(text)();
+	}
+
+	protected themeSwitchLabel(): string {
+		const mode = this.themeService.mode() === 'light' ? 'dark' : 'light';
+		return `${this.translate('Switch to')} ${this.translate(mode)} ${this.translate('mode')}`;
+	}
 
 	protected topbarLabel(name: string): string {
 		if (name === 'RtcService') {

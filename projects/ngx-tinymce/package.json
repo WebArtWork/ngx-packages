@@ -1,13 +1,13 @@
 {
 	"name": "@wawjs/ngx-tinymce",
-	"version": "21.3.4",
+	"version": "22.0.1",
 	"description": "Angular TinyMCE editor integration package from Web Art Work.",
 	"license": "MIT",
 	"repository": "WebArtWork/ngx-tinymce",
 	"peerDependencies": {
-		"@angular/core": ">=21.0.0",
-		"@angular/common": ">=21.0.0",
-		"@angular/forms": ">=21.0.0"
+		"@angular/core": ">=22.0.0",
+		"@angular/common": ">=22.0.0",
+		"@angular/forms": ">=22.0.0"
 	},
 	"engines": {
 		"node": ">=24",

@@ -1,6 +1,5 @@
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import {
-	ChangeDetectionStrategy,
 	Component,
 	computed,
 	effect,
@@ -44,7 +43,6 @@ interface ServiceReferenceFileSection {
 	imports: [RouterLink, ServiceDetailFeatureFilesComponent, ServiceDetailSectionComponent],
 	templateUrl: './service-detail.component.html',
 	styleUrl: './service-detail.component.scss',
-	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ServiceDetailComponent {
 	private static readonly _AVAILABLE_ITEM_ORDER = [

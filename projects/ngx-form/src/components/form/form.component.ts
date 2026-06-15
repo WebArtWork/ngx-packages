@@ -1,5 +1,4 @@
 import {
-	ChangeDetectionStrategy,
 	Component,
 	computed,
 	effect,
@@ -118,7 +117,6 @@ import { FormComponentComponent } from '../form-component/form-component.compone
 		`,
 	],
 	imports: [FormComponentComponent],
-	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormComponent {
 	private readonly _coreService = inject(CoreService);

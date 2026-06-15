@@ -7,7 +7,13 @@ export interface Translate {
 
 export type TranslateVars = Record<string, unknown>;
 
-export type TranslateConfigTranslations = Record<string, Translate[]>;
+export type TranslateDictionary = Record<string, string>;
+
+export type TranslateArray = readonly string[];
+
+export type TranslatePayload = TranslateDictionary | TranslateArray | readonly Translate[];
+
+export type TranslateConfigTranslations = Record<string, TranslatePayload>;
 
 export interface TranslateFileLoaderConfig {
 	folder?: string;

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import {
 	AlertService,
 	BurgerComponent,
@@ -34,7 +34,6 @@ interface UiRow {
 	],
 	templateUrl: './landing.component.html',
 	styleUrl: './landing.component.scss',
-	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LandingComponent {
 	private readonly _alertService = inject(AlertService);
@@ -115,7 +114,6 @@ export class LandingComponent {
 			}
 		`,
 	],
-	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DemoModalComponent {
 	close: () => void = () => {};

@@ -1,5 +1,4 @@
 import {
-	ChangeDetectionStrategy,
 	ChangeDetectorRef,
 	Component,
 	inject,
@@ -15,7 +14,6 @@ import { ButtonType } from './button.type';
 
 @Component({
 	selector: 'wbutton',
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './button.component.html',
 	styles: [
 		`

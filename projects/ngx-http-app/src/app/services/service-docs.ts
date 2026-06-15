@@ -29,7 +29,7 @@ export interface ServiceDoc {
 	code: string;
 }
 
-const _SERVICE_DOC_ORDER = ['http-service', 'network-service'] as const;
+const _SERVICE_DOC_ORDER = ['http-service', 'http-resource', 'network-service'] as const;
 
 const _serviceDocOrderMap: ReadonlyMap<string, number> = new Map(
 	_SERVICE_DOC_ORDER.map((slug, index) => [slug, index] as const),
@@ -51,11 +51,13 @@ const _serviceDocs: ServiceDoc[] = [
 		config: [
 			'Configure the package with provideNgxHttp({ http: { url, headers }, network: { ... } }).',
 			'provideNgxHttp() also registers Angular HttpClient with fetch support and DI interceptors.',
+			'Prefer ngxHttpResource() for new non-CRUD HTTP GET/read behavior that should expose loading/error/value state.',
 		],
 		availableItems: [
 			'config.interface.ts',
 			'provide-ngx-http.ts',
 			'http.interface.ts',
+			'http-resource.ts',
 			'http.service.ts',
 		],
 		properties: [
@@ -166,6 +168,7 @@ export const appConfig = {
 				details: [
 					'Each helper supports a legacy callback as the third argument.',
 					'Options can override error handling, acceptance checks, field extraction, and request locking.',
+					'For new HTTP GET/read code outside ngx-crud, prefer ngxHttpResource() unless an imperative Observable flow is specifically needed.',
 				],
 				category: 'Requests',
 				sourceFile: 'http.service.ts',
@@ -185,12 +188,21 @@ loadProjects() {
 				category: 'Flow control',
 				sourceFile: 'http.service.ts',
 			},
+			{
+				name: 'resourceRequest',
+				signature: 'resourceRequest(request: HttpResourceRequest): HttpResourceRequest',
+				description:
+					'Normalizes Angular httpResource request objects with the current ngx-http base URL and shared headers.',
+				category: 'Requests',
+				sourceFile: 'http.service.ts',
+			},
 		],
 		sections: [
 			{
 				title: 'Feature role',
 				items: [
 					'Use HttpService when an app wants one place to manage API base URL and shared headers.',
+					'Use ngxHttpResource() for new non-CRUD read state that should be driven by signals.',
 					'The service preserves compatibility with older callback-based code without dropping Observable support.',
 					'Client-side overrides are persisted so debug or tenant-specific API targets survive reloads.',
 				],
@@ -205,6 +217,87 @@ export const appConfig = {
 \t\t}),
 \t],
 };`,
+	},
+	{
+		slug: 'http-resource',
+		name: 'ngxHttpResource',
+		description: 'Signal-based API read helper built on Angular httpResource().',
+		summary:
+			'ngxHttpResource creates Angular HTTP resources that automatically re-run when dependent signals change while still using the ngx-http base URL and shared headers.',
+		highlights: [
+			'Uses Angular httpResource() and returns HttpResourceRef.',
+			'Prepends the current HttpService base URL for relative request URLs.',
+			'Merges shared ngx-http headers with request-specific headers.',
+			'Preferred over new HttpService.get() calls outside ngx-crud when the read is signal-facing.',
+		],
+		config: [
+			'Bootstrap with provideNgxHttp() so Angular HttpClient is available with fetch support and DI interceptors.',
+			'Use HttpService.setUrl() and set() when runtime base URL or headers should also affect resources.',
+		],
+		availableItems: [
+			'http-resource.ts',
+			'http.service.ts',
+			'provide-ngx-http.ts',
+		],
+		methods: [
+			{
+				name: 'ngxHttpResource',
+				signature:
+					'ngxHttpResource<T>(request, options?): HttpResourceRef<T | undefined>',
+				description:
+					'Creates a signal-based HTTP read resource from a URL factory or HttpResourceRequest factory.',
+				details: [
+					'The factory can return a string URL or a full Angular HttpResourceRequest object.',
+					'Request factories can read signals, and Angular will reload when those dependencies change.',
+					'Prefer this over new HttpService.get() calls outside ngx-crud for read state.',
+					'Guard value() with hasValue() because Angular resources can throw when value() is read in an error state.',
+				],
+				category: 'Resources',
+				docType: 'Const',
+				sourceFile: 'http-resource.ts',
+				example: `import { Component, input } from '@angular/core';
+import { ngxHttpResource } from 'ngx-http';
+
+interface User {
+\t_id: string;
+\tname: string;
+\temail: string;
+}
+
+@Component({
+\tselector: 'app-user-card',
+\ttemplate: \`
+\t\t@if (user.hasValue()) {
+\t\t\t<h2>{{ user.value().name }}</h2>
+\t\t\t<p>{{ user.value().email }}</p>
+\t\t} @else if (user.error()) {
+\t\t\t<p>Could not load user.</p>
+\t\t} @else if (user.isLoading()) {
+\t\t\t<p>Loading...</p>
+\t\t}
+\t\`,
+})
+export class UserCardComponent {
+\treadonly userId = input.required<string>();
+\treadonly user = ngxHttpResource<User>(() => \`/users/\${this.userId()}\`);
+}`,
+			},
+		],
+		sections: [
+			{
+				title: 'Request object usage',
+				items: [
+					'Return { url, params, headers, timeout, transferCache } when a read needs Angular HttpResourceRequest options.',
+					'Use request-specific headers to override matching shared headers.',
+					'Use HttpService for writes, legacy callback flows, request locking, existing CRUD internals, or Observable request flows.',
+				],
+				example: `readonly users = ngxHttpResource<User[]>(() => ({
+\turl: '/users',
+\tparams: { page: this.page() },
+}));`,
+			},
+		],
+		code: `readonly user = ngxHttpResource<User>(() => \`/users/\${this.userId()}\`);`,
 	},
 	{
 		slug: 'network-service',

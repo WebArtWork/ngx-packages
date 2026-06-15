@@ -17,8 +17,10 @@
 						class="wtable__search-input"
 						type="text"
 						placeholder="Search..."
-						[(ngModel)]="searching_text"
-						(ngModelChange)="searching()"
+						[value]="searchingText()"
+						(input)="
+							searchingText.set(inputValue($event)); searching()
+						"
 						(keyup.enter)="search(); searchShow = false"
 					/>
 					<button

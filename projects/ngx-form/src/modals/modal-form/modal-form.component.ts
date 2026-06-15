@@ -1,5 +1,4 @@
 import {
-	ChangeDetectionStrategy,
 	Component,
 	inject,
 	signal,
@@ -46,7 +45,6 @@ import { FormModalButton, FormService } from '../../services/form.service';
 		`,
 	],
 	imports: [FormComponent, ButtonComponent],
-	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModalFormComponent {
 	private readonly _coreService = inject(CoreService);

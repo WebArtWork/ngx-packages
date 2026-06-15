@@ -1,8 +1,8 @@
 import {
 	inject,
-	Injectable,
 	Injector,
 	runInInjectionContext,
+	Service,
 	signal,
 	TemplateRef,
 	WritableSignal,
@@ -38,7 +38,7 @@ function formCrudConfig(): CrudConfig<Form> {
 	};
 }
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class FormService extends CrudService<Form> {
 	private readonly _ngxFormConfig = inject(NGX_FORM_CONFIG);
 	private readonly _formStoreService = inject(StoreService);

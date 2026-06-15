@@ -1,7 +1,5 @@
-import { NgClass } from '@angular/common';
 import {
 	AfterViewInit,
-	ChangeDetectionStrategy,
 	Component,
 	ElementRef,
 	computed,
@@ -11,8 +9,8 @@ import {
 	signal,
 	viewChild,
 } from '@angular/core';
-import { FormField } from '@angular/forms/signals';
-import { TranslatePipe } from '@wawjs/ngx-translate';
+import { FormField, type Field } from '@angular/forms/signals';
+import { TranslateDirective } from '@wawjs/ngx-translate';
 import { MaterialComponent } from '../material/material.component';
 import {
 	ManualDisabledDirective,
@@ -24,11 +22,9 @@ import { InputType, InputValue } from './input.type';
 
 @Component({
 	selector: 'winput',
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [
 		FormField,
-		NgClass,
-		TranslatePipe,
+		TranslateDirective,
 		ManualTypeDirective,
 		ManualDisabledDirective,
 		MaterialComponent,
@@ -81,7 +77,7 @@ import { InputType, InputValue } from './input.type';
 })
 export class InputComponent implements AfterViewInit {
 	/* ---------------- Signal forms ---------------- */
-	readonly formField = input<any | null>(null);
+	readonly formField = input<Field<any> | null>(null);
 
 	/* ---------------- Template-model mode ---------------- */
 	readonly wModel = model<InputValue | null>(null, { alias: 'wModel' });
@@ -153,7 +149,7 @@ export class InputComponent implements AfterViewInit {
 
 		if (!errorsArray.length) return null;
 
-		const first = errorsArray[0] as any;
+		const first = errorsArray[0] as { message?: unknown } | string | null;
 		if (!first) return null;
 
 		if (typeof first === 'string') return first;
@@ -182,7 +178,7 @@ export class InputComponent implements AfterViewInit {
 			if (option != null && this.items().length && !this.formField()) {
 				const current = this.wModel() as InputValue;
 				const list = Array.isArray(current)
-					? [...(current as any[])]
+					? [...current]
 					: [];
 				const idx = list.indexOf(option);
 
@@ -231,8 +227,8 @@ export class InputComponent implements AfterViewInit {
 		return type === 'password' ? 'current-password' : null;
 	}
 
-	isItemChecked(item: any): boolean {
+	isItemChecked(item: string): boolean {
 		const model = this.wModel();
-		return Array.isArray(model) ? (model as any[]).includes(item) : !!model;
+		return Array.isArray(model) ? (model as readonly unknown[]).includes(item) : !!model;
 	}
 }

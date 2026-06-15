@@ -52,9 +52,11 @@
 						<span>{{ isRangeMode() ? 'Start time' : 'Time' }}</span>
 						<input
 							type="time"
-							[ngModel]="startTime()"
-							(ngModelChange)="
-								isRangeMode() ? updateStartTime($event) : updateSingleTime($event)
+							[value]="startTime()"
+							(input)="
+								isRangeMode()
+									? updateStartTime(inputValue($event))
+									: updateSingleTime(inputValue($event))
 							"
 						/>
 					</label>
@@ -64,8 +66,8 @@
 							<span>End time</span>
 							<input
 								type="time"
-								[ngModel]="endTime()"
-								(ngModelChange)="updateEndTime($event)"
+								[value]="endTime()"
+								(input)="updateEndTime(inputValue($event))"
 							/>
 						</label>
 					}

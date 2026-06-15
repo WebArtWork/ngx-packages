@@ -1,16 +1,15 @@
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Inject, inject, Injectable, Optional, PLATFORM_ID } from '@angular/core';
+import { PLATFORM_ID, Service, inject } from '@angular/core';
 import { EMPTY, Observable, ReplaySubject } from 'rxjs';
 import { catchError, first } from 'rxjs/operators';
-import { Config, CONFIG_TOKEN } from '../core/config.interface';
+import { CONFIG_TOKEN } from '../core/config.interface';
 import { DEFAULT_HTTP_CONFIG, HttpConfig, HttpHeaderType } from './http.interface';
 
-@Injectable({
-	providedIn: 'root',
-})
+@Service()
 export class HttpService {
 	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+	private readonly _http = inject(HttpClient);
 	private readonly _urlStorageKey = 'ngx-http.url';
 	private readonly _legacyUrlStorageKey = 'wacom-http.url';
 	private readonly _headersStorageKey = 'ngx-http.headers';
@@ -39,14 +38,13 @@ export class HttpService {
 	// Instance of HttpHeaders with current headers
 	private _http_headers = new HttpHeaders(this._headers);
 
-	constructor(
-		@Inject(CONFIG_TOKEN) @Optional() config: Config,
-		private _http: HttpClient,
-	) {
+	constructor() {
+		const config = inject(CONFIG_TOKEN, { optional: true });
+
 		// Initialize HTTP configuration and headers from injected config
 		this._config = {
 			...DEFAULT_HTTP_CONFIG,
-			...(config.http || {}),
+			...(config?.http || {}),
 		};
 
 		if (typeof this._config.url === 'string') {

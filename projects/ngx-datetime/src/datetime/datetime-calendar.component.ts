@@ -1,5 +1,4 @@
 import {
-	ChangeDetectionStrategy,
 	Component,
 	computed,
 	inject,
@@ -18,7 +17,6 @@ import { TimeService } from './time.service';
 	selector: 'ngx-datetime-calendar',
 	templateUrl: './datetime-calendar.component.html',
 	styleUrl: './datetime-calendar.component.css',
-	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DatetimeCalendarComponent {
 	private readonly _timeService = inject(TimeService);

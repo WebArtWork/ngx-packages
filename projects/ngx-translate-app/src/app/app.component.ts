@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { NgOptimizedImage } from '@angular/common';
+import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Language, LanguageService, TranslateDirective, TranslateService } from 'ngx-translate';
 import { ThemeService } from 'ngx-ui';
@@ -6,10 +7,9 @@ import { serviceDocs } from './services/service-docs';
 
 @Component({
 	selector: 'app-root',
-	imports: [RouterLink, RouterLinkActive, RouterOutlet, TranslateDirective],
+	imports: [NgOptimizedImage, RouterLink, RouterLinkActive, RouterOutlet, TranslateDirective],
 	templateUrl: './app.component.html',
 	styleUrl: './app.component.scss',
-	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent {
 	private readonly _languageFlagByCode: Record<string, string> = {

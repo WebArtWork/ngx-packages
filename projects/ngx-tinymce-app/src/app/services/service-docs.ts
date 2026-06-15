@@ -118,7 +118,7 @@ export const appConfig = {
 		methods: [
 			{
 				name: 'TinymceComponent',
-				signature: 'component <tinymce [(ngModel)] [config] [inline] [disabled] [delay] />',
+				signature: 'component <tinymce [formControl] [config] [inline] [disabled] [delay] />',
 				description:
 					'Standalone component wrapper that initializes TinyMCE on demand and keeps its content synchronized with Angular forms.',
 				details: [
@@ -130,21 +130,21 @@ export const appConfig = {
 				docType: 'Component',
 				sourceFile: 'tinymce.component.ts',
 				example: `import { Component, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { TinymceComponent } from 'ngx-tinymce';
 
 @Component({
-\timports: [FormsModule, TinymceComponent],
+\timports: [ReactiveFormsModule, TinymceComponent],
 \ttemplate: \`
 \t\t<tinymce
-\t\t\t[(ngModel)]="content"
+\t\t\t[formControl]="content"
 \t\t\t[config]="editorConfig()"
 \t\t\t(ready)="onReady()"
 \t\t></tinymce>
 \t\`,
 })
 export class EditorDemoComponent {
-\treadonly content = signal('<p>Hello TinyMCE</p>');
+\treadonly content = new FormControl('<p>Hello TinyMCE</p>', { nonNullable: true });
 \treadonly editorConfig = signal({
 \t\tmenubar: false,
 \t\tplugins: 'lists link code',

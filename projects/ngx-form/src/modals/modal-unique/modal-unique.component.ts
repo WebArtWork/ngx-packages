@@ -1,5 +1,4 @@
 import {
-	ChangeDetectionStrategy,
 	Component,
 	inject,
 	input,
@@ -18,7 +17,6 @@ import { FormInterface } from '../../interfaces/form.interface';
 		`,
 	],
 	imports: [FormComponent],
-	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModalUniqueComponent {
 	private readonly _http = inject(HttpService);

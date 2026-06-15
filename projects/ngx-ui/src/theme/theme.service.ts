@@ -1,5 +1,5 @@
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
-import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
+import { PLATFORM_ID, Service, inject, signal } from '@angular/core';
 import {
 	DEFAULT_THEME_CONFIG,
 	DEFAULT_THEME_STORAGE_KEYS,
@@ -9,7 +9,7 @@ import {
 } from './theme.interface';
 import { ThemeDensity, ThemeMode, ThemeRadius } from './theme.type';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class ThemeService {
 	private readonly _doc = inject(DOCUMENT);
 	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));

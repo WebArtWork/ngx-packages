@@ -1,6 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
 import {
-	ChangeDetectionStrategy,
 	Component,
 	TemplateRef,
 	computed,
@@ -9,7 +8,7 @@ import {
 	output,
 	signal,
 } from '@angular/core';
-import { TranslatePipe } from '@wawjs/ngx-translate';
+import { TranslateDirective } from '@wawjs/ngx-translate';
 import { ButtonComponent } from '../../../button/button.component';
 import { fileDefaults } from '../../file.const';
 
@@ -17,8 +16,7 @@ export type FileView = 'dropzone' | 'list';
 
 @Component({
 	selector: 'ngx-file',
-	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [NgTemplateOutlet, TranslatePipe, ButtonComponent],
+	imports: [NgTemplateOutlet, TranslateDirective, ButtonComponent],
 	templateUrl: './file.component.html',
 	styles: [
 		`

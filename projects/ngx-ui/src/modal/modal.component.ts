@@ -1,5 +1,4 @@
 import {
-	ChangeDetectionStrategy,
 	Component,
 	OnDestroy,
 	OnInit,
@@ -15,7 +14,6 @@ import {
 			}
 		`,
 	],
-	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModalComponent implements OnInit, OnDestroy {
 	closable = true;

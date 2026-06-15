@@ -1,9 +1,9 @@
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
-import { Inject, Injectable, Optional, PLATFORM_ID, inject } from '@angular/core';
+import { PLATFORM_ID, Service, inject } from '@angular/core';
 import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../core/config.interface';
+import { CONFIG_TOKEN, DEFAULT_CONFIG } from '../core/config.interface';
 import { isDefined } from './meta.const';
 import { MetaConfig, MetaDefaults, MetaPage } from './meta.interface';
 import { TagAttr } from './meta.type';
@@ -36,9 +36,14 @@ import { TagAttr } from './meta.type';
  * - Robots:
  *   - <meta name="robots" ...> (derived from `robots` or `index`)
  */
-@Injectable({ providedIn: 'root' })
+@Service()
 export class MetaService {
 	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+	private readonly _config = inject(CONFIG_TOKEN, { optional: true }) || DEFAULT_CONFIG;
+	private readonly _router = inject(Router);
+	private readonly _activatedRoute = inject(ActivatedRoute);
+	private readonly _meta = inject(Meta);
+	private readonly _titleService = inject(Title);
 
 	/**
 	 * Effective configuration (from CONFIG_TOKEN + DEFAULT_CONFIG fallback).
@@ -62,14 +67,7 @@ export class MetaService {
 	 */
 	private _managedLinkRels = new Set<string>();
 
-	constructor(
-		@Inject(CONFIG_TOKEN) @Optional() private _config: Config,
-		private _router: Router,
-		private _activatedRoute: ActivatedRoute,
-		private _meta: Meta,
-		private _titleService: Title,
-	) {
-		this._config = this._config || DEFAULT_CONFIG;
+	constructor() {
 		this._metaConfig = this._config.meta || {};
 
 		// Recommended default: keep meta in sync with route changes automatically.

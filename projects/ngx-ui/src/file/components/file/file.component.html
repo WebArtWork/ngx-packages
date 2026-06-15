@@ -3,7 +3,7 @@ _disabled = isDisabled(); @let _dragging = isDragging();
 
 <div class="wfile" [class._disabled]="_disabled">
 	@if (_label) {
-	<div class="wfile__label">{{ _label | translate }}</div>
+	<div class="wfile__label" [translate]="_label"></div>
 	}
 
 	<input
@@ -34,11 +34,11 @@ _disabled = isDisabled(); @let _dragging = isDragging();
 			@if (!_files.length) {
 			<ng-container [ngTemplateOutlet]="tEmpty() || emptyTpl" />
 			<ng-template #emptyTpl>
-				<div class="wfile__empty">{{ _ph | translate }}</div>
+				<div class="wfile__empty" [translate]="_ph"></div>
 			</ng-template>
 			} @else {
-			<div class="wfile__empty">
-				{{ 'Drop more files or click to browse' | translate }}
+			<div class="wfile__empty" translate>
+				Drop more files or click to browse
 			</div>
 			}
 		</div>
@@ -83,7 +83,7 @@ _disabled = isDisabled(); @let _dragging = isDragging();
 				(wClick)="triggerPick(fileInput)"
 			>
 				<span class="material-icons">upload_file</span>
-				<span>{{ 'Browse' | translate }}</span>
+				<span translate>Browse</span>
 			</wbutton>
 
 			@if (clearable() && _files.length) {
@@ -94,7 +94,7 @@ _disabled = isDisabled(); @let _dragging = isDragging();
 				(wClick)="clear()"
 			>
 				<span class="material-icons">close</span>
-				<span>{{ 'Clear' | translate }}</span>
+				<span translate>Clear</span>
 			</wbutton>
 			}
 		</div>

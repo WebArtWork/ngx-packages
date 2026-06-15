@@ -1,11 +1,9 @@
-import { Injectable, inject } from '@angular/core';
+import { Service, inject } from '@angular/core';
 import { Modal, ModalService } from '@wawjs/ngx-ui';
 import { FabricCropModalComponent } from './fabric-crop-modal.component';
 import type { FabricCropModalOptions } from './fabric-crop.interfaces';
 
-@Injectable({
-	providedIn: 'root',
-})
+@Service()
 export class FabricCropModalService {
 	private readonly _modalService = inject(ModalService);
 

@@ -4,17 +4,15 @@ import {
 	ComponentRef,
 	EmbeddedViewRef,
 	EnvironmentInjector,
-	Injectable,
 	PLATFORM_ID,
+	Service,
 	Type,
 	createComponent,
 	inject,
 } from '@angular/core';
 import { DomComponent } from './dom.interface';
 
-@Injectable({
-	providedIn: 'root',
-})
+@Service()
 /**
  * Utility service for programmatically creating and interacting with Angular
  * components within the DOM.

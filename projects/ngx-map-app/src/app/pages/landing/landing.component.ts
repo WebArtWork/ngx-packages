@@ -1,12 +1,11 @@
 import { JsonPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { AddressComponent, GeoAddress, LatLngLiteral, LibMapMarker, MapComponent } from 'ngx-map';
 
 @Component({
 	imports: [AddressComponent, JsonPipe, MapComponent],
 	templateUrl: './landing.component.html',
 	styleUrl: './landing.component.scss',
-	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LandingComponent {
 	protected readonly address = signal<GeoAddress>({

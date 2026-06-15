@@ -1,8 +1,8 @@
-import { Injectable, WritableSignal, signal } from '@angular/core';
+import { Service, WritableSignal, signal } from '@angular/core';
 
 type Dict<T = unknown> = Record<string, T>;
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class UtilService {
 	// --- CSS variables (persisted) ---
 	private readonly _storageKey = 'css_variables';

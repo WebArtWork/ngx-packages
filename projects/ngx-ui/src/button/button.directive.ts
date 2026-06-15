@@ -1,6 +1,7 @@
 import {
 	Directive,
 	ElementRef,
+	inject,
 	input,
 	output,
 } from '@angular/core';
@@ -22,7 +23,7 @@ import { ButtonType } from './button.type';
 	},
 })
 export class ButtonDirective {
-	constructor(private el: ElementRef<HTMLElement>) {}
+	private readonly _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
 
 	readonly type = input<ButtonType>(buttonDefaults.type);
 	readonly disabled = input<boolean>(buttonDefaults.disabled);
@@ -38,7 +39,7 @@ export class ButtonDirective {
 	private cooling = false;
 
 	private get tag(): string {
-		return this.el.nativeElement.tagName;
+		return this._elementRef.nativeElement.tagName;
 	}
 	private get isButton(): boolean {
 		return this.tag === 'BUTTON';
@@ -82,7 +83,7 @@ export class ButtonDirective {
 	onClick(ev: Event) {
 		if (this.isBlocked) {
 			ev.preventDefault();
-			(ev as any).stopImmediatePropagation?.();
+			ev.stopImmediatePropagation();
 			return;
 		}
 

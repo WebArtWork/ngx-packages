@@ -1,21 +1,21 @@
 import { isPlatformBrowser } from '@angular/common';
-import { Inject, inject, Injectable, Optional, PLATFORM_ID } from '@angular/core';
+import { PLATFORM_ID, Service, inject } from '@angular/core';
 import { Config, CONFIG_TOKEN, DEFAULT_CONFIG } from '../config.interface';
 
-@Injectable({
-	providedIn: 'root',
-})
+@Service()
 export class SocketService {
 	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+	private _config: Config = {
+		...DEFAULT_CONFIG,
+		...(inject(CONFIG_TOKEN, { optional: true }) || {}),
+	};
 
 	private _url = '';
 	private _io: any;
 	private _connected = false;
 	private _opts: any = {};
 
-	constructor(@Inject(CONFIG_TOKEN) @Optional() private _config: Config) {
-		this._config = { ...DEFAULT_CONFIG, ...(this._config || {}) };
-
+	constructor() {
 		if (!this._isBrowser || !this._config.io) {
 			return;
 		}

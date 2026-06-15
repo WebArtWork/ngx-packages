@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { Component } from '@angular/core';
 import { MapComponent } from '../../components/map/map.component';
 import { LatLngLiteral } from '../../map.interface';
 
@@ -12,7 +12,6 @@ import { LatLngLiteral } from '../../map.interface';
 			}
 		`,
 	],
-	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PickerComponent {
 	mapClick!: (latLng: LatLngLiteral) => void;

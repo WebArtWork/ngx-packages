@@ -1,4 +1,4 @@
-import { Injectable, WritableSignal, signal } from '@angular/core';
+import { Service, WritableSignal, signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 import {
 	Observable,
@@ -16,7 +16,7 @@ import {
 
 type Any = unknown;
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class EmitterService {
 	private _signals = new Map<string, WritableSignal<Any>>();
 	private _closers = new Map<string, Subject<void>>();

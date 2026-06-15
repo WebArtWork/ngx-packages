@@ -1,7 +1,6 @@
 import { JsonPipe } from '@angular/common';
 import {
 	AfterViewInit,
-	ChangeDetectionStrategy,
 	Component,
 	TemplateRef,
 	inject,
@@ -22,7 +21,6 @@ interface TemplateContext {
 	imports: [FileComponent, FormComponent, InputComponent, JsonPipe, SelectComponent],
 	templateUrl: './landing.component.html',
 	styleUrl: './landing.component.scss',
-	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LandingComponent implements AfterViewInit {
 	private readonly _formService = inject(FormService);

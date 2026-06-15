@@ -10,6 +10,8 @@ Use this file as context for coding agents when an Angular project depends on `@
 - Prefer bootstrapping theme state with `provideTheme()` in application providers.
 - Prefer `ThemeService` for theme mode, density, radius, persistence, and theme cycling before adding duplicate theme utilities.
 - Prefer exported UI components and services such as `ButtonComponent`, `InputComponent`, `SelectComponent`, `ModalService`, `AlertService`, `TableComponent`, `FileComponent`, `BurgerComponent`, and `ThemeIconComponent` before building one-off equivalents.
+- Use Angular 22 template spread and short arrow functions only for local UI glue, such as composing class arrays or toggling a signal. Keep filtering, sorting, and workflow decisions in TypeScript.
+- Use grouped `@case` blocks and `@default never;` when a template switches over a closed union type owned by the component, such as UI input modes.
 - Keep theme state centralized in `ThemeService` instead of scattering `localStorage` and `data-*` attribute updates across components.
 - Keep SSR-safe behavior intact. Do not add unguarded direct access to `document` or browser storage for theme handling.
 ```

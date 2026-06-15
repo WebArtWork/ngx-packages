@@ -1,5 +1,4 @@
 import {
-	ChangeDetectionStrategy,
 	Component,
 	computed,
 	input,
@@ -91,7 +90,6 @@ export type BurgerState = 'three-lines' | 'two-lines' | 'one-line' | 'cross';
 			}
 		`,
 	],
-	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BurgerComponent {
 	readonly state = input<BurgerState>('three-lines');

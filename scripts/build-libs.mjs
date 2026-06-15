@@ -10,18 +10,18 @@ const _ngArgs = process.platform === 'win32' ? ['/d', '/s', '/c', 'npx.cmd', 'ng
 
 const _libs = [
 	'ngx-ace',
-	'ngx-fabric',
 	'ngx-core',
 	'ngx-datetime',
+	'ngx-translate',
 	'ngx-http',
 	'ngx-crud',
 	'ngx-socket',
 	'ngx-rtc',
-	'ngx-translate',
 	'ngx-tinymce',
 	'ngx-ui',
 	'ngx-form',
-	'ngx-map'
+	'ngx-map',
+	'ngx-fabric'
 ];
 
 const _failedLibs = [];

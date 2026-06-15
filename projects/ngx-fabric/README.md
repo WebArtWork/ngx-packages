@@ -29,6 +29,7 @@ export const appConfig = {
 - `FabricComponent` for template-level canvas usage with JSON loading support
 - `FabricDirective` for direct canvas instance control
 - `provideNgxFabric()` for app-wide Fabric defaults
+- `injectFabricCropModalService()` for lazy crop modal service loading with Angular `injectAsync()`
 - `FABRIC_CONFIG`, `FabricConfigInterface`, `FabricConfig`, and `FabricEvents`
 
 ## Notes
@@ -37,6 +38,7 @@ export const appConfig = {
 - `loadFromJSON()` is available through the directive reference and is also used by the component `data` input.
 - Width and height fall back to the container size through `ResizeObserver`.
 - Event outputs follow camelCase Angular bindings, for example `objectAdded` for Fabric's `object:added`.
+- Prefer `injectFabricCropModalService()` for new crop actions so the crop modal service and component load only when the user opens the crop workflow.
 
 ## AI Coding Agents
 
@@ -48,6 +50,7 @@ Copy this into the consuming project's `AGENTS.md`, `CLAUDE.md`, or equivalent f
 - This Angular project uses `@wawjs/ngx-fabric` for Fabric.js canvas integration and crop workflows.
 - Import public APIs from `@wawjs/ngx-fabric`.
 - Prefer `provideNgxFabric({...})` for shared canvas defaults.
-- Prefer `FabricComponent`, `FabricDirective`, `FabricCropModalComponent`, and `FabricCropModalService` before adding duplicate wrappers.
+- Prefer `FabricComponent`, `FabricDirective`, `FabricCropModalComponent`, `FabricCropModalService`, and `injectFabricCropModalService()` before adding duplicate wrappers.
+- Prefer `injectFabricCropModalService()` for new on-demand crop buttons so Angular can lazy-load the crop modal path with `injectAsync()`.
 - Keep browser-only canvas behavior SSR-safe.
 ```

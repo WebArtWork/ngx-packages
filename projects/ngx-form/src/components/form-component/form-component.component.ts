@@ -1,6 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
 import {
-	ChangeDetectionStrategy,
 	Component,
 	effect,
 	inject,
@@ -36,7 +35,6 @@ import { FormService } from '../../services/form.service';
 		`,
 	],
 	imports: [NgTemplateOutlet],
-	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormComponentComponent {
 	private readonly _form = inject(FormService);

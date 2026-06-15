@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Injectable, inject } from '@angular/core';
+import { Service, inject } from '@angular/core';
 import {
 	DATETIME_CONFIG,
 	DatetimeConfig,
@@ -7,19 +7,16 @@ import {
 	WeekStartDay,
 } from './datetime.interface';
 
-@Injectable({
-	providedIn: 'root',
-})
+@Service()
 export class TimeService {
 	private readonly _config = this._resolveConfig(
 		inject<DatetimeConfig | null>(DATETIME_CONFIG, { optional: true }),
 	);
+	private readonly _datePipe = inject(DatePipe);
 
 	private _weekDays = this._config.weekDays;
 
 	private _monthNames = this._config.monthNames;
-
-	constructor(private _datePipe: DatePipe) {}
 
 	/**
 	 * Returns the name of the day of the week for a given date.

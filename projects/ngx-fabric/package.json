@@ -1,6 +1,6 @@
 {
 	"name": "@wawjs/ngx-fabric",
-	"version": "21.3.4",
+	"version": "22.0.1",
 	"description": "Angular Fabric canvas integration package from Web Art Work.",
 	"license": "MIT",
 	"repository": "WebArtWork/ngx-fabric",
@@ -19,9 +19,9 @@
 		"resize-observer-polyfill": "^1.5.1"
 	},
 	"peerDependencies": {
-		"@angular/common": ">=21.0.0",
-		"@angular/core": ">=21.0.0",
-		"@wawjs/ngx-ui": ">=21.3.4"
+		"@angular/common": ">=22.0.0",
+		"@angular/core": ">=22.0.0",
+		"@wawjs/ngx-ui": ">=22.0.1"
 	},
 	"engines": {
 		"node": ">=24",

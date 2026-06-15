@@ -1,7 +1,5 @@
-import { CommonModule } from '@angular/common';
 import {
 	AfterViewInit,
-	ChangeDetectionStrategy,
 	Component,
 	ElementRef,
 	OnDestroy,
@@ -55,8 +53,6 @@ import {
 			}
 		`,
 	],
-	imports: [CommonModule],
-	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 /**
  * Displays an individual alert message with optional icon, actions and

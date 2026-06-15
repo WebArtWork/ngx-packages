@@ -85,13 +85,17 @@ Prefer:
 - `input()`, `output()`, and `model()` for new component APIs.
 - Signals and `computed()` for local state.
 - `inject()` for dependency injection in new code.
-- `ChangeDetectionStrategy.OnPush` for components.
+- `@Service()` for root-provided singleton services.
 - Native control flow in templates (`@if`, `@for`, `@switch`).
+- Angular 22 template spread and short arrow functions for local UI glue only, such as composing class arrays or toggling a signal. Keep filtering, sorting, async work, and workflow decisions in TypeScript.
+- Grouped `@case` blocks and `@default never;` when a template switches over a closed union type.
 - Reactive forms for new form-heavy behavior.
 
 Avoid:
 
 - Adding broad shared wrapper modules.
+- Setting explicit `changeDetection` for the Angular 22 default mode. Use `ChangeDetectionStrategy.Eager` only when eager change detection is explicitly required.
+- `@Injectable({ providedIn: 'root' })` for plain root singleton services; reserve `@Injectable()` for guards or deeper DI configuration.
 - Using `ngClass` or `ngStyle` where class/style bindings are enough.
 - Introducing untyped `any` unless the surrounding public API already requires it.
 - Large unrelated refactors during focused package work.
@@ -137,6 +141,10 @@ Most packages are intended to be SSR-safe. Do not add unguarded direct access to
 
 Guard browser-only behavior with Angular platform checks or existing guarded services. Prefer `isPlatformBrowser(inject(PLATFORM_ID))`, `DOCUMENT`, `DomService`, `StoreService`, or package-specific services that already handle SSR boundaries.
 
+For persisted async reads, prefer `ngxResource({ key, ... })` from `@wawjs/ngx-core` over direct `StoreService.getJson()` so reads expose Angular resource loading/error/value state and can use StoreService-backed caching consistently. Use direct `StoreService.getJson()` only for imperative restore, migrations, queue replay, or one-off service initialization where a resource state object would make the flow less clear.
+
+For new HTTP GET/read behavior outside `ngx-crud`, prefer `ngxHttpResource()` from `@wawjs/ngx-http` over `HttpService.get()` so reads expose Angular resource loading/error/value state and react to signal dependencies. Keep `HttpService.get()` for imperative workflows, legacy callbacks, Observable composition, request locking, and existing CRUD internals.
+
 When adding a component that depends on browser-only libraries, ensure server rendering can instantiate the component without throwing.
 
 ## Styling
@@ -165,7 +173,7 @@ Put package-wide defaults in providers instead of scattering constants across co
 
 For metadata, prefer `provideNgxCore({ meta: ... })`, route metadata, and `MetaService`. If route-driven updates are expected, prefer `meta.applyFromRoutes = true`; use a guard only when a guard is genuinely needed.
 
-For translations, register app translations with `provideTranslate(...)` and use the exported translate pipe/directive.
+For translations, register app translations with `provideTranslate(...)` and use `TranslateDirective` or `TranslateService`.
 
 ## Build And Verification
 

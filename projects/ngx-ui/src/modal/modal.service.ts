@@ -1,11 +1,9 @@
-import { Injectable, Type, inject } from '@angular/core';
+import { Service, Type, inject } from '@angular/core';
 import { DomComponent, DomService } from '@wawjs/ngx-core';
 import { ModalComponent } from './modal.component';
 import { DEFAULT_MODAL_CONFIG, Modal, ModalConfig } from './modal.interface';
 
-@Injectable({
-	providedIn: 'root',
-})
+@Service()
 export class ModalService {
 	private readonly _dom = inject(DomService);
 

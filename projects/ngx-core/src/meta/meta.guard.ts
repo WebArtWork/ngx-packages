@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { ActivatedRouteSnapshot } from '@angular/router';
 import { MetaPage } from './meta.interface';
 import { MetaService } from './meta.service';
@@ -17,7 +17,7 @@ import { MetaService } from './meta.service';
  */
 @Injectable({ providedIn: 'root' })
 export class MetaGuard {
-	constructor(private _metaService: MetaService) {}
+	private readonly _metaService = inject(MetaService);
 
 	canActivate(route: ActivatedRouteSnapshot): boolean {
 		const pageMeta = (route.data && (route.data['meta'] as MetaPage)) || null;

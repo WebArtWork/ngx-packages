@@ -1,7 +1,6 @@
 import { NgTemplateOutlet } from '@angular/common';
 import {
 	AfterContentInit,
-	ChangeDetectionStrategy,
 	Component,
 	OnInit,
 	Signal,
@@ -16,7 +15,6 @@ import {
 	output,
 	signal,
 } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { StoreService } from '@wawjs/ngx-core';
 import { ButtonComponent } from '../button/button.component';
@@ -30,7 +28,6 @@ import {
 
 @Component({
 	selector: 'wtable',
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './table.component.html',
 	styles: [
 		`
@@ -39,7 +36,7 @@ import {
 			}
 		`,
 	],
-	imports: [FormsModule, ButtonComponent, NgTemplateOutlet, RouterLink],
+	imports: [ButtonComponent, NgTemplateOutlet, RouterLink],
 })
 export class TableComponent implements OnInit, AfterContentInit {
 	private readonly _router = inject(Router);
@@ -71,8 +68,8 @@ export class TableComponent implements OnInit, AfterContentInit {
 	editForm?: CustomEditDirective;
 
 	searchShow = false;
-	searching_text = '';
-	filter_filter = '';
+	readonly searchingText = signal('');
+	readonly filterFilter = signal('');
 	select_page_size = false;
 
 	custom_cell: Record<string, any> = {};
@@ -95,7 +92,7 @@ export class TableComponent implements OnInit, AfterContentInit {
 		// server mode or global search handled outside
 		if (!cfg.allDocs || cfg.globalSearch) return rows;
 
-		const term = (this.filter_filter || this.searching_text || '')
+		const term = (this.filterFilter() || this.searchingText() || '')
 			.trim()
 			.toLowerCase();
 
@@ -218,10 +215,14 @@ export class TableComponent implements OnInit, AfterContentInit {
 		this._refreshToken.update((v) => v + 1);
 	}
 
+	protected inputValue(event: Event): string {
+		return (event.target as HTMLInputElement | null)?.value || '';
+	}
+
 	searching() {
 		setTimeout(() => {
 			if (!this.config().globalSearch) {
-				this.filter_filter = this.searching_text;
+				this.filterFilter.set(this.searchingText());
 				this.refresh();
 			}
 		}, 100);
@@ -235,12 +236,12 @@ export class TableComponent implements OnInit, AfterContentInit {
 
 		setTimeout(() => {
 			if (!this.config().globalSearch) {
-				this.filter_filter = this.searching_text;
+				this.filterFilter.set(this.searchingText());
 				this.refresh();
 			}
 		}, 100);
 
-		this.onSearch.emit(this.searching_text);
+		this.onSearch.emit(this.searchingText());
 	}
 
 	next() {

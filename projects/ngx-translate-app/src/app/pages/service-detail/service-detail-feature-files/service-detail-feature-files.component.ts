@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 
 interface FeatureFileItem {
 	id: string;
@@ -16,7 +16,6 @@ interface FeatureFileSection {
 	selector: 'app-service-detail-feature-files',
 	templateUrl: './service-detail-feature-files.component.html',
 	styleUrl: './service-detail-feature-files.component.scss',
-	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ServiceDetailFeatureFilesComponent {
 	readonly fileSections = input.required<FeatureFileSection[]>();

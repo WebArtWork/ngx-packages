@@ -1,6 +1,5 @@
 import {
 	AfterViewInit,
-	ChangeDetectionStrategy,
 	ChangeDetectorRef,
 	Component,
 	ElementRef,
@@ -22,7 +21,6 @@ type ImageElement = HTMLImageElement | HTMLCanvasElement;
 
 @Component({
 	selector: 'ngx-fabric-crop-modal',
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [ButtonComponent],
 	template: `
 		<section class="fabric-crop">

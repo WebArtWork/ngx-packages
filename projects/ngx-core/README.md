@@ -69,6 +69,7 @@ export const appConfig = {
 | `DomService` | Dynamic component creation and DOM attachment helpers |
 | `EmitterService` | Lightweight event bus and task completion signaling |
 | `StoreService` | Async storage wrapper with JSON helpers and prefix support |
+| `ngxResource` | Angular resource wrapper with optional StoreService-backed caching |
 | `MetaService` | Route-aware title/meta/link management |
 | `MetaGuard` | Optional guard for route-driven metadata flows |
 | `ClickOutsideDirective` | Standalone outside-click directive |
@@ -171,6 +172,8 @@ login(uid: string) {
 
 `StoreService` provides an async-first API for storage access. It uses `localStorage` by default, supports custom storage adapters through config, and safely handles JSON values.
 
+For persisted async reads in components and signal-first services, prefer `ngxResource({ key, ... })` over direct `StoreService.getJson()`. Keep direct `getJson()` for imperative restore, migrations, queue replay, or one-off service initialization where a resource state object would add noise.
+
 ### Methods
 
 - `setPrefix(prefix: string): void`
@@ -195,6 +198,62 @@ async saveProfile() {
 	});
 }
 ```
+
+## Resource Helper
+
+`ngxResource()` wraps Angular `resource()` for signal-based async reads. Without a `key`, it passes options directly to Angular. With a `key`, it uses `StoreService` to read and cache values, making it the preferred API over direct `StoreService.getJson()` for persisted async reads.
+
+```ts
+import { Component, computed, signal } from '@angular/core';
+import { ngxResource } from '@wawjs/ngx-core';
+
+interface Weather {
+	city: string;
+	temperature: number;
+}
+
+@Component({
+	selector: 'app-weather',
+	template: `
+		@if (weather.hasValue()) {
+			<p>{{ title() }}</p>
+		} @else if (weather.error()) {
+			<p>Could not load weather.</p>
+		} @else {
+			<p>Loading weather...</p>
+		}
+	`,
+})
+export class WeatherComponent {
+	readonly city = signal('Volos');
+
+	readonly weather = ngxResource<Weather, { city: string }>({
+		key: ({ city }) => `weather:${city}`,
+		params: () => ({ city: this.city() }),
+		loader: async ({ params, abortSignal }) => {
+			const response = await fetch(`/api/weather?city=${params.city}`, {
+				signal: abortSignal,
+			});
+
+			return response.json();
+		},
+	});
+
+	readonly title = computed(() => {
+		if (!this.weather.hasValue()) return 'Loading...';
+
+		return `${this.weather.value().city}: ${this.weather.value().temperature}`;
+	});
+}
+```
+
+Storage modes:
+
+- `network-first` is the default. It loads fresh data, stores it, and falls back to the stored value if loading fails.
+- `cache-first` returns the stored value when present and only calls the loader on a cache miss.
+- `store-only` reads from `StoreService` and does not call a loader.
+
+Always guard `value()` with `hasValue()` because Angular resources can throw when `value()` is read in an error state.
 
 ## Meta Service
 
@@ -304,13 +363,13 @@ open(component: any) {
 <div (clickOutside)="closePanel()"></div>
 ```
 
-It is SSR-safe and marks OnPush components for check after emission.
+It is SSR-safe and marks the view for check after emission.
 
 ## Related Packages
 
 Some legacy features from the old all-in-one package now live in dedicated packages:
 
-- `@wawjs/ngx-http`: `provideNgxHttp`, `HttpService`, `NetworkService`
+- `@wawjs/ngx-http`: `provideNgxHttp`, `HttpService`, `ngxHttpResource`, `NetworkService`
 - `@wawjs/ngx-crud`: `provideNgxCrud`, `CrudService`, `CrudComponent`
 - `@wawjs/ngx-socket`: `provideNgxSocket`, `SocketService`
 - `@wawjs/ngx-rtc`: `provideNgxRtc`, `RtcService`
@@ -327,6 +386,8 @@ Copy this into the consuming project's `AGENTS.md`, `CLAUDE.md`, or equivalent f
 - Import public APIs from `@wawjs/ngx-core`.
 - Prefer bootstrapping with `provideNgxCore({...})` in application providers.
 - Put library-wide configuration in `provideNgxCore()` instead of scattering it across components. Common config areas include `store` and `meta`, with shared `http` and `network` config available for companion packages.
+- Prefer `ngxResource()` for generic signal-based async reads, adding `key` when the value should be read from or cached through `StoreService`.
+- Prefer `ngxResource({ key })` over direct `StoreService.getJson()` for persisted async reads. Use direct `getJson()` only for imperative restore, migrations, queue replay, or one-off service initialization.
 - Prefer `StoreService`, `MetaService`, `EmitterService`, `CoreService`, `DomService`, and `UtilService` when their built-in behavior matches the need.
 - Prefer importing the specific standalone directives and pipes you need instead of wrapping the library in another shared abstraction.
 - For metadata, prefer configuring defaults in `provideNgxCore({ meta: ... })` and using `MetaService` or route metadata. If route-driven updates are expected, prefer `meta.applyFromRoutes = true`; use `MetaGuard` only when that flow specifically needs a guard.

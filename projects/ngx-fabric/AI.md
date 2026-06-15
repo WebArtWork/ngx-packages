@@ -10,6 +10,7 @@ Use this file as context for coding agents when an Angular project depends on `@
 - Prefer bootstrapping canvas defaults with `provideNgxFabric({...})` in application providers.
 - Prefer `FabricComponent` for template-level canvas usage and `FabricDirective` for direct Fabric canvas control.
 - Prefer `FabricCropModalComponent` and `FabricCropModalService` for crop workflows before adding duplicate crop modals.
+- Prefer `injectFabricCropModalService()` for new on-demand crop actions. It wraps Angular `injectAsync()` so the crop modal service/component path is loaded only when the user opens the crop workflow.
 - Keep browser-only canvas behavior SSR-safe. Do not access Fabric globals, canvas APIs, `window`, or `document` directly during server rendering.
 ```
 

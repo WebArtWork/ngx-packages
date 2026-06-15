@@ -10,9 +10,8 @@
 	@if (_label) {
 	<div
 		class="wselect__label mb-[var(--sp-2)] text-[14px] font-medium text-[var(--c-text-primary)]"
-	>
-		{{ _label | translate }}
-	</div>
+		[translate]="_label"
+	></div>
 	}
 
 	<div
@@ -45,13 +44,13 @@
 						class="text-overflow truncate text-[var(--c-text-primary)]"
 					>
 						@if (!_ids.length) {
-						<span class="opacity-70">{{ _ph | translate }}</span>
+						<span class="opacity-70" [translate]="_ph"></span>
 						} @for (sid of _ids; track sid; let i = $index) { @if
 						(allItem[sid]) {
 						<span class="inline-flex items-center align-middle">
 							@if (i) { <span>,&nbsp;</span> }
 							<span class="inline-flex items-center gap-1">
-								<span>{{ allItem[sid] | translate }}</span>
+								<span [translate]="allItem[sid]"></span>
 								<button
 									type="button"
 									class="material-icons text-[18px] leading-none inline-flex items-center justify-center rounded-full p-1 hover:bg-black/5"
@@ -68,8 +67,8 @@
 					<div
 						class="text-overflow truncate text-[var(--c-text-primary)]"
 					>
-						@if (_id) { {{ allItem[_id] | translate }} } @else {
-						<span class="opacity-70">{{ _ph | translate }}</span>
+						@if (_id) { <span [translate]="allItem[_id]"></span> } @else {
+						<span class="opacity-70" [translate]="_ph"></span>
 						}
 					</div>
 					}
@@ -143,7 +142,7 @@
 
 				<ng-template #defaultSearch>
 					<winput
-						placeholder="{{ 'Enter search text...' | translate }}"
+						[placeholder]="'Enter search text...'"
 						(wChange)="search.set(($event ?? '') + '')"
 						[focused]="true"
 					/>
@@ -196,9 +195,11 @@
 						<div
 							class="truncate text-[14px] text-[var(--c-text-primary)]"
 						>
-							@if (item()[bindLabel()]) { {{ item()[bindLabel()] |
-							translate }} } @else { {{ 'Unknown item' | translate
-							}} }
+							@if (item()[bindLabel()]) {
+							<span [translate]="item()[bindLabel()]"></span>
+							} @else {
+							<span translate>Unknown item</span>
+							}
 						</div>
 					</div>
 				</button>

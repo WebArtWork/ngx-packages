@@ -1,16 +1,20 @@
 import { isPlatformBrowser } from '@angular/common';
-import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Inject, inject, Injectable, Optional, PLATFORM_ID } from '@angular/core';
+import {
+	HttpClient,
+	HttpErrorResponse,
+	HttpHeaders,
+	type HttpResourceRequest,
+} from '@angular/common/http';
+import { PLATFORM_ID, Service, inject } from '@angular/core';
 import { EMPTY, Observable, ReplaySubject } from 'rxjs';
 import { catchError, first } from 'rxjs/operators';
-import { Config, CONFIG_TOKEN } from '../config.interface';
+import { CONFIG_TOKEN } from '../config.interface';
 import { DEFAULT_HTTP_CONFIG, HttpConfig, HttpHeaderType } from './http.interface';
 
-@Injectable({
-	providedIn: 'root',
-})
+@Service()
 export class HttpService {
 	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+	private readonly _http = inject(HttpClient);
 	private readonly _urlStorageKey = 'ngx-http.url';
 	private readonly _legacyUrlStorageKey = 'wacom-http.url';
 	private readonly _headersStorageKey = 'ngx-http.headers';
@@ -39,14 +43,13 @@ export class HttpService {
 	// Instance of HttpHeaders with current headers
 	private _http_headers = new HttpHeaders(this._headers);
 
-	constructor(
-		@Inject(CONFIG_TOKEN) @Optional() config: Config,
-		private _http: HttpClient,
-	) {
+	constructor() {
+		const config = inject(CONFIG_TOKEN, { optional: true });
+
 		// Initialize HTTP configuration and headers from injected config
 		this._config = {
 			...DEFAULT_HTTP_CONFIG,
-			...(config.http || {}),
+			...(config?.http || {}),
 		};
 
 		if (typeof this._config.url === 'string') {
@@ -108,6 +111,73 @@ export class HttpService {
 	// Get the value of a specific HTTP header
 	header(key: any) {
 		return this._headers[key];
+	}
+
+	// Build a request URL using the current ngx-http base URL.
+	requestUrl(url: string): string {
+		if (/^(?:[a-z][a-z\d+\-.]*:)?\/\//i.test(url)) {
+			return url;
+		}
+
+		const base = this.url || '';
+
+		if (!base) {
+			return url;
+		}
+
+		if (base.endsWith('/') && url.startsWith('/')) {
+			return base + url.slice(1);
+		}
+
+		if (!base.endsWith('/') && !url.startsWith('/')) {
+			return `${base}/${url}`;
+		}
+
+		return base + url;
+	}
+
+	// Merge shared ngx-http headers with request-specific headers.
+	resourceHeaders(headers?: HttpResourceRequest['headers']): HttpHeaders {
+		let next = this._http_headers;
+
+		if (!headers) {
+			return next;
+		}
+
+		if (headers instanceof HttpHeaders) {
+			for (const key of headers.keys()) {
+				next = next.delete(key);
+				const values = headers.getAll(key) || [];
+
+				for (const value of values) {
+					next = next.append(key, value);
+				}
+			}
+
+			return next;
+		}
+
+		for (const [key, value] of Object.entries(headers)) {
+			next = next.delete(key);
+
+			if (typeof value === 'string') {
+				next = next.set(key, value);
+			} else {
+				for (const item of value) {
+					next = next.append(key, item);
+				}
+			}
+		}
+
+		return next;
+	}
+
+	resourceRequest(request: HttpResourceRequest): HttpResourceRequest {
+		return {
+			...request,
+			url: this.requestUrl(request.url),
+			headers: this.resourceHeaders(request.headers),
+		};
 	}
 
 	// Remove a specific HTTP header and update the stored headers

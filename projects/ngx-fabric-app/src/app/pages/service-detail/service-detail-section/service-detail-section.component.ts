@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 
 interface ServiceDetailSectionItem {
 	id: string;
@@ -22,7 +22,6 @@ interface ServiceDetailSectionData {
 	selector: 'app-service-detail-section',
 	templateUrl: './service-detail-section.component.html',
 	styleUrl: './service-detail-section.component.scss',
-	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ServiceDetailSectionComponent {
 	readonly section = input.required<ServiceDetailSectionData>();

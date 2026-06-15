@@ -85,6 +85,7 @@ export const appConfig = {
 - inline translations through config
 - file loading from `/i18n/{language}.json`
 - optional multi-folder loading such as `/i18n/common/{language}.json` and `/i18n/articles/{language}.json`
+- object-map and compact array translation payloads
 - signal-based translation updates
 - variable interpolation with `{{name}}` placeholders
 - source-text fallback when no translation exists
@@ -121,6 +122,44 @@ const message = _translateService.interpolate('Phrase has counter {{count}}', {
 void _translateService.setLanguage('de');
 ```
 
+## Translation Payloads
+
+Object JSON keeps the source text and translated text together.
+
+```json
+{
+	"hello": "привіт",
+	"now": "зараз"
+}
+```
+
+Array JSON is also supported when the default language file is the root source
+array. For example, with `defaultLanguage: 'en'`:
+
+`/i18n/en.json`
+
+```json
+["hello", "now"]
+```
+
+`/i18n/ua.json`
+
+```json
+["привіт", "зараз"]
+```
+
+Then this template:
+
+```html
+<span translate>hello</span>
+```
+
+renders as `привіт` when the active language is `ua`.
+
+Array payloads are index-based. Keep the default language array and translated
+language arrays in the same order; missing translated items fall back to the
+source text and length mismatches are reported with a console warning.
+
 ## Route/Page Extra JSON Bundles
 
 You can merge additional JSON translation files for a specific page without replacing the base language file.
@@ -145,6 +184,7 @@ Notes:
 - For folder-style paths, `/{language}.json` is appended automatically.
 - `{language}` and `:language` placeholders are replaced automatically.
 - Existing translations are kept by default and then overridden by later files.
+- Array extra payloads are paired with the matching default-language array from the same URL pattern.
 - Extra translation URLs are cached per language and are not fetched again on repeat calls.
 - Pass `replace: true` to replace cached translations for that language with only the loaded files.
 - Pass `forceReload: true` to refetch URLs that were already cached.
@@ -174,16 +214,11 @@ Use `content` for the host text. Other object keys are translated and written as
 attributes; camelCase keys such as `ariaLabel` are written as dash-case
 attributes such as `aria-label`.
 
-## Translate Pipe
-
-```html
-{{ 'phrase' | translate: { count: 5 } }}
-```
-
 ## Notes
 
 - Language persistence uses guarded browser storage access and is skipped during SSR.
 - Translation payloads can come from inline config, `folder`, `folders`, and route/page extra JSON files.
+- File payloads can be object maps or compact string arrays paired by index with the default language array.
 - Missing translations safely fall back to the source text.
 
 ## AI Coding Agents
@@ -197,6 +232,7 @@ Copy this into the consuming project's `AGENTS.md`, `CLAUDE.md`, or equivalent f
 - Import public APIs from `@wawjs/ngx-translate`.
 - Prefer bootstrapping with `provideTranslate({...})` when translations are needed, or `provideLanguage({...})` for language-only state.
 - Register app translations with `provideTranslate(...)` and use `TranslateService` or `TranslateDirective` instead of creating a parallel translation bootstrap path.
+- Translation JSON can use object maps or compact string arrays; array payloads must keep the same order as the default language array.
 - Prefer `LanguageService` for active language state, validation, defaults, and persistence before adding app-specific language utilities.
 - Keep SSR-safe behavior intact. Do not add unguarded direct access to browser storage for language persistence when the package already handles it.
 ```

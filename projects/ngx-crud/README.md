@@ -81,7 +81,7 @@ Prefer the `documents` signal as the source of truth. Build local component and 
 Example:
 
 ```ts
-import { Injectable } from '@angular/core';
+import { Service } from '@angular/core';
 import { CrudDocument, CrudService } from '@wawjs/ngx-crud';
 
 export interface Work extends CrudDocument<Work> {
@@ -89,7 +89,7 @@ export interface Work extends CrudDocument<Work> {
 	description: string;
 }
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class WorkService extends CrudService<Work> {
 	works = this.documents;
 

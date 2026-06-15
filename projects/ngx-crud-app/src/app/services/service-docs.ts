@@ -270,7 +270,7 @@ createDraft() {
 				description:
 					'Standalone directive that emits when a pointer event happens outside the host element.',
 				details: [
-					'Uses a document-level pointerdown listener and marks the view for check to stay safe with OnPush and zoneless apps.',
+					'Uses a document-level pointerdown listener and marks the view for check to stay safe with default and zoneless change detection.',
 				],
 				category: 'Directives',
 				docType: 'Const',
@@ -479,9 +479,11 @@ updateStatus() {
 				category: 'Pipes',
 				docType: 'Const',
 				sourceFile: 'search.pipe.ts',
-				example: `<article *ngFor="let project of projects | search: query() : 'name owner.name' : 10">
+				example: `@for (project of projects | search: query() : 'name owner.name' : 10; track project._id) {
+<article>
   {{ project.name }}
-</article>`,
+</article>
+}`,
 			},
 			{
 				name: 'SplicePipe',
@@ -922,6 +924,7 @@ async connect(id: string) {
 			'Set a global prefix with provideNgxCore({ store: { prefix: "waStore" } }).',
 			'Provide custom store.set/get/remove/clear handlers to back the service with another persistence layer.',
 			'setPrefix() adds an additional runtime prefix on top of the configured prefix.',
+			'Prefer ngxResource({ key }) over direct getJson() for persisted async reads that should expose loading/error/value state.',
 		],
 		availableItems: ['store.service.ts', 'store.interface.ts'],
 		properties: [
@@ -987,6 +990,7 @@ async connect(id: string) {
 				details: [
 					'clearOnError defaults to true and removes malformed JSON automatically.',
 					'defaultValue is returned when storage is missing or parsing fails.',
+					'Prefer ngxResource({ key, store }) for signal-based persisted reads; use getJson() directly for imperative restore, migrations, or queue replay.',
 				],
 				category: 'JSON',
 				sourceFile: 'store.service.ts',
@@ -2044,7 +2048,7 @@ formatDueDate(date: Date) {
 			'Register translation bootstrap with provideTranslate({ language, defaultLanguage, translations?, folder? }).',
 			'With folder mode, language files are loaded as /i18n/{lang}.json by default.',
 			'Language selection is handled by the Language feature and reused here.',
-			'This service manages runtime translation state; the translate pipe and directive build on top of it.',
+			'This service manages runtime translation state; TranslateDirective builds on top of it.',
 		],
 		availableItems: [
 			'provide-translate.ts',
@@ -2052,7 +2056,6 @@ formatDueDate(date: Date) {
 			'translate.interface.ts',
 			'translate.type.ts',
 			'translate.directive.ts',
-			'translate.pipe.ts',
 		],
 		methods: [
 			{

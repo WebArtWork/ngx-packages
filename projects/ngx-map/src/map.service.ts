@@ -1,10 +1,10 @@
-import { inject, Injectable } from '@angular/core';
+import { Service, inject } from '@angular/core';
 import { HttpService } from '@wawjs/ngx-http';
 import { firstValueFrom } from 'rxjs';
 import { CONFIG_TOKEN, DEFAULT_CONFIG, NgxMapConfig } from './config.interface';
 import { GeoAddress, PhotonFeatureCollectionDTO, PhotonFeatureDTO } from './map.interface';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class MapService {
 	private readonly _httpService = inject(HttpService);
 	private readonly _providedConfig = inject(CONFIG_TOKEN, { optional: true }) ?? {};

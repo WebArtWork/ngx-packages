@@ -170,13 +170,12 @@ export const appConfig = {
 					'Switch between light and dark modes by reading the current signal and calling setMode().',
 				category: 'Usage',
 				sourceFile: 'theme.service.ts',
-				example: `import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+				example: `import { Component, inject } from '@angular/core';
 import { ThemeService } from 'ngx-ui';
 
 @Component({
 \tselector: 'app-theme-toggle',
 \ttemplate: '<button type="button" (click)=\"toggleTheme()\">Toggle theme</button>',
-\tchangeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ThemeToggleComponent {
 \treadonly themeService = inject(ThemeService);

@@ -1,13 +1,26 @@
 // network.service.ts â€” Angular 20+ (zoneless) signal-based connectivity checker
 import { isPlatformBrowser } from '@angular/common';
-import { Inject, inject, Injectable, Optional, PLATFORM_ID, signal } from '@angular/core';
+import { PLATFORM_ID, Service, inject, signal } from '@angular/core';
 import { EmitterService } from '@wawjs/ngx-core';
-import { Config, CONFIG_TOKEN } from '../config.interface';
+import { CONFIG_TOKEN } from '../config.interface';
 import { DEFAULT_NETWORK_CONFIG, NetworkConfig, NetworkStatus } from './network.interface';
 
-@Injectable({ providedIn: 'root' })
+interface NetworkInformationLike {
+	addEventListener?: (type: 'change', listener: () => void) => void;
+}
+
+interface NavigatorWithConnection extends Navigator {
+	connection?: NetworkInformationLike;
+}
+
+@Service()
 export class NetworkService {
 	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+	private readonly _config = {
+		...DEFAULT_NETWORK_CONFIG,
+		...(inject(CONFIG_TOKEN, { optional: true })?.network ||
+			({} as NetworkConfig)),
+	};
 
 	/** Internal mutable signals. */
 	private _status = signal<NetworkStatus>(this._isBrowser && navigator.onLine ? 'poor' : 'none');
@@ -26,12 +39,7 @@ export class NetworkService {
 	 * Creates the network monitor, binds browser/Capacitor events,
 	 * performs an immediate check, and starts periodic polling.
 	 */
-	constructor(@Inject(CONFIG_TOKEN) @Optional() config: Config) {
-		this._config = {
-			...DEFAULT_NETWORK_CONFIG,
-			...(config.network || ({} as NetworkConfig)),
-		};
-
+	constructor() {
 		if (!this._isBrowser) return;
 
 		this._bindEvents();
@@ -122,7 +130,9 @@ export class NetworkService {
 			this._updateClassification();
 		});
 
-		(navigator as any).connection?.addEventListener?.('change', () => this.recheckNow());
+		(navigator as NavigatorWithConnection).connection?.addEventListener?.('change', () =>
+			this.recheckNow(),
+		);
 	}
 
 	/**
@@ -181,8 +191,6 @@ export class NetworkService {
 			return { ok: false, latency: null };
 		}
 	}
-
-	private _config: NetworkConfig;
 
 	private _emitterService = inject(EmitterService);
 }

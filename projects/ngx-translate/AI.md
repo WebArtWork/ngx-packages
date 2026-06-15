@@ -8,8 +8,9 @@ Use this file as context for coding agents when an Angular project depends on `@
 - This Angular project uses `@wawjs/ngx-translate` for runtime language state and signal-based translations.
 - Import public APIs from `@wawjs/ngx-translate`.
 - Prefer bootstrapping with `provideTranslate({...})` when translations are needed, or `provideLanguage({...})` for language-only state.
-- Register app translations with `provideTranslate(...)` and use `TranslateService`, `TranslatePipe`, or `TranslateDirective` instead of creating a parallel translation bootstrap path.
-- Use `[vars]="{ key: value }"` with `TranslateDirective`, `{{ 'key' | translate: vars }}`, or `TranslateService.interpolate(...)` for `{{key}}` placeholder interpolation.
+- Register app translations with `provideTranslate(...)` and use `TranslateService` or `TranslateDirective` instead of creating a parallel translation bootstrap path.
+- Translation payloads may be object maps, `Translate[]`, or compact string arrays; compact arrays are index-based and must match the default language array order.
+- Use `[vars]="{ key: value }"` with `TranslateDirective` or `TranslateService.interpolate(...)` for `{{key}}` placeholder interpolation.
 - Prefer `LanguageService` for active language state, validation, defaults, registry management, and persistence before adding app-specific language utilities.
 - Keep SSR-safe behavior intact. Do not add unguarded direct access to browser storage for language persistence when the package already handles it.
 ```
@@ -33,6 +34,19 @@ export const appConfig = {
 		}),
 	],
 };
+```
+
+Compact array payloads are also valid when the default language array is the root source list:
+
+```ts
+provideTranslate({
+	defaultLanguage: 'en',
+	languages: ['en', 'ua'],
+	translations: {
+		en: ['Save', 'phrase'],
+		ua: ['Зберегти', 'Фраза має лічильник {{count}}'],
+	},
+});
 ```
 
 ```html

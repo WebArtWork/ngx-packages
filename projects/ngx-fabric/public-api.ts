@@ -11,6 +11,7 @@ export * from './src/fabric/fabric.interfaces';
 export * from './src/crop/fabric-crop.interfaces';
 export * from './src/crop/fabric-crop-modal.component';
 export * from './src/crop/fabric-crop-modal.service';
+export * from './src/crop/inject-fabric-crop-modal-service';
 
 /*
  *  Bootstrap

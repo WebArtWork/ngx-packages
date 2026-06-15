@@ -47,6 +47,7 @@ export const appConfig = {
 | Name | Description |
 | --- | --- |
 | `HttpService` | Shared HTTP layer with base URL, persistent headers, callback compatibility, and observable APIs |
+| `ngxHttpResource` | Signal-based read helper built on Angular `httpResource()` with ngx-http base URL and headers |
 | `NetworkService` | Signal-based connectivity status and latency checks |
 | `provideNgxHttp` | Environment provider for HTTP and network configuration |
 | `HttpConfig`, `NetworkConfig`, `NetworkStatus`, `Config` | Public configuration and typing helpers |
@@ -54,6 +55,8 @@ export const appConfig = {
 ## Http Service
 
 `HttpService` wraps Angular `HttpClient` with shared URL/header management and supports both legacy callback usage and observable flows.
+
+For new HTTP GET/read behavior outside `ngx-crud`, prefer `ngxHttpResource()` over `HttpService.get()` so the read exposes Angular resource loading/error/value state and reacts to signal dependencies. Keep `HttpService.get()` for imperative workflows, legacy callbacks, Observable composition, request locking, and existing CRUD internals.
 
 ### Configuration and headers
 
@@ -96,6 +99,51 @@ loadProfile() {
 }
 ```
 
+## HTTP Resource
+
+`ngxHttpResource()` wraps Angular `httpResource()` for signal-based reads. It uses the current `HttpService` base URL and shared headers, including runtime values set with `setUrl()` and `set()`. Use it as the default for new non-CRUD HTTP GET/read code.
+
+```ts
+import { Component, input } from '@angular/core';
+import { ngxHttpResource } from '@wawjs/ngx-http';
+
+interface User {
+	_id: string;
+	name: string;
+	email: string;
+}
+
+@Component({
+	selector: 'app-user-card',
+	template: `
+		@if (user.hasValue()) {
+			<h2>{{ user.value().name }}</h2>
+			<p>{{ user.value().email }}</p>
+		} @else if (user.error()) {
+			<p>Could not load user.</p>
+		} @else if (user.isLoading()) {
+			<p>Loading...</p>
+		}
+	`,
+})
+export class UserCardComponent {
+	readonly userId = input.required<string>();
+
+	readonly user = ngxHttpResource<User>(() => `/users/${this.userId()}`);
+}
+```
+
+Use the request-object form for params, headers, transfer cache, timeout, or other Angular `HttpResourceRequest` options:
+
+```ts
+readonly users = ngxHttpResource<User[]>(() => ({
+	url: '/users',
+	params: { page: this.page() },
+}));
+```
+
+Always guard `value()` with `hasValue()` because Angular resources can throw when `value()` is read in an error state.
+
 ## Network Service
 
 `NetworkService` monitors connectivity using Angular signals and periodic endpoint probes.
@@ -134,7 +182,7 @@ Copy this into the consuming project's `AGENTS.md`, `CLAUDE.md`, or equivalent f
 - Import public APIs from `@wawjs/ngx-http`.
 - Prefer bootstrapping with `provideNgxHttp({...})` in application providers.
 - Put shared API base URL, default headers, and network probe settings in `provideNgxHttp()` instead of scattering them across components.
-- Prefer `HttpService` for API calls and shared header/base URL handling before introducing another app-specific wrapper.
+- Prefer `ngxHttpResource()` for new HTTP GET/read behavior outside `ngx-crud`; use `HttpService` for mutations, legacy callbacks, request locks, existing CRUD internals, and observable flows.
 - Prefer `NetworkService` for connectivity state and latency checks before adding duplicate online/offline utilities.
 - Keep SSR-safe behavior intact. Do not add unguarded browser-only network logic when `@wawjs/ngx-http` already provides the needed abstraction.
 ```

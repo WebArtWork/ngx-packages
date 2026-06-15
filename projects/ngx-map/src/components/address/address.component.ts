@@ -1,5 +1,4 @@
 import {
-	ChangeDetectionStrategy,
 	Component,
 	inject,
 	input,
@@ -64,7 +63,6 @@ import { PickerComponent } from '../../modals/picker/picker.component';
 			}
 		`,
 	],
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [InputComponent],
 })
 export class AddressComponent {

@@ -1,5 +1,4 @@
 import {
-	ChangeDetectionStrategy,
 	Component,
 	computed,
 	forwardRef,
@@ -7,7 +6,7 @@ import {
 	model,
 	signal,
 } from '@angular/core';
-import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { DatetimeCalendarComponent } from './datetime-calendar.component';
 import {
 	DatetimePickerMode,
@@ -17,7 +16,7 @@ import {
 
 @Component({
 	selector: 'ngx-datetime-picker',
-	imports: [DatetimeCalendarComponent, FormsModule],
+	imports: [DatetimeCalendarComponent],
 	providers: [
 		{
 			provide: NG_VALUE_ACCESSOR,
@@ -27,7 +26,6 @@ import {
 	],
 	templateUrl: './datetime-picker.component.html',
 	styleUrl: './datetime-picker.component.css',
-	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DatetimePickerComponent implements ControlValueAccessor {
 	readonly mode = input<DatetimePickerMode>('date');
@@ -147,6 +145,10 @@ export class DatetimePickerComponent implements ControlValueAccessor {
 			start: current.start,
 			end: current.end ? this._applyTime(current.end, time) : null,
 		});
+	}
+
+	protected inputValue(event: Event): string {
+		return (event.target as HTMLInputElement | null)?.value || '';
 	}
 
 	protected apply(): void {

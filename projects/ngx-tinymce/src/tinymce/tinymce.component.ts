@@ -1,6 +1,5 @@
 import { DOCUMENT, NgTemplateOutlet } from '@angular/common';
 import {
-	ChangeDetectionStrategy,
 	Component,
 	TemplateRef,
 	ViewEncapsulation,
@@ -66,7 +65,6 @@ let _loaderPromise: Promise<void> | null = null;
 	],
 	preserveWhitespaces: false,
 	encapsulation: ViewEncapsulation.None,
-	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TinymceComponent implements ControlValueAccessor {
 	private readonly _config = inject<TinymceConfig | null>(TINYMCE_CONFIG, { optional: true });

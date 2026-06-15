@@ -1,8 +1,6 @@
 import {
 	AfterViewInit,
-	ChangeDetectionStrategy,
 	Component,
-	HostBinding,
 	ViewEncapsulation,
 	input,
 	model,
@@ -16,6 +14,9 @@ import { AceConfigInterface } from './ace.interfaces';
 @Component({
 	selector: 'ace',
 	exportAs: 'ngxAce',
+	host: {
+		'[class.ace]': 'useAceClass()',
+	},
 	templateUrl: './ace.component.html',
 	styles: [
 		`
@@ -76,7 +77,6 @@ import { AceConfigInterface } from './ace.interfaces';
 		`,
 	],
 	encapsulation: ViewEncapsulation.None,
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [AceDirective],
 })
 export class AceComponent implements AfterViewInit {
@@ -97,25 +97,20 @@ export class AceComponent implements AfterViewInit {
 	readonly value = model<string>('');
 
 	// -------- outputs --------
-	readonly blur = output();
-	readonly focus = output();
+	readonly blur = output<unknown>();
+	readonly focus = output<unknown>();
 
-	readonly copy = output();
-	readonly paste = output();
+	readonly copy = output<unknown>();
+	readonly paste = output<unknown>();
 
-	readonly change = output();
+	readonly change = output<unknown>();
 
-	readonly changeCursor = output();
-	readonly changeSession = output();
-	readonly changeSelection = output();
+	readonly changeCursor = output<unknown>();
+	readonly changeSession = output<unknown>();
+	readonly changeSelection = output<unknown>();
 
 	// -------- view child --------
 	readonly directiveRef = viewChild(AceDirective);
-
-	@HostBinding('class.ace')
-	get hostAceClass(): boolean {
-		return this.useAceClass();
-	}
 
 	ngAfterViewInit(): void {
 		const directive = this.directiveRef();
@@ -127,7 +122,7 @@ export class AceComponent implements AfterViewInit {
 		}
 	}
 
-	onContentChange(event: any): void {
+	onContentChange(event: unknown): void {
 		const directive = this.directiveRef();
 		if (!directive) return;
 

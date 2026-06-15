@@ -88,6 +88,8 @@ Copy this into the consuming project's `AGENTS.md`, `CLAUDE.md`, or equivalent f
 - Prefer bootstrapping with `provideTheme()` in application providers.
 - Prefer `ThemeService` for theme mode, density, radius, persistence, and theme cycling before adding duplicate theme utilities.
 - Prefer exported UI components and services before building one-off equivalents.
+- Use Angular 22 template spread and short arrow functions only for local UI glue, such as class composition and signal toggles.
+- Use grouped `@case` blocks and `@default never;` when a template switches over a closed union type owned by the component.
 - Keep theme state centralized in `ThemeService` instead of scattering `localStorage` and `data-*` attribute updates across components.
 - Keep SSR-safe behavior intact. Do not add unguarded direct access to `document` or `localStorage` for theme handling.
 ```

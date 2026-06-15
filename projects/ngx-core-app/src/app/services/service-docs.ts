@@ -34,6 +34,7 @@ const _SERVICE_DOC_ORDER = [
 	'dom-service',
 	'emitter-service',
 	'store-service',
+	'resource-helper',
 	'meta-service',
 	'network-service',
 	'http-service',
@@ -268,7 +269,7 @@ createDraft() {
 				description:
 					'Standalone directive that emits when a pointer event happens outside the host element.',
 				details: [
-					'Uses a document-level pointerdown listener and marks the view for check to stay safe with OnPush and zoneless apps.',
+					'Uses a document-level pointerdown listener and marks the view for check to stay safe with default and zoneless change detection.',
 				],
 				category: 'Directives',
 				docType: 'Const',
@@ -477,9 +478,11 @@ updateStatus() {
 				category: 'Pipes',
 				docType: 'Const',
 				sourceFile: 'search.pipe.ts',
-				example: `<article *ngFor="let project of projects | search: query() : 'name owner.name' : 10">
+				example: `@for (project of projects | search: query() : 'name owner.name' : 10; track project._id) {
+<article>
   {{ project.name }}
-</article>`,
+</article>
+}`,
 			},
 			{
 				name: 'SplicePipe',
@@ -920,6 +923,7 @@ async connect(id: string) {
 			'Set a global prefix with provideNgxCore({ store: { prefix: "waStore" } }).',
 			'Provide custom store.set/get/remove/clear handlers to back the service with another persistence layer.',
 			'setPrefix() adds an additional runtime prefix on top of the configured prefix.',
+			'Prefer ngxResource({ key }) over direct getJson() for persisted async reads that should expose loading/error/value state.',
 		],
 		availableItems: ['store.service.ts', 'store.interface.ts'],
 		properties: [
@@ -985,6 +989,7 @@ async connect(id: string) {
 				details: [
 					'clearOnError defaults to true and removes malformed JSON automatically.',
 					'defaultValue is returned when storage is missing or parsing fails.',
+					'Prefer ngxResource({ key, store }) for signal-based persisted reads; use getJson() directly for imperative restore, migrations, or queue replay.',
 				],
 				category: 'JSON',
 				sourceFile: 'store.service.ts',
@@ -1023,6 +1028,115 @@ async saveSettings() {
 \tawait this._storeService.setJson('settings', { compact: true, mode: 'dark' });
 \treturn this._storeService.getJson('settings', { defaultValue: {} });
 }`,
+	},
+	{
+		slug: 'resource-helper',
+		name: 'ngxResource',
+		description:
+			'Angular resource wrapper with optional StoreService-backed caching.',
+		summary:
+			'ngxResource keeps Angular resource() semantics for generic async signal reads and adds an opt-in key option for StoreService-backed cached values.',
+		highlights: [
+			'Passes through to Angular resource() when no key is provided.',
+			'Uses StoreService get/set JSON behavior when a key is provided.',
+			'Supports network-first, cache-first, and store-only storage modes.',
+		],
+		config: [
+			'Configure storage through provideNgxCore({ store }) when cached resource values need a prefix or custom adapter.',
+			'Use @wawjs/ngx-http ngxHttpResource() for HttpClient reads that need shared base URL and headers.',
+		],
+		availableItems: ['resource.ts', 'store.service.ts', 'store.interface.ts'],
+		properties: [
+			{
+				name: 'NgxResourceKey',
+				signature: 'string | ((params) => string)',
+				description:
+					'Optional cache key. When present, ngxResource stores successful loader values through StoreService.',
+				category: 'Types',
+				docType: 'Type',
+				sourceFile: 'resource.ts',
+			},
+			{
+				name: 'NgxResourceStoreMode',
+				signature: "'network-first' | 'cache-first' | 'store-only'",
+				description:
+					'Controls whether the loader or stored value is preferred.',
+				category: 'Types',
+				docType: 'Type',
+				sourceFile: 'resource.ts',
+			},
+		],
+		methods: [
+			{
+				name: 'ngxResource',
+				signature: 'ngxResource<T, R>(options): ResourceRef<T | undefined>',
+				description:
+					'Creates an Angular resource, optionally backed by StoreService when key is provided.',
+				details: [
+					'Without key, options are passed directly to Angular resource().',
+					'With key, successful loader results are stored in StoreService under that key.',
+					'Prefer this over direct StoreService.getJson() for persisted async reads that should expose loading/error/value state.',
+					'Always guard value() with hasValue() before reading resource values.',
+				],
+				category: 'Resources',
+				docType: 'Const',
+				sourceFile: 'resource.ts',
+				example: `import { Component, computed, signal } from '@angular/core';
+import { ngxResource } from 'ngx-core';
+
+interface Weather {
+\tcity: string;
+\ttemperature: number;
+}
+
+@Component({
+\tselector: 'app-weather',
+\ttemplate: \`
+\t\t@if (weather.hasValue()) {
+\t\t\t<p>{{ title() }}</p>
+\t\t} @else if (weather.error()) {
+\t\t\t<p>Could not load weather.</p>
+\t\t} @else {
+\t\t\t<p>Loading weather...</p>
+\t\t}
+\t\`,
+})
+export class WeatherComponent {
+\treadonly city = signal('Volos');
+\treadonly weather = ngxResource<Weather, { city: string }>({
+\t\tkey: ({ city }) => \`weather:\${city}\`,
+\t\tparams: () => ({ city: this.city() }),
+\t\tloader: async ({ params, abortSignal }) => {
+\t\t\tconst response = await fetch(\`/api/weather?city=\${params.city}\`, {
+\t\t\t\tsignal: abortSignal,
+\t\t\t});
+
+\t\t\treturn response.json();
+\t\t},
+\t});
+
+\treadonly title = computed(() => {
+\t\tif (!this.weather.hasValue()) return 'Loading...';
+\t\treturn \`\${this.weather.value().city}: \${this.weather.value().temperature}\`;
+\t});
+}`,
+			},
+		],
+		sections: [
+			{
+				title: 'Storage modes',
+				items: [
+					'network-first loads fresh data, stores it, and falls back to cache if loading fails.',
+					'cache-first returns a cached value when present and loads only on cache miss.',
+					'store-only reads from StoreService and errors when no stored value exists.',
+				],
+			},
+		],
+		code: `readonly weather = ngxResource<Weather, { city: string }>({
+\tkey: ({ city }) => \`weather:\${city}\`,
+\tparams: () => ({ city: this.city() }),
+\tloader: async ({ params }) => fetchWeather(params.city),
+});`,
 	},
 	{
 		slug: 'meta-service',
@@ -1879,7 +1993,7 @@ async setGerman() {
 			'Register translation bootstrap with provideTranslate({ language, defaultLanguage, translations?, folder? }).',
 			'With folder mode, language files are loaded as /i18n/{lang}.json by default.',
 			'Language selection is handled by the Language feature and reused here.',
-			'This service manages runtime translation state; the translate pipe and directive build on top of it.',
+			'This service manages runtime translation state; TranslateDirective builds on top of it.',
 		],
 		availableItems: [
 			'provide-translate.ts',
@@ -1887,7 +2001,6 @@ async setGerman() {
 			'translate.interface.ts',
 			'translate.type.ts',
 			'translate.directive.ts',
-			'translate.pipe.ts',
 		],
 		methods: [
 			{

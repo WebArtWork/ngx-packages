@@ -1,6 +1,5 @@
 import { TitleCasePipe } from '@angular/common';
 import {
-	ChangeDetectionStrategy,
 	Component,
 	computed,
 	inject,
@@ -11,7 +10,6 @@ import { ThemeDensity, ThemeMode, ThemeRadius } from '../theme/theme.type';
 import { ThemeService } from '../theme/theme.service';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'icon-theme',
 	templateUrl: './theme.component.html',
 	styles: [

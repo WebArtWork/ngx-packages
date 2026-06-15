@@ -1,5 +1,5 @@
 import { isPlatformBrowser } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, PLATFORM_ID, signal } from '@angular/core';
+import { Component, inject, PLATFORM_ID, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DatetimePickerComponent, DatetimePickerValue, DatetimeRangeValue } from 'ngx-datetime';
 import { serviceDocs } from '../../services/service-docs';
@@ -14,7 +14,6 @@ interface LandingFeatureGroup {
 	imports: [RouterLink, DatetimePickerComponent],
 	templateUrl: './landing.component.html',
 	styleUrl: './landing.component.scss',
-	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LandingComponent {
 	private readonly _platformId = inject(PLATFORM_ID);

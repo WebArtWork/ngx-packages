@@ -11,19 +11,19 @@ const _rootPackageJsonPath = path.join(_rootDir, 'package.json');
 const _ngCommand = process.platform === 'win32' ? 'cmd.exe' : 'npx';
 const _ngArgs = process.platform === 'win32' ? ['/d', '/s', '/c', 'npx.cmd', 'ng'] : ['ng'];
 const _libraryNames = [
+	'ngx-ace',
 	'ngx-core',
+	'ngx-datetime',
+	'ngx-translate',
 	'ngx-http',
 	'ngx-crud',
-	'ngx-ace',
-	'ngx-fabric',
-	'ngx-datetime',
 	'ngx-socket',
 	'ngx-rtc',
-	'ngx-translate',
 	'ngx-tinymce',
 	'ngx-ui',
 	'ngx-form',
-	'ngx-map'
+	'ngx-map',
+	'ngx-fabric'
 ];
 const _libraries = _libraryNames.map((_projectName) => ({
 	projectName: _projectName,

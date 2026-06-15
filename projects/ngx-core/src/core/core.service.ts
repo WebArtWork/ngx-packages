@@ -2,8 +2,8 @@
 import { isPlatformBrowser } from '@angular/common';
 import {
 	DestroyRef,
-	Injectable,
 	PLATFORM_ID,
+	Service,
 	Signal,
 	WritableSignal,
 	computed,
@@ -12,9 +12,7 @@ import {
 } from '@angular/core';
 import { Viewport } from './core.type';
 
-@Injectable({
-	providedIn: 'root',
-})
+@Service()
 export class CoreService {
 	private readonly _platformId = inject(PLATFORM_ID);
 	private readonly _isBrowser = isPlatformBrowser(this._platformId);
@@ -483,7 +481,7 @@ export class CoreService {
 	}
 
 	/**
-	 * Returns a generic trackBy function for *ngFor, tracking by the specified object field.
+	 * Returns a generic track function for @for, tracking by the specified object field.
 	 * @template Document
 	 * @param {string} field - The object field to use for tracking (e.g., '_id').
 	 * @returns {(index: number, sig: Signal<Document>) => unknown} TrackBy function for Angular.

@@ -206,11 +206,13 @@ async setGerman() {
 			'translate(text) lazily creates a signal that falls back to the source text.',
 			'setLanguage() switches through LanguageService, lazy-loads payloads, and applies them without stale state.',
 			'Works with inline translations, folder/folders file loaders, and route/page extra JSON bundles.',
+			'Supports object-map payloads and compact string-array payloads paired with the default language array.',
 			'Interpolates {{name}} placeholders with directive vars, pipe vars, or TranslateService.interpolate().',
 		],
 		config: [
 			'Register bootstrap with provideTranslate({ language, defaultLanguage, translations?, folder?, folders? }).',
 			'With folder/folders mode, language files are loaded as /i18n/{lang}.json and optional additional sources.',
+			'Array payloads use defaultLanguage as the root source array and pair translated strings by index.',
 			'Language selection is handled by the Language feature and reused here.',
 			'TranslateDirective builds on top of this runtime service and can translate host text plus attributes.',
 		],
@@ -346,6 +348,16 @@ export const appConfig = {
 				sourceFile: 'translate.interface.ts',
 			},
 			{
+				name: 'TranslatePayload',
+				signature:
+					'type TranslatePayload = Record<string, string> | readonly string[] | readonly Translate[]',
+				description:
+					'Accepted translation payload shape for inline config and JSON files. String arrays are paired by index with the default language array.',
+				category: 'Contracts',
+				docType: 'Type',
+				sourceFile: 'translate.interface.ts',
+			},
+			{
 				name: 'TranslateDirectiveValue',
 				signature:
 					'type TranslateDirectiveValue = string | Record<string, string>',
@@ -389,10 +401,19 @@ export const appConfig = {
 				items: [
 					'Initial language resolves from language ?? stored language ?? defaultLanguage.',
 					'Language payloads are merged from file loaders (folder/folders) and inline translations when provided.',
+					'Object-map payloads use object keys as source text; array payloads use the default language array as source text and translated arrays as index-matched values.',
 					'Missing language files fail safely and translations fall back to source text.',
 					'Extra page bundles can be merged at runtime and are cached per language/url.',
 					'Signals are created lazily; there is no need to pre-register every possible text.',
 				],
+				example: `// /i18n/en.json
+["hello", "now"]
+
+// /i18n/ua.json
+["привіт", "зараз"]
+
+// Template
+<span translate>hello</span>`,
 			},
 		],
 		code: `import { TranslateService } from '@wawjs/ngx-translate';

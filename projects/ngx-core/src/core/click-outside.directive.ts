@@ -45,7 +45,7 @@ export class ClickOutsideDirective {
 	private _handler = (e: MouseEvent): void => {
 		if (!this._host.nativeElement.contains(e.target as Node)) {
 			this.clickOutside.emit(e); // notify parent
-			this._cdr.markForCheck(); // trigger CD for OnPush comps
+			this._cdr.markForCheck(); // trigger CD for signal-friendly consumers
 		}
 	};
 }

@@ -4,7 +4,6 @@
 export * from './src/translate/provide-translate';
 export * from './src/translate/translate.directive';
 export * from './src/translate/translate.interface';
-export * from './src/translate/translate.pipe';
 export * from './src/translate/translate.service';
 export * from './src/translate/translate.type';
 

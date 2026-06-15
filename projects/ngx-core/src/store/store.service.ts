@@ -1,23 +1,17 @@
 import { isPlatformBrowser } from '@angular/common';
-import { Inject, Injectable, Optional, PLATFORM_ID, inject } from '@angular/core';
-import { CONFIG_TOKEN, Config, DEFAULT_CONFIG } from '../core/config.interface';
+import { PLATFORM_ID, Service, inject } from '@angular/core';
+import { CONFIG_TOKEN, DEFAULT_CONFIG } from '../core/config.interface';
 import { StoreConfig, StoreOptions } from './store.interface';
 
-@Injectable({
-	providedIn: 'root',
-})
+@Service()
 export class StoreService {
 	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
 	private _prefix = '';
-	private _config: StoreConfig;
-
-	constructor(@Inject(CONFIG_TOKEN) @Optional() config: Config) {
-		this._config = {
-			...DEFAULT_CONFIG,
-			...(config?.store || {}),
-		};
-	}
+	private _config: StoreConfig = {
+		...(DEFAULT_CONFIG.store || {}),
+		...(inject(CONFIG_TOKEN, { optional: true })?.store || {}),
+	};
 
 	/**
 	 * Sets the prefix for storage keys.

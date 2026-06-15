@@ -1,5 +1,4 @@
 import {
-	ChangeDetectionStrategy,
 	Component,
 	ViewEncapsulation,
 } from '@angular/core';
@@ -29,6 +28,5 @@ import {
 		`,
 	],
 	encapsulation: ViewEncapsulation.None,
-	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ButtonStylesComponent {}

@@ -34,6 +34,11 @@ export * from './src/store/store.interface';
 export * from './src/store/store.service';
 
 /*
+ *	Resource
+ */
+export * from './src/resource/resource';
+
+/*
  *	Meta
  */
 export * from './src/meta/meta.guard';

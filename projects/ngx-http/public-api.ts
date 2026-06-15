@@ -7,6 +7,7 @@ export * from './src/config.interface';
  * Http
  */
 export * from './src/http/http.interface';
+export * from './src/http/http-resource';
 export * from './src/http/http.service';
 
 /*

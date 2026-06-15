@@ -56,6 +56,7 @@ export const serviceDocs: ServiceDoc[] = [
 			'fabric.interfaces.ts',
 			'fabric-crop-modal.component.ts',
 			'fabric-crop-modal.service.ts',
+			'inject-fabric-crop-modal-service.ts',
 			'fabric-crop.interfaces.ts',
 		],
 		properties: [
@@ -242,6 +243,38 @@ export const appConfig = {
 				sourceFile: 'fabric.directive.ts',
 			},
 			{
+				name: 'injectFabricCropModalService',
+				signature: 'injectFabricCropModalService(): () => Promise<FabricCropModalService>',
+				description:
+					'Creates an Angular injectAsync() loader for the crop modal service so crop UI code loads only when the workflow is opened.',
+				category: 'Crop modal',
+				docType: 'Const',
+				sourceFile: 'inject-fabric-crop-modal-service.ts',
+				example: `import { Component } from '@angular/core';
+import { injectFabricCropModalService } from 'ngx-fabric';
+
+@Component({
+\ttemplate: '<button (click)="crop(fileBase64)">Crop</button>',
+})
+export class DemoComponent {
+\tprivate readonly _loadCropModal = injectFabricCropModalService();
+\tfileBase64 = '';
+
+\tasync crop(image: string): Promise<void> {
+\t\tconst cropModal = await this._loadCropModal();
+
+\t\tcropModal.open({
+\t\t\timage,
+\t\t\taspectRatio: 1,
+\t\t\tformat: 'png',
+\t\t\tonCrop: result => {
+\t\t\t\tthis.fileBase64 = result.base64;
+\t\t\t},
+\t\t});
+\t}
+}`,
+			},
+			{
 				name: 'FabricCropModalService',
 				signature: 'open(options: FabricCropModalOptions): Modal',
 				description:
@@ -250,6 +283,7 @@ export const appConfig = {
 					'Supports base64 strings and Blob/File objects from file drop flows.',
 					'Provides scale, output format, and common aspect ratio controls inside the modal.',
 					'Uses @wawjs/ngx-ui ModalService and ButtonComponent through the published package boundary.',
+					'Prefer injectFabricCropModalService() for new on-demand crop buttons so the crop modal path can be lazy-loaded.',
 				],
 				category: 'Crop modal',
 				docType: 'Service',

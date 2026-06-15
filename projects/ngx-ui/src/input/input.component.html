@@ -1,11 +1,13 @@
 @let _formField = formField(); @let _type = type(); @let _name = name(); @let
 _label = label(); @let _disabled = disabled(); @let _items = items(); @let
 _wClass = wClass(); @let _clearable = clearable(); @let _placeholder =
-placeholder(); @let _error = fieldError(); @if (_type !== 'radio' && _type !==
-'checkbox' && _type !== 'textarea') {
+placeholder(); @let _error = fieldError(); @switch (_type) { @case ('text')
+@case ('password') @case ('email') @case ('search') @case ('tel') @case ('url')
+@case ('number') @case ('range') @case ('color') @case ('date') @case ('month')
+@case ('week') @case ('time') @case ('datetime') @case ('datetime-local') {
 <label class="winput">
 	@if (_label) {
-	<span class="winput__label">{{ _label | translate }}</span>
+	<span class="winput__label" [translate]="_label"></span>
 	}
 
 	<div
@@ -14,7 +16,7 @@ placeholder(); @let _error = fieldError(); @if (_type !== 'radio' && _type !==
 	>
 		@if (_formField) {
 		<input
-			[placeholder]="(_placeholder || 'Enter text...') | translate"
+			[translate]="{ placeholder: _placeholder || 'Enter text...' }"
 			[autocomplete]="getAutocompleteAttr(_type)"
 			(keydown)="wKeydown.emit($event)"
 			(focus)="wFocus.emit($event)"
@@ -24,8 +26,7 @@ placeholder(); @let _error = fieldError(); @if (_type !== 'radio' && _type !==
 			(input)="onInput($event)"
 			[formField]="_formField"
 			[class.error]="_error"
-			class="winput__field"
-			[ngClass]="_wClass"
+			[class]="['winput__field', _wClass]"
 			[manualType]="
 					_type === 'password'
 						? (showPassword() ? 'text' : 'password')
@@ -35,7 +36,7 @@ placeholder(); @let _error = fieldError(); @if (_type !== 'radio' && _type !==
 		/>
 		} @else {
 		<input
-			[placeholder]="(_placeholder || 'Enter text...') | translate"
+			[translate]="{ placeholder: _placeholder || 'Enter text...' }"
 			[autocomplete]="getAutocompleteAttr(_type)"
 			[attr.disabled]="_disabled ? '' : null"
 			(keydown)="wKeydown.emit($event)"
@@ -45,8 +46,7 @@ placeholder(); @let _error = fieldError(); @if (_type !== 'radio' && _type !==
 			(input)="onInput($event)"
 			[value]="wModel() ?? ''"
 			[class.error]="_error"
-			class="winput__field"
-			[ngClass]="_wClass"
+			[class]="['winput__field', _wClass]"
 			[attr.name]="_name"
 			[attr.type]="
 					_type === 'password'
@@ -60,7 +60,7 @@ placeholder(); @let _error = fieldError(); @if (_type !== 'radio' && _type !==
 			type="button"
 			class="winput__icon-btn winput__clear material-icons"
 			(click)="onClear()"
-			[attr.aria-label]="'Clear' | translate"
+			[translate]="{ ariaLabel: 'Clear' }"
 		>
 			close
 		</button>
@@ -68,10 +68,10 @@ placeholder(); @let _error = fieldError(); @if (_type !== 'radio' && _type !==
 		<button
 			type="button"
 			class="winput__icon-btn winput__eye material-icons"
-			(click)="showPassword.set(!showPassword())"
-			[attr.aria-label]="
-					(showPassword() ? 'Hide password' : 'Show password') | translate
-				"
+			(click)="showPassword.update((value) => !value)"
+			[translate]="{
+				ariaLabel: showPassword() ? 'Hide password' : 'Show password',
+			}"
 		>
 			visibility
 		</button>
@@ -85,20 +85,20 @@ placeholder(); @let _error = fieldError(); @if (_type !== 'radio' && _type !==
 	</div>
 
 	@if (_error) {
-	<div class="winput__error">{{ _error | translate }}</div>
+	<div class="winput__error" [translate]="_error"></div>
 	}
 </label>
-} @if (_type === 'textarea') {
+} @case ('textarea') {
 <label class="winput">
 	@if (_label) {
-	<span class="winput__label">{{ _label | translate }}</span>
+	<span class="winput__label" [translate]="_label"></span>
 	}
 
 	<div class="winput__control">
 		@if (_formField) {
 		<textarea
-			[placeholder]="(_placeholder || 'Enter text...') | translate"
-			class="winput__field winput__field--textarea"
+			[translate]="{ placeholder: _placeholder || 'Enter text...' }"
+			[class]="['winput__field', 'winput__field--textarea', _wClass]"
 			(keydown)="wKeydown.emit($event)"
 			(focus)="wFocus.emit($event)"
 			[manualDisabled]="_disabled"
@@ -106,13 +106,12 @@ placeholder(); @let _error = fieldError(); @if (_type !== 'radio' && _type !==
 			(input)="onInput($event)"
 			[class.error]="_error"
 			[formField]="_formField"
-			[ngClass]="_wClass"
 			#inputEl
 		></textarea>
 		} @else {
 		<textarea
-			[placeholder]="(_placeholder || 'Enter text...') | translate"
-			class="winput__field winput__field--textarea"
+			[translate]="{ placeholder: _placeholder || 'Enter text...' }"
+			[class]="['winput__field', 'winput__field--textarea', _wClass]"
 			[attr.disabled]="_disabled ? '' : null"
 			(keydown)="wKeydown.emit($event)"
 			(focus)="wFocus.emit($event)"
@@ -120,7 +119,6 @@ placeholder(); @let _error = fieldError(); @if (_type !== 'radio' && _type !==
 			(input)="onInput($event)"
 			[value]="wModel() ?? ''"
 			[class.error]="_error"
-			[ngClass]="_wClass"
 			[attr.name]="_name"
 			#inputEl
 		></textarea>
@@ -128,10 +126,10 @@ placeholder(); @let _error = fieldError(); @if (_type !== 'radio' && _type !==
 	</div>
 
 	@if (_error) {
-	<div class="winput__error">{{ _error | translate }}</div>
+	<div class="winput__error" [translate]="_error"></div>
 	}
 </label>
-} @if (_type === 'radio') { @if (_formField) { @for (item of _items; track
+} @case ('radio') { @if (_formField) { @for (item of _items; track
 $index) {
 <label class="winput__choice" [class.disabled]="_disabled">
 	<input
@@ -141,15 +139,14 @@ $index) {
 		(blur)="wBlur.emit($event)"
 		(input)="onInput($event)"
 		[formField]="_formField"
-		class="winput__native"
+		[class]="['winput__native', _wClass]"
 		[class.error]="_error"
-		[ngClass]="_wClass"
 		[value]="item"
 		type="radio"
 		#inputEl
 	/>
 	<span class="winput__choice-mark winput__choice-mark--radio"></span>
-	<span class="winput__choice-text">{{ item | translate }}</span>
+	<span class="winput__choice-text" [translate]="item"></span>
 </label>
 } } @else { @for (item of _items; track $index) {
 <label class="winput__choice" [class.disabled]="_disabled">
@@ -159,19 +156,18 @@ $index) {
 		[checked]="wModel() === item"
 		(focus)="wFocus.emit($event)"
 		(blur)="wBlur.emit($event)"
-		class="winput__native"
+		[class]="['winput__native', _wClass]"
 		[disabled]="_disabled"
 		[class.error]="_error"
-		[ngClass]="_wClass"
 		[value]="item"
 		[name]="_name"
 		type="radio"
 		#inputEl
 	/>
 	<span class="winput__choice-mark winput__choice-mark--radio"></span>
-	<span class="winput__choice-text">{{ item | translate }}</span>
+	<span class="winput__choice-text" [translate]="item"></span>
 </label>
-} } } @if (_type === 'checkbox') { @if (_items.length) { @for (item of _items;
+} } } @case ('checkbox') { @if (_items.length) { @for (item of _items;
 track $index) {
 <label class="winput__choice" [class.disabled]="_disabled">
 	<input
@@ -181,16 +177,15 @@ track $index) {
 		(focus)="wFocus.emit($event)"
 		(blur)="wBlur.emit($event)"
 		[name]="_name + $index"
-		class="winput__native"
+		[class]="['winput__native', _wClass]"
 		[disabled]="_disabled"
 		[class.error]="_error"
-		[ngClass]="_wClass"
 		type="checkbox"
 		[value]="item"
 		#inputEl
 	/>
 	<span class="winput__choice-mark"></span>
-	<span class="winput__choice-text">{{ item | translate }}</span>
+	<span class="winput__choice-text" [translate]="item"></span>
 </label>
 } } @else {
 <label class="winput__choice" [class.disabled]="_disabled">
@@ -202,9 +197,8 @@ track $index) {
 		(blur)="wBlur.emit($event)"
 		(input)="onInput($event)"
 		[formField]="_formField"
-		class="winput__native"
+		[class]="['winput__native', _wClass]"
 		[class.error]="_error"
-		[ngClass]="_wClass"
 		type="checkbox"
 		#inputEl
 	/>
@@ -216,9 +210,8 @@ track $index) {
 		(input)="onInput($event)"
 		[disabled]="_disabled"
 		[class.error]="_error"
-		class="winput__native"
+		[class]="['winput__native', _wClass]"
 		[checked]="!!wModel()"
-		[ngClass]="_wClass"
 		type="checkbox"
 		[name]="_name"
 		#inputEl
@@ -228,7 +221,7 @@ track $index) {
 	<span class="winput__choice-mark"></span>
 
 	@if (_label) {
-	<span class="winput__choice-text">{{ _label | translate }}</span>
+	<span class="winput__choice-text" [translate]="_label"></span>
 	}
 </label>
-} }
+} } @default never; }

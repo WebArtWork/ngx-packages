@@ -1,5 +1,4 @@
 import {
-	ChangeDetectionStrategy,
 	Component,
 	computed,
 	effect,
@@ -34,7 +33,6 @@ import { LatLngLiteral, LibMapMarker } from '../../map.interface';
 			}
 		`,
 	],
-	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MapComponent {
 	private readonly _platformId = inject(PLATFORM_ID);

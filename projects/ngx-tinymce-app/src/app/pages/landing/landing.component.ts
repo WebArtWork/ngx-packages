@@ -1,5 +1,5 @@
 import { isPlatformBrowser } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, PLATFORM_ID, signal } from '@angular/core';
+import { Component, inject, PLATFORM_ID, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { serviceDocs } from '../../services/service-docs';
 
@@ -13,7 +13,6 @@ interface LandingFeatureGroup {
 	imports: [RouterLink],
 	templateUrl: './landing.component.html',
 	styleUrl: './landing.component.scss',
-	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LandingComponent {
 	private readonly _platformId = inject(PLATFORM_ID);
@@ -43,7 +42,7 @@ export class LandingComponent {
 			title: 'Forms integration',
 			description:
 				'ControlValueAccessor support keeps template-driven and reactive forms aligned with editor content and readonly state.',
-			items: ['[(ngModel)]', 'formControlName', 'setDisabledState()', 'blur touch handling'],
+			items: ['Reactive forms', 'ControlValueAccessor', 'setDisabledState()', 'blur touch handling'],
 		},
 		{
 			title: 'Runtime safety',

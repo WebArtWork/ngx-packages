@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { Service, inject } from '@angular/core';
 import { TranslateService } from '@wawjs/ngx-translate';
 import { DomComponent, DomService } from '@wawjs/ngx-core';
 import { AlertComponent } from '../components/alert/alert.component';
@@ -9,11 +9,10 @@ import {
 	DEFAULT_ALERT_CONFIG,
 } from '../interfaces/alert.interface';
 
-@Injectable({
-	providedIn: 'root',
-})
+@Service()
 export class AlertService {
 	private readonly _translateService = inject(TranslateService);
+	private readonly _dom = inject(DomService);
 
 	/**
 	 * Creates a new alert service.
@@ -23,7 +22,7 @@ export class AlertService {
 	 * @param _dom Service responsible for DOM manipulation and dynamic
 	 * component creation.
 	 */
-	constructor(private _dom: DomService) {
+	constructor() {
 		this._container = this._dom.appendComponent(WrapperComponent)!;
 	}
 
