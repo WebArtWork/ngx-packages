@@ -11,7 +11,6 @@ const _ngArgs = process.platform === 'win32' ? ['/d', '/s', '/c', 'npx.cmd', 'ng
 const _apps = [
 	'ngx-datetime-app',
 	'ngx-core-app',
-	'ngx-app',
 	'ngx-ace-app',
 	'ngx-fabric-app',
 	'ngx-http-app',

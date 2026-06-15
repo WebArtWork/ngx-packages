@@ -34,11 +34,13 @@ jobs:
                 apps=(
                   ngx-datetime-app
                   ngx-core-app
-                  ngx-app
+                  wawjs.wiki
                   ngx-ace-app
                   ngx-fabric-app
                   ngx-http-app
                   ngx-crud-app
+                  ngx-form-app
+                  ngx-map-app
                   ngx-socket-app
                   ngx-rtc-app
                   ngx-translate-app
@@ -75,11 +77,13 @@ jobs:
                   apps=(
                     ngx-datetime-app
                     ngx-core-app
-                    ngx-app
+                    wawjs.wiki
                     ngx-ace-app
                     ngx-fabric-app
                     ngx-http-app
                     ngx-crud-app
+                    ngx-form-app
+                    ngx-map-app
                     ngx-socket-app
                     ngx-rtc-app
                     ngx-translate-app

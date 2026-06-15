@@ -40,7 +40,18 @@
 									</p>
 									<h3>{{ item.name }}</h3>
 								</div>
-								<code>{{ item.signature }}</code>
+								@if (item.url) {
+									<a
+										class="reference-link"
+										[href]="item.url"
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										{{ item.signature }}
+									</a>
+								} @else {
+									<code>{{ item.signature }}</code>
+								}
 							</div>
 
 							<p class="item-description">

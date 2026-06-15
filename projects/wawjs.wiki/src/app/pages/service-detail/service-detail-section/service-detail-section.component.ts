@@ -9,6 +9,7 @@ interface ServiceDetailSectionItem {
 	description: string;
 	details: string[];
 	example: string | null;
+	url: string | null;
 }
 
 interface ServiceDetailSectionData {

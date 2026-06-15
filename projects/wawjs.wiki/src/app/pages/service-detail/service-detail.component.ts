@@ -25,6 +25,7 @@ interface ServiceReferenceItem {
 	description: string;
 	details: string[];
 	example: string | null;
+	url: string | null;
 }
 
 interface AvailableItemLabel {
@@ -180,6 +181,7 @@ export class ServiceDetailComponent {
 			signature: item.signature,
 			description: item.description,
 			details: item.details || [],
+			url: item.url || null,
 			example: item.example
 				? this.formatExample(item.example)
 				: (item.docType || 'Service') === 'Service'

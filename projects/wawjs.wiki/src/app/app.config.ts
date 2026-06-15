@@ -30,7 +30,7 @@ export const appConfig: ApplicationConfig = {
 					title: 'wawjs.wiki',
 					titleSuffix: ' | Web Art Work',
 					description:
-						'Feature placeholder portal for waw, ngx, react, and vue on wawjs.wiki.',
+						'Developer guide for WAW framework and Angular ngx product docs on wawjs.wiki.',
 					image: 'https://wawjs.wiki/logo.png',
 					links: {
 						canonical: 'https://wawjs.wiki/',

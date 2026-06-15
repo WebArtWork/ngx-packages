@@ -2,7 +2,7 @@
 	"name": "ngx-packages",
 	"version": "22.0.1",
 	"scripts": {
-		"start": "ng serve ngx-app",
+		"start": "ng serve wawjs.wiki",
 		"build": "node scripts/build-libs.mjs",
 		"build:apps": "node scripts/build-apps.mjs",
 		"publish": "node scripts/publish.mjs",
@@ -20,7 +20,6 @@
 		"start:ui": "ng serve ngx-ui-app",
 		"start:form": "ng serve ngx-form-app",
 		"start:map": "ng serve ngx-map-app",
-		"start:app": "ng serve ngx-app",
 		"start:wiki": "ng serve wawjs.wiki"
 	},
 	"dependencies": {

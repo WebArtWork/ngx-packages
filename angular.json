@@ -132,69 +132,6 @@
 				}
 			}
 		},
-		"ngx-app": {
-			"projectType": "application",
-			"root": "projects/ngx-app",
-			"sourceRoot": "projects/ngx-app/src",
-			"prefix": "app",
-			"architect": {
-				"build": {
-					"builder": "@angular/build:application",
-					"options": {
-						"browser": "projects/ngx-app/src/main.ts",
-						"server": "projects/ngx-app/src/main.server.ts",
-						"index": "projects/ngx-app/src/index.html",
-						"tsConfig": "projects/ngx-app/tsconfig.app.json",
-						"prerender": {
-							"discoverRoutes": true,
-							"routesFile": "projects/ngx-app/src/prerender-routes.txt"
-						},
-						"assets": [
-							{
-								"glob": "**/*",
-								"input": "projects/ngx-app/src/assets"
-							}
-						],
-						"styles": ["projects/ngx-app/src/styles.scss"]
-					},
-					"configurations": {
-						"production": {
-							"budgets": [
-								{
-									"type": "initial",
-									"maximumWarning": "500kB",
-									"maximumError": "1MB"
-								},
-								{
-									"type": "anyComponentStyle",
-									"maximumWarning": "8kB",
-									"maximumError": "12kB"
-								}
-							],
-							"outputHashing": "all"
-						},
-						"development": {
-							"optimization": false,
-							"extractLicenses": false,
-							"sourceMap": true
-						}
-					},
-					"defaultConfiguration": "production"
-				},
-				"serve": {
-					"builder": "@angular/build:dev-server",
-					"configurations": {
-						"production": {
-							"buildTarget": "ngx-app:build:production"
-						},
-						"development": {
-							"buildTarget": "ngx-app:build:development"
-						}
-					},
-					"defaultConfiguration": "development"
-				}
-			}
-		},
 		"wawjs.wiki": {
 			"projectType": "application",
 			"root": "projects/wawjs.wiki",

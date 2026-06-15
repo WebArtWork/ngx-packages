@@ -163,6 +163,18 @@ h3 {
 	font: 600 0.82rem/1.6 var(--font-code);
 }
 
+.reference-link {
+	color: var(--accent-strong);
+	font: 600 0.82rem/1.6 var(--font-code);
+	overflow-wrap: anywhere;
+	text-decoration: none;
+}
+
+.reference-link:hover,
+.reference-link:focus-visible {
+	text-decoration: underline;
+}
+
 .item-description {
 	margin: 18px 0 0;
 	font-size: 1rem;
