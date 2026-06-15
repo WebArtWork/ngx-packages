@@ -92,7 +92,11 @@ jobs:
                   )
 
                   for app in "${apps[@]}"; do
-                    domain="${app%-app}.webart.work"
+                    if [ "$app" = "wawjs.wiki" ]; then
+                      domain="wawjs.wiki"
+                    else
+                      domain="${app%-app}.webart.work"
+                    fi
 
                     pushd "dist/$app/browser"
                     git init
