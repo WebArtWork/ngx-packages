@@ -1,4 +1,4 @@
-import { Routes } from '@angular/router';
+﻿import { Routes } from '@angular/router';
 
 export const routes: Routes = [
 	{
@@ -7,9 +7,9 @@ export const routes: Routes = [
 			import('./pages/landing/landing.component').then(m => m.LandingComponent),
 		data: {
 			meta: {
-				title: 'wawjs.wiki',
+				title: 'wawjs.dev',
 				description:
-					'Developer guide for WAW framework and Angular ngx product docs on wawjs.wiki.',
+					'Developer guide for WAW framework and Angular ngx product docs on wawjs.dev.',
 			},
 		},
 	},

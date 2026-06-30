@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
+﻿import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { provideNgxCore } from 'ngx-core';
 import { provideTranslate } from 'ngx-translate';
@@ -35,9 +35,9 @@ export const appConfig: ApplicationConfig = {
 					titleSuffix: ' | Web Art Work',
 					description:
 						'Angular language and runtime translation library from Web Art Work with signal-based APIs, theme-ready docs, and SSR-safe behavior.',
-					image: 'https://wawjs.wiki/logo.png',
+					image: 'https://wawjs.dev/logo.png',
 					links: {
-						canonical: 'https://wawjs.wiki/ngx-translate',
+						canonical: 'https://wawjs.dev/ngx-translate',
 					},
 				},
 				useTitleSuffix: true,

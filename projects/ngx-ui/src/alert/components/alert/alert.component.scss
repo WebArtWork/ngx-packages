@@ -24,32 +24,160 @@
 	}
 }
 
-/* minimal utility classes for animations */
-.animate-alert-bounce-in-up {
-	animation: alert-bounce-in-up 0.7s ease-in-out both;
+.walert-wrap {
+	max-width: 100%;
+	opacity: 1;
+	transition:
+		opacity var(--motion) var(--easing),
+		transform var(--motion) var(--easing);
+
+	&--removing {
+		opacity: 0;
+	}
 }
 
-.animate-alert-progress {
+.walert {
+	position: relative;
+	pointer-events: auto;
+	user-select: none;
+	font-size: 0.875rem;
+	min-height: 2.5rem;
+	max-width: 100%;
+	padding: var(--sp-2) var(--sp-4);
+	border: 1px solid transparent;
+	border-radius: var(--radius);
+	box-shadow: var(--shadow-sm);
+	animation: alert-bounce-in-up var(--motion) var(--easing) both;
+
+	&--info {
+		background: var(--c-alert-info-bg);
+		border-color: var(--c-alert-info-bg);
+		color: var(--c-text-primary);
+
+		.walert__progress-bar {
+			background: var(--c-alert-info-bar);
+		}
+	}
+
+	&--success {
+		background: var(--c-alert-success-bg);
+		border-color: var(--c-alert-success-bg);
+		color: var(--c-text-primary);
+
+		.walert__progress-bar {
+			background: var(--c-alert-success-bar);
+		}
+	}
+
+	&--warning {
+		background: var(--c-alert-warning-bg);
+		border-color: var(--c-alert-warning-bg);
+		color: var(--c-text-primary);
+
+		.walert__progress-bar {
+			background: var(--c-alert-warning-bar);
+		}
+	}
+
+	&--error {
+		background: var(--c-alert-error-bg);
+		border-color: var(--c-alert-error-bg);
+		color: var(--c-text-primary);
+
+		.walert__progress-bar {
+			background: var(--c-alert-error-bar);
+		}
+	}
+
+	&--question {
+		background: var(--c-alert-question-bg);
+		border-color: var(--c-alert-question-bg);
+		color: var(--c-text-primary);
+
+		.walert__progress-bar {
+			background: var(--c-alert-question-bar);
+		}
+	}
+}
+
+.walert__progress {
+	position: absolute;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+}
+
+.walert__progress-bar {
+	display: block;
+	height: 2px;
+	width: 100%;
+	border-radius: var(--radius-pill);
 	animation-name: alert-progress;
 	animation-timing-function: linear;
 	animation-fill-mode: both;
 }
 
-.animate-alert-slide-in {
-	/* your old `iziT-slideIn` depended on a global keyframe.
-	   keep the hook but fall back gracefully if not present */
-	animation: iziT-slideIn 1s cubic-bezier(0.16, 0.81, 0.32, 1) both;
+.walert__body {
+	display: flex;
+	align-items: center;
+	gap: var(--sp-3);
+	width: 100%;
 }
 
-/* pause progress bar when hovering the alert card */
-.animate-alert-bounce-in-up:hover .animate-alert-progress {
-	animation-play-state: paused;
+.walert__content {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--sp-3);
+}
+
+.walert__message {
+	display: flex;
+	align-items: center;
+	gap: var(--sp-2);
+	min-width: 0;
+}
+
+.walert__text {
+	min-width: 0;
+	word-break: break-word;
+	font-size: 0.875rem;
+	line-height: 1rem;
+	animation: iziT-slideIn var(--motion) var(--easing) both;
+}
+
+.walert__actions {
+	display: flex;
+	align-items: center;
+	gap: var(--sp-2);
+	flex-shrink: 0;
+}
+
+.walert .walert__btn {
+	height: 2rem;
+	padding: 0 var(--sp-3);
+	font-size: 0.75rem;
+}
+
+.walert .walert__close {
+	flex-shrink: 0;
+	height: 1.75rem;
+	width: 1.75rem;
+	border-radius: var(--radius-pill);
+	padding: 0;
+	opacity: 0.6;
+
+	&:hover {
+		opacity: 1;
+	}
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.animate-alert-bounce-in-up,
-	.animate-alert-slide-in,
-	.animate-alert-progress {
+	.walert,
+	.walert__text,
+	.walert__progress-bar {
 		animation: none !important;
 	}
 }

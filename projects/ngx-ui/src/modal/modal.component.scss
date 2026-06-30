@@ -1,3 +1,85 @@
 :host {
 	display: block;
 }
+
+.wawjs-modal {
+	position: fixed;
+	inset: 0;
+	z-index: 9999;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: var(--sp-6);
+	background: color-mix(in srgb, var(--c-bg-primary) 55%, transparent);
+
+	@media (min-width: 768px) {
+		padding: calc(var(--sp-6) + var(--sp-4));
+	}
+}
+
+.wawjs-modal__content {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	max-height: 90vh;
+	overflow: hidden;
+	box-shadow: var(--shadow-md);
+	background: var(--c-bg-secondary);
+	color: var(--c-text-primary);
+	border-radius: var(--radius-card);
+
+	&--small {
+		max-width: 28rem;
+	}
+
+	&--mid {
+		max-width: 56rem;
+	}
+
+	&--big {
+		max-width: 72rem;
+	}
+
+	&--full {
+		max-width: 1440px;
+		max-height: calc(100vh - 3rem);
+
+		@media (min-width: 768px) {
+			max-height: calc(100vh - 5rem);
+		}
+	}
+}
+
+.wawjs-modal__body {
+	flex: 1;
+	min-height: 0;
+	overflow: auto;
+	padding: var(--sp-4) calc(var(--sp-6) + var(--sp-5)) var(--sp-4) var(--sp-4);
+
+	@media (min-width: 768px) {
+		padding: var(--sp-6) calc(var(--sp-6) + var(--sp-5)) var(--sp-6) var(--sp-6);
+	}
+}
+
+.wawjs-modal .wawjs-modal__close {
+	position: absolute;
+	top: var(--sp-3);
+	right: var(--sp-3);
+	display: inline-flex;
+	height: 2.5rem;
+	width: 2.5rem;
+	align-items: center;
+	justify-content: center;
+	border-radius: var(--radius-pill);
+	padding: 0;
+	color: var(--c-text-secondary);
+
+	&:hover {
+		background: color-mix(in srgb, var(--c-text-primary) 10%, transparent);
+	}
+
+	&:focus-visible {
+		outline: none;
+	}
+}

@@ -1,5 +1,6 @@
 import { InjectionToken } from '@angular/core';
 import { ThemeDensity, ThemeMode, ThemeRadius } from './theme.type';
+import { ThemeTokens } from './theme.tokens';
 
 export interface ThemeStorageKeys {
 	mode: string;
@@ -17,6 +18,20 @@ export interface ThemeConfig {
 	radiuses?: ThemeRadius[];
 	persist?: boolean;
 	storageKeys?: Partial<ThemeStorageKeys>;
+	/** Token overrides applied regardless of mode, density, or radius */
+	tokens?: ThemeTokens;
+	/** Token overrides applied when mode is 'light' */
+	lightTokens?: ThemeTokens;
+	/** Token overrides applied when mode is 'dark' */
+	darkTokens?: ThemeTokens;
+	/** Token overrides applied when density is 'comfortable' */
+	comfortableTokens?: ThemeTokens;
+	/** Token overrides applied when density is 'compact' */
+	compactTokens?: ThemeTokens;
+	/** Token overrides applied when radius is 'rounded' */
+	roundedTokens?: ThemeTokens;
+	/** Token overrides applied when radius is 'square' */
+	squareTokens?: ThemeTokens;
 }
 
 export const DEFAULT_THEME_STORAGE_KEYS: ThemeStorageKeys = {

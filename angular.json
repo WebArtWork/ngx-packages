@@ -132,30 +132,30 @@
 				}
 			}
 		},
-		"wawjs.wiki": {
+		"wawjs.dev": {
 			"projectType": "application",
-			"root": "projects/wawjs.wiki",
-			"sourceRoot": "projects/wawjs.wiki/src",
+			"root": "projects/wawjs.dev",
+			"sourceRoot": "projects/wawjs.dev/src",
 			"prefix": "app",
 			"architect": {
 				"build": {
 					"builder": "@angular/build:application",
 					"options": {
-						"browser": "projects/wawjs.wiki/src/main.ts",
-						"server": "projects/wawjs.wiki/src/main.server.ts",
-						"index": "projects/wawjs.wiki/src/index.html",
-						"tsConfig": "projects/wawjs.wiki/tsconfig.app.json",
+						"browser": "projects/wawjs.dev/src/main.ts",
+						"server": "projects/wawjs.dev/src/main.server.ts",
+						"index": "projects/wawjs.dev/src/index.html",
+						"tsConfig": "projects/wawjs.dev/tsconfig.app.json",
 						"prerender": {
 							"discoverRoutes": true,
-							"routesFile": "projects/wawjs.wiki/src/prerender-routes.txt"
+							"routesFile": "projects/wawjs.dev/src/prerender-routes.txt"
 						},
 						"assets": [
 							{
 								"glob": "**/*",
-								"input": "projects/wawjs.wiki/src/assets"
+								"input": "projects/wawjs.dev/src/assets"
 							}
 						],
-						"styles": ["projects/wawjs.wiki/src/styles.scss"]
+						"styles": ["projects/wawjs.dev/src/styles.scss"]
 					},
 					"configurations": {
 						"production": {
@@ -185,10 +185,10 @@
 					"builder": "@angular/build:dev-server",
 					"configurations": {
 						"production": {
-							"buildTarget": "wawjs.wiki:build:production"
+							"buildTarget": "wawjs.dev:build:production"
 						},
 						"development": {
-							"buildTarget": "wawjs.wiki:build:development"
+							"buildTarget": "wawjs.dev:build:development"
 						}
 					},
 					"defaultConfiguration": "development"

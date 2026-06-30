@@ -2,18 +2,16 @@ import {
 	Component,
 	OnDestroy,
 	OnInit,
+	ViewEncapsulation,
 } from '@angular/core';
+import { ButtonDirective } from '../button/button.directive';
 
 @Component({
 	selector: 'lib-modal',
 	templateUrl: './modal.component.html',
-	styles: [
-		`
-			:host {
-				display: block;
-			}
-		`,
-	],
+	styleUrl: './modal.component.scss',
+	encapsulation: ViewEncapsulation.None,
+	imports: [ButtonDirective],
 })
 export class ModalComponent implements OnInit, OnDestroy {
 	closable = true;
@@ -26,6 +24,12 @@ export class ModalComponent implements OnInit, OnDestroy {
 
 	// optional custom class applied to the content panel
 	panelClass = '';
+
+	get contentClasses(): string {
+		return ['wawjs-modal__content', `wawjs-modal__content--${this.size || 'mid'}`, this.panelClass]
+			.filter(Boolean)
+			.join(' ');
+	}
 
 	private readonly _popStateHandler = (e: PopStateEvent) =>
 		this.popStateListener(e);

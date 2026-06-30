@@ -2,6 +2,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import {
 	Component,
 	TemplateRef,
+	ViewEncapsulation,
 	computed,
 	input,
 	model,
@@ -18,91 +19,8 @@ export type FileView = 'dropzone' | 'list';
 	selector: 'ngx-file',
 	imports: [NgTemplateOutlet, TranslateDirective, ButtonComponent],
 	templateUrl: './file.component.html',
-	styles: [
-		`
-			:host {
-				display: block;
-			}
-
-			.wfile._disabled {
-				opacity: 0.6;
-				pointer-events: none;
-			}
-
-			.wfile__label {
-				margin-bottom: 6px;
-			}
-
-			.wfile__body {
-				border: 1px dashed var(--c-border);
-				border-radius: var(--radius);
-				background: var(--c-bg-secondary);
-				box-shadow: var(--shadow-sm);
-				transition:
-					border-color var(--motion-fast) var(--easing),
-					box-shadow var(--motion-fast) var(--easing);
-			}
-
-			.wfile__body._dragging {
-				border-color: var(--c-primary);
-				box-shadow: var(--focus-ring);
-			}
-
-			.wfile__dropzone {
-				display: grid;
-				place-items: center;
-				gap: var(--sp-2);
-				min-block-size: 120px;
-				padding: var(--sp-4);
-				cursor: pointer;
-				text-align: center;
-			}
-
-			.wfile__empty {
-				color: var(--c-placeholder);
-				font-size: 0.9rem;
-			}
-
-			.wfile__list {
-				display: grid;
-				gap: var(--sp-2);
-				padding: var(--sp-3);
-			}
-
-			.wfile__item {
-				display: flex;
-				align-items: center;
-				justify-content: space-between;
-				gap: var(--sp-2);
-				border: 1px solid var(--c-border);
-				border-radius: var(--radius-card);
-				padding: var(--sp-2) var(--sp-3);
-				background: var(--c-bg-secondary);
-			}
-
-			.wfile__name {
-				min-inline-size: 0;
-				overflow: hidden;
-				text-overflow: ellipsis;
-				white-space: nowrap;
-			}
-
-			.wfile__meta {
-				color: var(--c-text-muted);
-				font-size: 0.8rem;
-				white-space: nowrap;
-			}
-
-			.wfile__actions {
-				display: flex;
-				align-items: center;
-				justify-content: flex-end;
-				gap: var(--sp-2);
-				padding: var(--sp-2) var(--sp-3);
-				border-top: 1px solid var(--c-border);
-			}
-		`,
-	],
+	styleUrl: './file.component.scss',
+	encapsulation: ViewEncapsulation.None,
 })
 export class FileComponent {
 	readonly label = input(fileDefaults.label);

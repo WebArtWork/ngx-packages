@@ -1,13 +1,13 @@
 {
 	"name": "@wawjs/ngx-core",
-	"version": "22.0.1",
+	"version": "22.0.2",
 	"description": "Angular common package with shared services, pipes, directives, and app-level configuration.",
 	"license": "MIT",
 	"repository": "WebArtWork/ngx-core",
 	"funding": [
 		{
 			"type": "website",
-			"url": "http://wawjs.wiki/fund"
+			"url": "http://wawjs.dev/fund"
 		},
 		{
 			"type": "opencollective",

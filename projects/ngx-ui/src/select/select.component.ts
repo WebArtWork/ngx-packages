@@ -4,6 +4,7 @@ import {
 	ElementRef,
 	Signal,
 	TemplateRef,
+	ViewEncapsulation,
 	computed,
 	contentChild,
 	effect,
@@ -38,13 +39,8 @@ import { SelectId, SelectValue } from './select.type';
 		ClickOutsideDirective,
 	],
 	templateUrl: './select.component.html',
-	styles: [
-		`
-			:host {
-				display: block;
-			}
-		`,
-	],
+	styleUrl: './select.component.scss',
+	encapsulation: ViewEncapsulation.None,
 	providers: [
 		{
 			provide: NG_VALUE_ACCESSOR,

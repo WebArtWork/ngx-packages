@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+﻿name: Deploy to GitHub Pages
 
 on:
     push:
@@ -34,7 +34,7 @@ jobs:
                 apps=(
                   ngx-datetime-app
                   ngx-core-app
-                  wawjs.wiki
+                  wawjs.dev
                   ngx-ace-app
                   ngx-fabric-app
                   ngx-http-app
@@ -77,7 +77,7 @@ jobs:
                   apps=(
                     ngx-datetime-app
                     ngx-core-app
-                    wawjs.wiki
+                    wawjs.dev
                     ngx-ace-app
                     ngx-fabric-app
                     ngx-http-app
@@ -92,8 +92,8 @@ jobs:
                   )
 
                   for app in "${apps[@]}"; do
-                    if [ "$app" = "wawjs.wiki" ]; then
-                      domain="wawjs.wiki.site"
+                    if [ "$app" = "wawjs.dev" ]; then
+                      domain="wawjs.dev.site"
                     else
                       domain="${app%-app}.webart.work"
                     fi

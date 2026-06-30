@@ -1,6 +1,7 @@
 import { TitleCasePipe } from '@angular/common';
 import {
 	Component,
+	ViewEncapsulation,
 	computed,
 	inject,
 	input,
@@ -12,48 +13,8 @@ import { ThemeService } from '../theme/theme.service';
 @Component({
 	selector: 'icon-theme',
 	templateUrl: './theme.component.html',
-	styles: [
-		`
-			.icon-theme {
-				display: inline-flex;
-				align-items: center;
-				gap: 8px;
-				cursor: pointer;
-				line-height: 1;
-				user-select: none;
-			}
-
-			.icon-theme__box {
-				position: relative;
-				display: inline-block;
-				flex: 0 0 auto;
-			}
-
-			.icon-theme__svg {
-				position: absolute;
-				inset: 0;
-				width: 100%;
-				height: 100%;
-			}
-
-			.icon-theme__mode {
-				position: absolute;
-				inset: 0;
-				display: grid;
-				place-items: center;
-				line-height: 1;
-				font-size: 1em;
-			}
-
-			.icon-theme__text {
-				display: inline-flex;
-				align-items: center;
-				white-space: nowrap;
-				line-height: 1;
-				font-size: 14px;
-			}
-		`,
-	],
+	styleUrl: './theme.component.scss',
+	encapsulation: ViewEncapsulation.None,
 	imports: [TitleCasePipe, TranslateDirective],
 })
 export class ThemeComponent {

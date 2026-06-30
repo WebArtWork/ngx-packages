@@ -1,4 +1,4 @@
-import { spawnSync } from 'node:child_process';
+﻿import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -11,7 +11,7 @@ const _ngArgs = process.platform === 'win32' ? ['/d', '/s', '/c', 'npx.cmd', 'ng
 const _apps = [
 	'ngx-datetime-app',
 	'ngx-core-app',
-	'wawjs.wiki',
+	'wawjs.dev',
 	'ngx-ace-app',
 	'ngx-fabric-app',
 	'ngx-http-app',

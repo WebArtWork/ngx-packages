@@ -73,4 +73,5 @@ export * from './src/theme-icon/theme.component';
 export * from './src/theme/provide-theme';
 export * from './src/theme/theme.interface';
 export * from './src/theme/theme.service';
+export * from './src/theme/theme.tokens';
 export * from './src/theme/theme.type';

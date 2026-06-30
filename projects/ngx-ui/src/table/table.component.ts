@@ -4,6 +4,7 @@ import {
 	Component,
 	OnInit,
 	Signal,
+	ViewEncapsulation,
 	computed,
 	contentChild,
 	contentChildren,
@@ -29,13 +30,8 @@ import {
 @Component({
 	selector: 'wtable',
 	templateUrl: './table.component.html',
-	styles: [
-		`
-			:host {
-				display: block;
-			}
-		`,
-	],
+	styleUrl: './table.component.scss',
+	encapsulation: ViewEncapsulation.None,
 	imports: [ButtonComponent, NgTemplateOutlet, RouterLink],
 })
 export class TableComponent implements OnInit, AfterContentInit {

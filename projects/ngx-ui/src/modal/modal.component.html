@@ -1,30 +1,20 @@
 <div
-	class="wawjs-modal fixed inset-0 z-[9999] flex items-center justify-center p-6 md:p-10 bg-black/55"
+	class="wawjs-modal"
 	(click)="onBackdropClick()"
 >
 	<div
-		class="wawjs-modal__content relative flex flex-col w-full max-h-[90vh] overflow-hidden shadow-[0_18px_45px_rgba(0,0,0,0.6)]"
-		[class]="
-			'bg-[var(--c-bg-secondary)] text-[var(--c-text-primary)] rounded-[var(--radius-card)] ' +
-			(panelClass || '') + ' ' +
-			(size === 'small' ? 'max-w-md' : '') +
-			((!size || size === 'mid') ? ' max-w-4xl' : '') +
-			(size === 'big' ? ' max-w-6xl' : '') +
-			(size === 'full' ? ' max-w-[1440px] max-h-[calc(100vh-3rem)] md:max-h-[calc(100vh-5rem)]' : '')
-		"
+		[class]="contentClasses"
 		(click)="$event.stopPropagation()"
 	>
-		<div
-			class="wawjs-modal__body flex-1 min-h-0 overflow-auto p-4 md:p-6 pr-14"
-		>
+		<div class="wawjs-modal__body">
 			<!-- content host -->
 		</div>
 
 		@if (closable) {
 		<button
 			wbutton
-			type="button"
-			class="wawjs-modal__close material-icons absolute top-3 right-3 inline-flex !h-10 !w-10 items-center justify-center !rounded-full !p-0 text-[var(--c-text-secondary)] hover:bg-white/10 focus-visible:outline-none"
+			[disableSubmit]="true"
+			class="wawjs-modal__close material-icons"
 			(wClick)="close()"
 			aria-label="Close"
 		>

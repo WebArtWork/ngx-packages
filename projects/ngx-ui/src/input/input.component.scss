@@ -1,6 +1,6 @@
 .winput {
 	display: grid;
-	gap: 6px;
+	gap: var(--sp-2);
 
 	&__label {
 		font-size: 0.85rem;
@@ -15,7 +15,7 @@
 		border: 1px solid var(--c-border);
 		border-radius: var(--radius);
 		background: var(--c-bg-secondary);
-		padding: 10px 12px;
+		padding: var(--sp-2) var(--sp-3);
 		box-shadow: var(--shadow-sm);
 		transition:
 			border-color var(--motion-fast) var(--easing),
@@ -64,4 +64,142 @@
 		font-size: 0.8rem;
 		color: var(--c-secondary);
 	}
+}
+
+/* Error state: highlight the control border */
+.winput__control:has(.error) {
+	border-color: var(--c-secondary);
+}
+
+/* Textarea modifier on the field */
+.winput__field--textarea {
+	resize: vertical;
+	min-height: 80px;
+	line-height: 1.5;
+}
+
+/* Align control to top when it wraps a textarea */
+.winput__control:has(.winput__field--textarea) {
+	align-items: flex-start;
+}
+
+/* Icon action buttons (clear, eye/password-toggle) */
+.winput__icon-btn {
+	flex-shrink: 0;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2rem;
+	height: 2rem;
+	border-radius: var(--radius-pill);
+	border: 0;
+	background: transparent;
+	color: var(--c-text-muted);
+	cursor: pointer;
+	font-size: 18px;
+	line-height: 1;
+	padding: 0;
+	transition:
+		background-color var(--motion-fast) var(--easing),
+		color var(--motion-fast) var(--easing);
+
+	&:hover {
+		background: color-mix(in srgb, var(--c-text-primary) 5%, transparent);
+		color: var(--c-text-primary);
+	}
+}
+
+/* Radio / Checkbox choice wrapper */
+.winput__choice {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	gap: var(--sp-2);
+	cursor: pointer;
+	user-select: none;
+
+	&.disabled {
+		opacity: 0.6;
+		pointer-events: none;
+	}
+}
+
+/* Visually hide native input; keep it accessible for keyboard & :checked state */
+.winput__native {
+	position: absolute;
+	opacity: 0;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	pointer-events: none;
+}
+
+/* Custom visual mark (checkbox by default) */
+.winput__choice-mark {
+	flex-shrink: 0;
+	width: 1.125rem;
+	height: 1.125rem;
+	border: 2px solid var(--c-border);
+	border-radius: calc(var(--radius) / 2);
+	background: var(--c-bg-secondary);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	transition:
+		border-color var(--motion-fast) var(--easing),
+		background-color var(--motion-fast) var(--easing);
+
+	&::after {
+		content: '';
+		width: 0.35rem;
+		height: 0.6rem;
+		border-right: 2px solid transparent;
+		border-bottom: 2px solid transparent;
+		transform: rotate(45deg) scale(0);
+		margin-top: -2px;
+		transition: transform var(--motion-fast) var(--easing), border-color var(--motion-fast) var(--easing);
+	}
+
+	&--radio {
+		border-radius: var(--radius-pill);
+
+		&::after {
+			width: 0.45rem;
+			height: 0.45rem;
+			border: 0;
+			border-radius: var(--radius-pill);
+			background: transparent;
+			margin-top: 0;
+		}
+	}
+}
+
+.winput__native:checked + .winput__choice-mark {
+	border-color: var(--c-primary);
+	background: var(--c-primary);
+
+	&::after {
+		border-right-color: var(--c-on-primary);
+		border-bottom-color: var(--c-on-primary);
+		transform: rotate(45deg) scale(1);
+	}
+
+	&.winput__choice-mark--radio::after {
+		background: var(--c-on-primary);
+		transform: scale(1);
+	}
+}
+
+.winput__native:focus-visible + .winput__choice-mark {
+	box-shadow: var(--focus-ring);
+}
+
+.winput__native.error + .winput__choice-mark {
+	border-color: var(--c-secondary);
+}
+
+.winput__choice-text {
+	font-size: 0.875rem;
+	color: var(--c-text-primary);
+	line-height: 1.4;
 }

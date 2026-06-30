@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
+﻿import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { provideNgxCore } from 'ngx-core';
 import { provideNgxTinymce } from 'ngx-tinymce';
@@ -29,7 +29,7 @@ export const appConfig: ApplicationConfig = {
 			defaultLanguage: 'en',
 			languages: [
 				{ code: 'en', name: 'English', nativeName: 'English' },
-				{ code: 'ua', name: 'Ukrainian', nativeName: 'Українська' },
+				{ code: 'ua', name: 'Ukrainian', nativeName: 'Ð£ÐºÑ€Ð°Ñ—Ð½ÑÑŒÐºÐ°' },
 			],
 			folder: '/i18n/',
 		}),
@@ -41,9 +41,9 @@ export const appConfig: ApplicationConfig = {
 					titleSuffix: ' | Web Art Work',
 					description:
 						'Angular TinyMCE package from Web Art Work with standalone providers, lazy script loading, form integration, and SSR-safe runtime guards.',
-					image: 'https://wawjs.wiki/logo.png',
+					image: 'https://wawjs.dev/logo.png',
 					links: {
-						canonical: 'https://wawjs.wiki/',
+						canonical: 'https://wawjs.dev/',
 					},
 				},
 				useTitleSuffix: true,

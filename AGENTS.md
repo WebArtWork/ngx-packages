@@ -1,4 +1,4 @@
-# Repository Guide
+﻿# Repository Guide
 
 This is a multi-project Angular workspace for the `@wawjs/ngx-*` package family. Treat it as a monorepo of publishable Angular libraries plus website/demo applications for those libraries.
 
@@ -9,7 +9,7 @@ Projects under `projects/` fall into two groups:
 - `ngx-*` projects without the `-app` suffix are publishable node module packages.
 - `ngx-*-app` projects are websites, demos, and documentation apps for the matching package.
 - `ngx-app` is a combined workspace app that can compose multiple packages.
-- `wawjs.wiki` is a site project, not a publishable package.
+- `wawjs.dev` is a site project, not a publishable package.
 
 Current library packages:
 

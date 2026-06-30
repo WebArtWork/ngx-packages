@@ -7,6 +7,17 @@ import {
 	ThemeConfig,
 	ThemeStorageKeys,
 } from './theme.interface';
+import {
+	DEFAULT_COMFORTABLE_TOKENS,
+	DEFAULT_COMPACT_TOKENS,
+	DEFAULT_DARK_TOKENS,
+	DEFAULT_LIGHT_TOKENS,
+	DEFAULT_ROUNDED_TOKENS,
+	DEFAULT_SQUARE_TOKENS,
+	DEFAULT_STATIC_TOKENS,
+	TOKEN_VAR_MAP,
+	ThemeTokens,
+} from './theme.tokens';
 import { ThemeDensity, ThemeMode, ThemeRadius } from './theme.type';
 
 @Service()
@@ -28,6 +39,7 @@ export class ThemeService {
 			}
 		}
 		this.mode.set(mode);
+		this._applyCurrentTokens();
 	}
 
 	density = signal<ThemeDensity | undefined>(undefined);
@@ -41,6 +53,7 @@ export class ThemeService {
 			}
 		}
 		this.density.set(density);
+		this._applyCurrentTokens();
 	}
 
 	radius = signal<ThemeRadius | undefined>(undefined);
@@ -54,6 +67,7 @@ export class ThemeService {
 			}
 		}
 		this.radius.set(radius);
+		this._applyCurrentTokens();
 	}
 
 	themeIndex = signal<number>(0);
@@ -114,6 +128,54 @@ export class ThemeService {
 			this._doc.documentElement.dataset['mode'] = mode;
 			this._doc.documentElement.dataset['density'] = density;
 			this._doc.documentElement.dataset['radius'] = radius;
+		}
+
+		this._applyCurrentTokens();
+	}
+
+	/**
+	 * Merges default tokens with any config overrides and writes them to
+	 * document.documentElement as inline CSS custom properties.
+	 * Inline style on :root is overridable per-element via normal CSS:
+	 *   .my-section { --c-primary: hotpink; }
+	 */
+	private _applyCurrentTokens(): void {
+		if (!this._isBrowser) return;
+
+		const mode = this.mode();
+		const density = this.density();
+		const radius = this.radius();
+
+		const merged: ThemeTokens = {
+			// 1. static (font, motion) — never change
+			...DEFAULT_STATIC_TOKENS,
+			// 2. mode color defaults
+			...(mode === 'light' ? DEFAULT_LIGHT_TOKENS : DEFAULT_DARK_TOKENS),
+			// 3. density spacing defaults
+			...(density === 'compact' ? DEFAULT_COMPACT_TOKENS : DEFAULT_COMFORTABLE_TOKENS),
+			// 4. radius defaults
+			...(radius === 'square' ? DEFAULT_SQUARE_TOKENS : DEFAULT_ROUNDED_TOKENS),
+			// 5. global config overrides (highest base priority)
+			...(this._config.tokens ?? {}),
+			// 6. mode-specific config overrides
+			...(mode === 'light' ? (this._config.lightTokens ?? {}) : (this._config.darkTokens ?? {})),
+			// 7. density-specific config overrides
+			...(density === 'compact'
+				? (this._config.compactTokens ?? {})
+				: (this._config.comfortableTokens ?? {})),
+			// 8. radius-specific config overrides
+			...(radius === 'square'
+				? (this._config.squareTokens ?? {})
+				: (this._config.roundedTokens ?? {})),
+		};
+
+		const root = this._doc.documentElement;
+		for (const key of Object.keys(merged) as Array<keyof ThemeTokens>) {
+			const cssVar = TOKEN_VAR_MAP[key];
+			const value = merged[key];
+			if (cssVar && value !== undefined) {
+				root.style.setProperty(cssVar, value);
+			}
 		}
 	}
 

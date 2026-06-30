@@ -1,7 +1,7 @@
 <div class="alert-lib-wrapper">
 	@for (pos of positions; track pos.id) {
 	<div
-		[class]="[...baseClasses, pos.class]"
+		[class]="'alert-lib-wrapper__slot ' + pos.class"
 		[id]="pos.id"
 	></div>
 	}

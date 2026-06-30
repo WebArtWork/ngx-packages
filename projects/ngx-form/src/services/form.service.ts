@@ -13,8 +13,6 @@ import { CrudConfig, CrudService } from '@wawjs/ngx-crud';
 import { NGX_FORM_CONFIG, NgxFormModal } from '../config.interface';
 import { FormComponentInterface } from '../interfaces/component.interface';
 import { Form, FormInterface } from '../interfaces/form.interface';
-import { ModalFormComponent } from '../modals/modal-form/modal-form.component';
-import { ModalUniqueComponent } from '../modals/modal-unique/modal-unique.component';
 
 export interface FormModalButton {
 	click: (submition: unknown, close: () => void) => void;
@@ -202,10 +200,18 @@ export class FormService extends CrudService<Form> {
 			this.form(schema, submition as Record<string, unknown>),
 		);
 
+		const modalFormComponent = this._ngxFormConfig.modalFormComponent;
+
+		if (!modalFormComponent) {
+			throw new Error(
+				'NgxForm modal helpers require a modalFormComponent. Provide it via provideNgxForm({ modalFormComponent }) or in NGX_FORM_CONFIG.',
+			);
+		}
+
 		return new Promise((resolve) => {
 			this._showModal({
 				...modalOptions,
-				component: ModalFormComponent,
+				component: modalFormComponent,
 				class: 'forms_modalService',
 				size: 'big',
 				form,
@@ -224,13 +230,21 @@ export class FormService extends CrudService<Form> {
 		docs: T[],
 		title = 'Modify content of documents',
 	): Promise<T[]> {
+		const modalFormComponent = this._ngxFormConfig.modalFormComponent;
+
+		if (!modalFormComponent) {
+			throw new Error(
+				'NgxForm modal helpers require a modalFormComponent. Provide it via provideNgxForm({ modalFormComponent }) or in NGX_FORM_CONFIG.',
+			);
+		}
+
 		return new Promise((resolve) => {
 			const submition = {
 				docs: JSON.stringify(docs.length ? docs : [], null, 4),
 			};
 
 			this._showModal({
-				component: ModalFormComponent,
+				component: modalFormComponent,
 				class: 'forms_modalService',
 				size: 'big',
 				submition,
@@ -280,8 +294,16 @@ export class FormService extends CrudService<Form> {
 
 		this.form(form, doc);
 
+		const modalUniqueComponent = this._ngxFormConfig.modalUniqueComponent;
+
+		if (!modalUniqueComponent) {
+			throw new Error(
+				'NgxForm modal helpers require a modalUniqueComponent. Provide it via provideNgxForm({ modalUniqueComponent }) or in NGX_FORM_CONFIG.',
+			);
+		}
+
 		this._showModal({
-			component: ModalUniqueComponent,
+			component: modalUniqueComponent,
 			form,
 			module,
 			field,

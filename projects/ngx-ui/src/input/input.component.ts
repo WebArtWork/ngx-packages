@@ -2,6 +2,7 @@ import {
 	AfterViewInit,
 	Component,
 	ElementRef,
+	ViewEncapsulation,
 	computed,
 	input,
 	model,
@@ -30,50 +31,8 @@ import { InputType, InputValue } from './input.type';
 		MaterialComponent,
 	],
 	templateUrl: './input.component.html',
-	styles: [
-		`
-			.winput {
-				display: grid;
-				gap: 6px;
-			}
-
-			.winput__label {
-				font-size: 0.85rem;
-				font-weight: 600;
-				color: var(--c-text-primary);
-			}
-
-			.winput__control {
-				display: inline-flex;
-				align-items: center;
-				gap: var(--sp-2);
-				border: 1px solid var(--c-border);
-				border-radius: var(--radius);
-				background: var(--c-bg-secondary);
-				padding: 10px 12px;
-				box-shadow: var(--shadow-sm);
-			}
-
-			.winput__control:focus-within {
-				box-shadow: var(--focus-ring);
-			}
-
-			.winput__field {
-				flex: 1 1 auto;
-				min-width: 0;
-				border: 0;
-				outline: 0;
-				background: transparent;
-				color: var(--c-text-primary);
-				font: inherit;
-			}
-
-			.winput__error {
-				font-size: 0.8rem;
-				color: var(--c-secondary);
-			}
-		`,
-	],
+	styleUrl: './input.component.scss',
+	encapsulation: ViewEncapsulation.None,
 })
 export class InputComponent implements AfterViewInit {
 	/* ---------------- Signal forms ---------------- */

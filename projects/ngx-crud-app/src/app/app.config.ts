@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
+﻿import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { provideNgxCore } from 'ngx-core';
 import { provideNgxCrud } from 'ngx-crud';
@@ -20,7 +20,7 @@ export const appConfig: ApplicationConfig = {
 			defaultLanguage: 'en',
 			languages: [
 				{ code: 'en', name: 'English', nativeName: 'English' },
-				{ code: 'ua', name: 'Ukrainian', nativeName: 'Українська' },
+				{ code: 'ua', name: 'Ukrainian', nativeName: 'Ð£ÐºÑ€Ð°Ñ—Ð½ÑÑŒÐºÐ°' },
 			],
 			folder: '/i18n/',
 		}),
@@ -32,9 +32,9 @@ export const appConfig: ApplicationConfig = {
 					titleSuffix: ' | Web Art Work',
 					description:
 						'Angular CRUD package from Web Art Work for signal-first collections, optimistic local writes, Mongo-compatible IDs, and offline queue replay.',
-					image: 'https://wawjs.wiki/logo.png',
+					image: 'https://wawjs.dev/logo.png',
 					links: {
-						canonical: 'https://wawjs.wiki/ngx-crud',
+						canonical: 'https://wawjs.dev/ngx-crud',
 					},
 				},
 				useTitleSuffix: true,

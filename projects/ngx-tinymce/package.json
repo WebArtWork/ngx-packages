@@ -1,6 +1,6 @@
 {
 	"name": "@wawjs/ngx-tinymce",
-	"version": "22.0.1",
+	"version": "22.0.2",
 	"description": "Angular TinyMCE editor integration package from Web Art Work.",
 	"license": "MIT",
 	"repository": "WebArtWork/ngx-tinymce",

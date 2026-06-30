@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
+﻿import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { provideNgxCore } from '@wawjs/ngx-core';
 import { provideNgxHttp } from '@wawjs/ngx-http';
@@ -33,9 +33,9 @@ export const appConfig: ApplicationConfig = {
 					titleSuffix: ' | Web Art Work',
 					description:
 						'Angular map package from Web Art Work for Google Maps display, markers, address search, and Photon geocoding.',
-					image: 'https://wawjs.wiki/logo.png',
+					image: 'https://wawjs.dev/logo.png',
 					links: {
-						canonical: 'https://wawjs.wiki/ngx-map',
+						canonical: 'https://wawjs.dev/ngx-map',
 					},
 				},
 				useTitleSuffix: true,

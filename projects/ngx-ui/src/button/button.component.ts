@@ -1,6 +1,7 @@
 import {
 	ChangeDetectorRef,
 	Component,
+	ViewEncapsulation,
 	inject,
 	input,
 	output,
@@ -15,44 +16,8 @@ import { ButtonType } from './button.type';
 @Component({
 	selector: 'wbutton',
 	templateUrl: './button.component.html',
-	styles: [
-		`
-			:host {
-				display: inline-flex;
-				align-items: stretch;
-			}
-
-			.wbutton {
-				cursor: pointer;
-				display: inline-flex;
-				align-items: center;
-				justify-content: center;
-				gap: var(--sp-2);
-				user-select: none;
-				white-space: nowrap;
-				border-radius: var(--radius-btn);
-				font-family: var(--ff-base);
-				letter-spacing: var(--letter-spacing);
-				font-weight: 500;
-				font-size: 0.875rem;
-				line-height: 1;
-				padding: var(--sp-3) var(--sp-6);
-				border: 1px solid transparent;
-			}
-
-			.wbutton:focus-visible {
-				outline: none;
-				box-shadow: var(--focus-ring);
-			}
-
-			.wbutton:disabled,
-			.wbutton[aria-disabled='true'] {
-				opacity: 0.6;
-				cursor: not-allowed;
-				pointer-events: none;
-			}
-		`,
-	],
+	styleUrl: './button.component.scss',
+	encapsulation: ViewEncapsulation.None,
 })
 export class ButtonComponent {
 	private _cdr = inject(ChangeDetectorRef);

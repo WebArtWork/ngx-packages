@@ -1,4 +1,4 @@
-# ngx-packages
+﻿# ngx-packages
 
 A modular ecosystem of Angular-first packages and documentation-driven websites built by Web Art Work.
 
@@ -12,7 +12,7 @@ The ecosystem is designed to:
 - scale across multiple apps
 - support plugin-based architecture
 - be portable to other frameworks (React, Vue)
-- serve as a foundation for wawjs.wiki
+- serve as a foundation for wawjs.dev
 
 ---
 
@@ -20,9 +20,9 @@ The ecosystem is designed to:
 
 ### core platforms
 
-- **wawjs.wiki** → unified documentation (waw + ngx + react + vue)
-- **ngx.webart.work** → main entry for all ngx packages
-- **ngx-default.webart.work** → default Angular starter project
+- **wawjs.dev** â†’ unified documentation (waw + ngx + react + vue)
+- **ngx.webart.work** â†’ main entry for all ngx packages
+- **ngx-default.webart.work** â†’ default Angular starter project
 
 ---
 
@@ -30,20 +30,20 @@ The ecosystem is designed to:
 
 ### base packages
 
-- **ngx-core** → Core, Dom, Emitter, Store, Meta
-- **ngx-ui** → Theme
-- **ngx-translate** → Translate, Language
-- **ngx-http** → Network, Http
-- **ngx-socket** → Socket
-- **ngx-crud** → Crud
-- **ngx-rtc** → RTC
-- **ngx-datetime** → Datetime
+- **ngx-core** â†’ Core, Dom, Emitter, Store, Meta
+- **ngx-ui** â†’ Theme
+- **ngx-translate** â†’ Translate, Language
+- **ngx-http** â†’ Network, Http
+- **ngx-socket** â†’ Socket
+- **ngx-crud** â†’ Crud
+- **ngx-rtc** â†’ RTC
+- **ngx-datetime** â†’ Datetime
 
 ### editor & tools
 
-- **ngx-ace** → Code editor integration
-- **ngx-fabric** → Canvas / graphics
-- **ngx-tinymce** → Rich text editor
+- **ngx-ace** â†’ Code editor integration
+- **ngx-fabric** â†’ Canvas / graphics
+- **ngx-tinymce** â†’ Rich text editor
 
 ---
 
@@ -67,11 +67,11 @@ Each package has its own live documentation:
 
 ## philosophy
 
-- **modular first** → each feature is a package
-- **docs-first development** → every package has a live site
-- **framework-agnostic future** → Angular → React → Vue
-- **plugin architecture** → small, composable pieces
-- **monorepo-friendly** → optimized for NX / large scale apps
+- **modular first** â†’ each feature is a package
+- **docs-first development** â†’ every package has a live site
+- **framework-agnostic future** â†’ Angular â†’ React â†’ Vue
+- **plugin architecture** â†’ small, composable pieces
+- **monorepo-friendly** â†’ optimized for NX / large scale apps
 
 ---
 
@@ -85,7 +85,7 @@ Each package has its own live documentation:
 - translation setup
 - scalable architecture
 
-👉 [https://ngx-default.webart.work](https://ngx-default.webart.work)
+ðŸ‘‰ [https://ngx-default.webart.work](https://ngx-default.webart.work)
 
 ---
 
@@ -103,7 +103,7 @@ Each package has its own live documentation:
 - serve as a base for production apps
 - provide reusable architecture patterns
 - standardize frontend development across projects
-- enable fast MVP → scalable product transition
+- enable fast MVP â†’ scalable product transition
 
 ---
 

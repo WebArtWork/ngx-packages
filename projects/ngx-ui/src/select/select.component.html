@@ -4,18 +4,18 @@
 
 <div
 	(clickOutside)="toggleOptions(false)"
-	class="wselect w-full"
+	class="wselect"
 	(keydown)="onKeydown($event)"
 >
 	@if (_label) {
 	<div
-		class="wselect__label mb-[var(--sp-2)] text-[14px] font-medium text-[var(--c-text-primary)]"
+		class="wselect__label"
 		[translate]="_label"
 	></div>
 	}
 
 	<div
-		class="wselect__body relative flex items-center w-full min-h-[48px] h-[48px] border border-[var(--c-border)] rounded-[var(--b-radius)] bg-transparent transition px-[var(--sp-3)] gap-[var(--sp-2)]"
+		class="wselect__body"
 		[class._active]="_show"
 		role="combobox"
 		[attr.aria-expanded]="_show ? 'true' : 'false'"
@@ -23,52 +23,44 @@
 	>
 		<!-- header (click target) -->
 		<div
-			class="wselect__header flex items-center w-full min-w-0 gap-[var(--sp-2)]"
+			class="wselect__header"
 			[class._disabled]="isDisabled()"
 			(click)="toggleOptions()"
 		>
-			<span
-				class="material-icons text-[20px] text-[var(--c-text-muted)] select-none"
-			>
-				unfold_more
-			</span>
+			<span class="wselect__icon-expand material-icons">unfold_more</span>
 
-			<ng-container
-				[ngTemplateOutlet]="viewTpl() || defaultView"
-			></ng-container>
+			<ng-container [ngTemplateOutlet]="viewTpl() || defaultView"></ng-container>
 
 			<ng-template #defaultView>
-				<div class="wselect__text flex-1 min-w-0">
+				<div class="wselect__text">
 					@if (_isMulti) {
-					<div
-						class="text-overflow truncate text-[var(--c-text-primary)]"
-					>
+					<div class="wselect__value">
 						@if (!_ids.length) {
-						<span class="opacity-70" [translate]="_ph"></span>
-						} @for (sid of _ids; track sid; let i = $index) { @if
-						(allItem[sid]) {
-						<span class="inline-flex items-center align-middle">
-							@if (i) { <span>,&nbsp;</span> }
-							<span class="inline-flex items-center gap-1">
-								<span [translate]="allItem[sid]"></span>
-								<button
-									type="button"
-									class="material-icons text-[18px] leading-none inline-flex items-center justify-center rounded-full p-1 hover:bg-black/5"
-									(click)="removeItem(i); $event.stopPropagation()"
-									aria-label="Remove"
-								>
-									close
-								</button>
+						<span class="wselect__placeholder" [translate]="_ph"></span>
+						}
+						@for (sid of _ids; track sid; let i = $index) {
+							@if (allItem[sid]) {
+							<span class="wselect__chip">
+								@if (i) { <span>,&nbsp;</span> }
+								<span class="wselect__chip-inner">
+									<span [translate]="allItem[sid]"></span>
+									<button
+										type="button"
+										class="wselect__chip-remove material-icons"
+										(click)="removeItem(i); $event.stopPropagation()"
+										aria-label="Remove"
+									>close</button>
+								</span>
 							</span>
-						</span>
-						} }
+							}
+						}
 					</div>
 					} @else {
-					<div
-						class="text-overflow truncate text-[var(--c-text-primary)]"
-					>
-						@if (_id) { <span [translate]="allItem[_id]"></span> } @else {
-						<span class="opacity-70" [translate]="_ph"></span>
+					<div class="wselect__value">
+						@if (_id) {
+						<span [translate]="allItem[_id]"></span>
+						} @else {
+						<span class="wselect__placeholder" [translate]="_ph"></span>
 						}
 					</div>
 					}
@@ -80,66 +72,53 @@
 		@if (clearable() && (_isMulti ? _ids.length : _id)) {
 		<button
 			type="button"
-			class="wselect__icon-btn material-icons inline-flex items-center justify-center w-8 h-8 rounded-full text-[20px] text-[var(--c-text-muted)] hover:bg-black/5"
+			class="wselect__icon-btn material-icons"
 			(click)="clear(); $event.stopPropagation()"
 			aria-label="Clear"
-		>
-			close
-		</button>
+		>close</button>
 		}
 
 		<!-- dropdown caret -->
 		<button
 			type="button"
-			class="wselect__icon-btn material-icons inline-flex items-center justify-center w-8 h-8 rounded-full text-[20px] text-[var(--c-text-muted)] transition hover:bg-black/5"
+			class="wselect__icon-btn material-icons"
 			[class._disabled]="isDisabled()"
-			(click)="toggleOptions(); $event.stopPropagation()"
 			[class._active]="_show"
+			(click)="toggleOptions(); $event.stopPropagation()"
 			aria-label="Toggle options"
-		>
-			expand_more
-		</button>
+		>expand_more</button>
 
 		<!-- extra buttons -->
-		@for (button of buttons() || []; track button.icon || button.text) { @if
-		(button.icon) {
-		<button
-			type="button"
-			class="wselect__icon-btn material-icons inline-flex items-center justify-center w-8 h-8 rounded-full text-[20px] text-[var(--c-text-muted)] hover:bg-black/5"
-			(click)="button.click(); $event.stopPropagation()"
-			[class._disabled-btn]="button.disabled"
-			aria-label="Action"
-		>
-			{{ button.icon }}
-		</button>
-		} @else if (button.text) {
-		<button
-			type="button"
-			class="text-[14px] font-medium text-[var(--c-text-secondary)] px-2 py-1 rounded-md hover:bg-black/5"
-			(click)="button.click(); $event.stopPropagation()"
-			[class._disabled-btn]="button.disabled"
-		>
-			{{ button.text }}
-		</button>
-		} }
+		@for (button of buttons() || []; track button.icon || button.text) {
+			@if (button.icon) {
+			<button
+				type="button"
+				class="wselect__icon-btn material-icons"
+				(click)="button.click(); $event.stopPropagation()"
+				[class._disabled-btn]="button.disabled"
+				aria-label="Action"
+			>{{ button.icon }}</button>
+			} @else if (button.text) {
+			<button
+				type="button"
+				class="wselect__icon-text"
+				(click)="button.click(); $event.stopPropagation()"
+				[class._disabled-btn]="button.disabled"
+			>{{ button.text }}</button>
+			}
+		}
 
-		<!-- dropdown -->
+		<!-- dropdown popup -->
 		@if (_show) {
 		<div
-			class="wselect__popup absolute left-0 top-[calc(100%+var(--sp-2))] z-10 w-full bg-[var(--c-bg-secondary)] border border-[var(--c-border)] rounded-[var(--b-radius-card)] shadow-[0_0_4px_var(--c-border)] overflow-hidden"
-			[class._search]="_searchable"
+			class="wselect__popup"
 			(click)="$event.stopPropagation()"
 			role="listbox"
 			[attr.aria-multiselectable]="_isMulti ? 'true' : null"
 		>
 			@if (_searchable) {
-			<div
-				class="wselect__search p-[var(--sp-3)] border-b border-[var(--c-border)]"
-			>
-				<ng-container
-					[ngTemplateOutlet]="searchTpl() || defaultSearch"
-				></ng-container>
-
+			<div class="wselect__search">
+				<ng-container [ngTemplateOutlet]="searchTpl() || defaultSearch"></ng-container>
 				<ng-template #defaultSearch>
 					<winput
 						[placeholder]="'Enter search text...'"
@@ -150,34 +129,27 @@
 			</div>
 			}
 
-			<div
-				#popupListEl
-				class="popup-block max-h-[220px] overflow-y-auto p-[var(--sp-2)]"
-			>
+			<div #popupListEl class="wselect__list">
 				@for (item of _all; track item().id; let i = $index) {
 				<ng-container
 					[ngTemplateOutlet]="itemTpl() || defaultItem"
 					[ngTemplateOutletContext]="{ item: item, index: i }"
 				/>
-				} @if (!_all?.length) {
-				<div
-					class="popup-block__empty-search py-[var(--sp-3)] text-center text-[var(--c-text-primary)] opacity-80"
-					translate
-				>
-					Nothing was found
-				</div>
+				}
+				@if (!_all?.length) {
+				<div class="wselect__empty" translate>Nothing was found</div>
 				}
 			</div>
 
-			<!-- default item -->
+			<!-- default item template -->
 			<ng-template #defaultItem let-item="item" let-index="index">
-				@let id = item().id; @let isSelected = _isMulti ?
-				_ids.includes(id) : (_id === id); @let isActive = activeIndex()
-				=== index;
+				@let id = item().id;
+				@let isSelected = _isMulti ? _ids.includes(id) : (_id === id);
+				@let isActive = activeIndex() === index;
 
 				<button
 					type="button"
-					class="wselect__item w-full text-left flex items-center gap-[var(--sp-2)] px-[var(--sp-3)] py-[var(--sp-2)] rounded-[10px] transition hover:bg-black/5"
+					class="wselect__item"
 					[class._selected]="isSelected"
 					[class._active]="isActive"
 					(click)="selectOption(item())"
@@ -185,16 +157,9 @@
 					[attr.aria-selected]="isSelected ? 'true' : 'false'"
 					[attr.data-index]="index"
 				>
-					<span
-						class="material-icons text-[18px] leading-none select-none text-[var(--c-text-muted)]"
-					>
-						{{ isSelected ? 'check' : '' }}
-					</span>
-
-					<div class="min-w-0 flex-1">
-						<div
-							class="truncate text-[14px] text-[var(--c-text-primary)]"
-						>
+					<span class="wselect__item-icon material-icons">{{ isSelected ? 'check' : '' }}</span>
+					<div class="wselect__item-label">
+						<div class="wselect__item-text">
 							@if (item()[bindLabel()]) {
 							<span [translate]="item()[bindLabel()]"></span>
 							} @else {

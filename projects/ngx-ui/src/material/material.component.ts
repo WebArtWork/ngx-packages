@@ -1,5 +1,6 @@
 import {
 	Component,
+	ViewEncapsulation,
 	computed,
 	input,
 	output,
@@ -12,49 +13,8 @@ import { TranslateDirective } from '@wawjs/ngx-translate';
 	imports: [TranslateDirective, RouterLinkActive, RouterLink],
 	selector: 'material-icon',
 	templateUrl: './material.component.html',
-	styles: [
-		`
-			.mi {
-				position: relative;
-				display: inline-flex;
-				align-items: center;
-				justify-content: center;
-				gap: var(--sp-2);
-				cursor: pointer;
-				white-space: nowrap;
-				text-decoration: none;
-				color: var(--c-text-secondary);
-			}
-
-			.mi__iconWrap,
-			.mi__icon {
-				position: relative;
-				display: inline-flex;
-				align-items: center;
-				justify-content: center;
-				line-height: 1;
-			}
-
-			.mi__icon {
-				font-size: 22px;
-			}
-
-			.mi__badge {
-				position: absolute;
-				top: -6px;
-				right: -8px;
-				min-width: 18px;
-				height: 18px;
-				padding: 0 6px;
-				border-radius: 999px;
-				background: var(--c-danger, #ef4444);
-				color: var(--c-on-danger, #fff);
-				font-size: 0.72rem;
-				line-height: 18px;
-				text-align: center;
-			}
-		`,
-	],
+	styleUrl: './material.component.scss',
+	encapsulation: ViewEncapsulation.None,
 })
 export class MaterialComponent {
 	routerLinkActiveOptions = input({ exact: false });

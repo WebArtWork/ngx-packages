@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
+﻿import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { provideNgxCore } from 'ngx-core';
 import { provideNgxFabric } from 'ngx-fabric';
@@ -37,9 +37,9 @@ export const appConfig: ApplicationConfig = {
 					titleSuffix: ' | Web Art Work',
 					description:
 						'Angular Fabric.js package from Web Art Work with focused canvas bindings, standalone providers, theme modes, and translations.',
-					image: 'https://wawjs.wiki/logo.png',
+					image: 'https://wawjs.dev/logo.png',
 					links: {
-						canonical: 'https://wawjs.wiki/',
+						canonical: 'https://wawjs.dev/',
 					},
 				},
 				useTitleSuffix: true,

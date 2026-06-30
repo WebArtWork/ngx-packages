@@ -1,64 +1,43 @@
 @if (text) {
 <div
-	[class]="[
-		'max-w-full',
-		'opacity-100',
-		'transition-all',
-		'duration-300',
-		'ease-in-out',
-		class || ''
-	]"
-	[class.opacity-0]="delete_animation"
+	class="walert-wrap"
+	[class.walert-wrap--removing]="delete_animation"
 >
 	<div
 		#alertRef
-		class="relative pointer-events-auto select-none text-sm min-h-10 max-w-full px-4 py-2 border shadow-sm animate-alert-bounce-in-up"
-		[class]="
-			'rounded-lg ' +
-			(type === 'info' ? 'bg-sky-200/90 border-sky-200/90 text-slate-800' : '') +
-			(type === 'success' ? 'bg-emerald-200/90 border-emerald-200/90 text-slate-800' : '') +
-			(type === 'warning' ? 'bg-amber-200/90 border-amber-200/90 text-slate-800' : '') +
-			(type === 'error' ? 'bg-rose-200/90 border-rose-200/90 text-slate-800' : '') +
-			(type === 'question' ? 'bg-yellow-200/90 border-yellow-200/90 text-slate-800' : '')
-		"
+		class="walert"
+		[class.walert--info]="type === 'info'"
+		[class.walert--success]="type === 'success'"
+		[class.walert--warning]="type === 'warning'"
+		[class.walert--error]="type === 'error'"
+		[class.walert--question]="type === 'question'"
 	>
 		@if (progress) {
-		<div class="absolute left-0 bottom-0 w-full">
+		<div class="walert__progress">
 			<span
-				class="block h-[2px] w-full rounded-full animate-alert-progress"
-				[class]="
-					(type === 'info' ? 'bg-sky-300' : '') +
-					(type === 'success' ? ' bg-emerald-300' : '') +
-					(type === 'warning' ? ' bg-amber-300' : '') +
-					(type === 'error' ? ' bg-rose-300' : '') +
-					(type === 'question' ? ' bg-yellow-300' : '')
-				"
+				class="walert__progress-bar"
 				[style.animation-duration.s]="(timeout + 350) / 1000"
 			></span>
 		</div>
 		}
 
-		<div class="flex items-center gap-3 w-full">
-			<div class="flex-1 min-w-0 flex items-center justify-between gap-3">
-				<div class="flex items-center gap-2 min-w-0">
+		<div class="walert__body">
+			<div class="walert__content">
+				<div class="walert__message">
 					@if (icon) {
-					<div [class]="icon" aria-hidden="true"></div>
+					<span class="material-icons" aria-hidden="true">{{ icon }}</span>
 					}
-					<div
-						class="min-w-0 break-words text-[14px] leading-4 animate-alert-slide-in"
-					>
-						{{ text }}
-					</div>
+					<span class="walert__text">{{ text }}</span>
 				</div>
 
-				@if (type === "question") {
-				<div class="flex items-center gap-2 flex-none">
+				@if (type === 'question') {
+				<div class="walert__actions">
 					@for (button of buttons; track button.text) {
 					<button
 						wbutton
-						type="button"
+						[disableSubmit]="true"
+						class="walert__btn"
 						(wClick)="remove(button.callback)"
-						class="!h-8 !px-3 !text-xs"
 					>
 						{{ button.text }}
 					</button>
@@ -70,8 +49,8 @@
 			@if (closable) {
 			<button
 				wbutton
-				type="button"
-				class="material-icons flex-none !h-7 !w-7 !rounded-full !p-0 opacity-60 hover:opacity-100"
+				[disableSubmit]="true"
+				class="walert__close material-icons"
 				(wClick)="remove()"
 				aria-label="Close alert"
 			>

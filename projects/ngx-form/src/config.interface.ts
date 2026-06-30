@@ -16,6 +16,8 @@ export interface NgxFormModalService {
 export interface NgxFormConfig {
 	appId?: string;
 	modalService?: NgxFormModalService;
+	modalFormComponent?: Type<unknown>;
+	modalUniqueComponent?: Type<unknown>;
 }
 
 export const DEFAULT_NGX_FORM_CONFIG: NgxFormConfig = {};

@@ -3,8 +3,10 @@ import {
 	Component,
 	ElementRef,
 	OnDestroy,
+	ViewEncapsulation,
 	viewChild,
 } from '@angular/core';
+import { ButtonDirective } from '../../../button/button.directive';
 import {
 	AlertButton,
 	AlertPosition,
@@ -14,45 +16,9 @@ import {
 @Component({
 	selector: 'alert',
 	templateUrl: './alert.component.html',
-	styles: [
-		`
-			@keyframes alert-bounce-in-up {
-				0% {
-					opacity: 0;
-					transform: translateY(200px);
-				}
-				50% {
-					opacity: 1;
-					transform: translateY(-10px);
-				}
-				70% {
-					transform: translateY(5px);
-				}
-				to {
-					transform: translateY(0);
-				}
-			}
-
-			@keyframes alert-progress {
-				from {
-					width: 100%;
-				}
-				to {
-					width: 0%;
-				}
-			}
-
-			.animate-alert-bounce-in-up {
-				animation: alert-bounce-in-up 0.7s ease-in-out both;
-			}
-
-			.animate-alert-progress {
-				animation-name: alert-progress;
-				animation-timing-function: linear;
-				animation-fill-mode: both;
-			}
-		`,
-	],
+	styleUrl: './alert.component.scss',
+	encapsulation: ViewEncapsulation.None,
+	imports: [ButtonDirective],
 })
 /**
  * Displays an individual alert message with optional icon, actions and

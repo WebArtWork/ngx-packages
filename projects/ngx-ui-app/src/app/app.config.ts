@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
+﻿import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { provideNgxCore } from 'ngx-core';
 import { provideTranslate } from 'ngx-translate';
@@ -19,7 +19,7 @@ export const appConfig: ApplicationConfig = {
 			defaultLanguage: 'en',
 			languages: [
 				{ code: 'en', name: 'English', nativeName: 'English' },
-				{ code: 'ua', name: 'Ukrainian', nativeName: 'Українська' },
+				{ code: 'ua', name: 'Ukrainian', nativeName: 'Ð£ÐºÑ€Ð°Ñ—Ð½ÑÑŒÐºÐ°' },
 			],
 			folder: '/i18n/',
 		}),
@@ -31,9 +31,9 @@ export const appConfig: ApplicationConfig = {
 					titleSuffix: ' | Web Art Work',
 					description:
 						'Angular theming package from Web Art Work for SSR-safe mode, density, and radius state.',
-					image: 'https://wawjs.wiki/logo.png',
+					image: 'https://wawjs.dev/logo.png',
 					links: {
-						canonical: 'https://wawjs.wiki/',
+						canonical: 'https://wawjs.dev/',
 					},
 				},
 				useTitleSuffix: true,
