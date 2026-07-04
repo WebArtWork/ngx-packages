@@ -198,20 +198,20 @@ export class FormComponent {
 		return this.config()?.class ?? '';
 	}
 
-	onSubmit(): void {
+	get values(): Record<string, unknown> {
 		const inst = this.instance();
-		const values = inst ? inst.model() : {};
 
-		this.wSubmit.emit(values);
+		return inst ? inst.model() : {};
+	}
+
+	onSubmit(): void {
+		this.wSubmit.emit(this.values);
 	}
 
 	onLegacyChange(): void {
-		const inst = this.instance();
-		const values = inst ? inst.model() : {};
-
 		this._coreService.afterWhile(
 			this,
-			() => this.wChange.emit(values),
+			() => this.wChange.emit(this.values),
 			150,
 		);
 	}

@@ -5,13 +5,14 @@ import {
 	ViewEncapsulation,
 } from '@angular/core';
 import { ButtonDirective } from '../button/button.directive';
+import { PlusIconComponent } from '../icons/plus/plus-icon.component';
 
 @Component({
 	selector: 'lib-modal',
 	templateUrl: './modal.component.html',
 	styleUrl: './modal.component.scss',
 	encapsulation: ViewEncapsulation.None,
-	imports: [ButtonDirective],
+	imports: [ButtonDirective, PlusIconComponent],
 })
 export class ModalComponent implements OnInit, OnDestroy {
 	closable = true;

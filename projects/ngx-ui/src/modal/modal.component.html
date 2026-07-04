@@ -14,11 +14,16 @@
 		<button
 			wbutton
 			[disableSubmit]="true"
-			class="wawjs-modal__close material-icons"
+			class="wawjs-modal__close"
 			(wClick)="close()"
 			aria-label="Close"
 		>
-			close
+			<plus-icon
+				class="wawjs-modal__close-icon"
+				[size]="20"
+				[rotate]="45"
+				[strokeWidth]="2.5"
+			/>
 		</button>
 		}
 	</div>

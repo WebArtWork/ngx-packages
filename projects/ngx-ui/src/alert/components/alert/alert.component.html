@@ -50,11 +50,16 @@
 			<button
 				wbutton
 				[disableSubmit]="true"
-				class="walert__close material-icons"
+				class="walert__close"
 				(wClick)="remove()"
 				aria-label="Close alert"
 			>
-				close
+				<plus-icon
+					class="walert__close-icon"
+					[size]="18"
+					[rotate]="45"
+					[strokeWidth]="2.5"
+				/>
 			</button>
 			}
 		</div>

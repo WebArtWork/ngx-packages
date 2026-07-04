@@ -7,6 +7,7 @@ import {
 	viewChild,
 } from '@angular/core';
 import { ButtonDirective } from '../../../button/button.directive';
+import { PlusIconComponent } from '../../../icons/plus/plus-icon.component';
 import {
 	AlertButton,
 	AlertPosition,
@@ -18,7 +19,7 @@ import {
 	templateUrl: './alert.component.html',
 	styleUrl: './alert.component.scss',
 	encapsulation: ViewEncapsulation.None,
-	imports: [ButtonDirective],
+	imports: [ButtonDirective, PlusIconComponent],
 })
 /**
  * Displays an individual alert message with optional icon, actions and

@@ -45,6 +45,18 @@
 	}
 }
 
+.wbutton.material-icons {
+	font-family: 'Material Icons';
+	font-weight: normal;
+	font-style: normal;
+	font-size: 1.25rem;
+	line-height: 1;
+	letter-spacing: normal;
+	text-transform: none;
+	font-feature-settings: 'liga';
+	-webkit-font-feature-settings: 'liga';
+}
+
 /* ===== Modifiers (token-driven) ===== */
 
 .wbutton--primary {

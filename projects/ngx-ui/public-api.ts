@@ -68,6 +68,11 @@ export * from './src/table/table.directive';
 export * from './src/theme-icon/theme.component';
 
 /*
+ * Icons
+ */
+export * from './src/icons/plus/plus-icon.component';
+
+/*
  * Theme
  */
 export * from './src/theme/provide-theme';

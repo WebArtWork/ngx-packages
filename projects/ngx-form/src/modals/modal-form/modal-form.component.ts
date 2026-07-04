@@ -2,6 +2,7 @@ import {
 	Component,
 	inject,
 	signal,
+	viewChild,
 } from '@angular/core';
 import { CoreService } from '@wawjs/ngx-core';
 import { ButtonComponent } from '@wawjs/ngx-ui';
@@ -50,6 +51,8 @@ export class ModalFormComponent {
 	private readonly _coreService = inject(CoreService);
 	private readonly _formService = inject(FormService);
 
+	private readonly _formComponent = viewChild(FormComponent);
+
 	form!: FormInterface;
 	submition!: Record<string, unknown>;
 	modalButtons!: FormModalButton[];
@@ -87,6 +90,7 @@ export class ModalFormComponent {
 			return;
 		}
 
+		this._sync(this._formComponent()?.values);
 		button.click(this.submition, this.close);
 
 		if (this.resetOnSubmit && this.form.formId) {

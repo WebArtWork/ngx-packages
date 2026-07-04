@@ -24,6 +24,8 @@ import { ButtonType } from './button.type';
 })
 export class ButtonDirective {
 	private readonly _elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
+	private readonly _staticClass =
+		this._elementRef.nativeElement.getAttribute('class') ?? '';
 
 	readonly type = input<ButtonType>(buttonDefaults.type);
 	readonly disabled = input<boolean>(buttonDefaults.disabled);
@@ -71,6 +73,7 @@ export class ButtonDirective {
 			WBUTTON_TYPE_CLASSES[this.type()] ?? WBUTTON_TYPE_CLASSES.primary;
 
 		return [
+			this._staticClass,
 			'wbutton',
 			WBUTTON_BASE_CLASSES,
 			typeClass,
