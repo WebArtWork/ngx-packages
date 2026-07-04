@@ -104,7 +104,8 @@ type ImageElement = HTMLImageElement | HTMLCanvasElement;
 		`
 			:host {
 				display: block;
-				min-inline-size: min(100%, 760px);
+				inline-size: min(100%, 980px);
+				margin-inline: auto;
 			}
 
 			.fabric-crop {
@@ -131,26 +132,18 @@ type ImageElement = HTMLImageElement | HTMLCanvasElement;
 			}
 
 			.fabric-crop__stage {
+				display: inline-flex;
+				justify-self: center;
+				max-inline-size: 100%;
 				overflow: hidden;
 				border: 1px solid var(--c-border, #d1d5db);
 				border-radius: var(--radius-card, 8px);
-				background:
-					linear-gradient(45deg, #eef2f7 25%, transparent 25%),
-					linear-gradient(-45deg, #eef2f7 25%, transparent 25%),
-					linear-gradient(45deg, transparent 75%, #eef2f7 75%),
-					linear-gradient(-45deg, transparent 75%, #eef2f7 75%);
-				background-color: #f8fafc;
-				background-position:
-					0 0,
-					0 12px,
-					12px -12px,
-					-12px 0;
-				background-size: 24px 24px;
+				background: var(--c-bg-secondary, #f8fafc);
 			}
 
 			.fabric-crop__stage canvas {
 				display: block;
-				inline-size: 100%;
+				max-inline-size: 100%;
 				block-size: auto;
 			}
 
@@ -240,7 +233,7 @@ export class FabricCropModalComponent implements AfterViewInit, OnDestroy {
 		this._canvas = new Canvas(this._canvasEl.nativeElement, {
 			width: this.width,
 			height: this.height,
-			backgroundColor: 'rgba(248,250,252,0.92)',
+			backgroundColor: 'rgb(248, 250, 252)',
 			preserveObjectStacking: true,
 			selection: false,
 		});
