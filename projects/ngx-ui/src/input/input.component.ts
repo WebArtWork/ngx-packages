@@ -4,6 +4,7 @@ import {
 	ElementRef,
 	ViewEncapsulation,
 	computed,
+	effect,
 	input,
 	model,
 	output,
@@ -13,10 +14,7 @@ import {
 import { FormField, type Field } from '@angular/forms/signals';
 import { TranslateDirective } from '@wawjs/ngx-translate';
 import { MaterialComponent } from '../material/material.component';
-import {
-	ManualDisabledDirective,
-	ManualTypeDirective,
-} from './manual-input.directives';
+import { ManualDisabledDirective, ManualTypeDirective } from './manual-input.directives';
 import { inputDefaults } from './input.const';
 import { InputIconAction } from './input.interface';
 import { InputType, InputValue } from './input.type';
@@ -54,9 +52,7 @@ export class InputComponent implements AfterViewInit {
 	readonly focused = input(inputDefaults.focused);
 	readonly clearable = input(inputDefaults.clearable);
 	readonly wClass = input(inputDefaults.wClass);
-	readonly autocomplete = input<string | null | undefined>(
-		inputDefaults.autocomplete,
-	);
+	readonly autocomplete = input<string | null | undefined>(inputDefaults.autocomplete);
 
 	// Optional external error override
 	readonly error = input<string | null>(inputDefaults.error);
@@ -71,8 +67,7 @@ export class InputComponent implements AfterViewInit {
 	/* ---------------- Internal state ---------------- */
 	showPassword = signal(false);
 
-	private readonly _inputEl =
-		viewChild<ElementRef<HTMLInputElement>>('inputEl');
+	private readonly _inputEl = viewChild<ElementRef<HTMLInputElement>>('inputEl');
 
 	/* ---------------- Derived state ---------------- */
 	readonly fieldState = computed(() => {
@@ -87,24 +82,19 @@ export class InputComponent implements AfterViewInit {
 		const state = this.fieldState();
 		if (!state) return null;
 
-		const touched =
-			typeof state.touched === 'function' ? state.touched() : false;
+		const touched = typeof state.touched === 'function' ? state.touched() : false;
 		const dirty = typeof state.dirty === 'function' ? state.dirty() : false;
-		const invalid =
-			typeof state.invalid === 'function' ? state.invalid() : false;
+		const invalid = typeof state.invalid === 'function' ? state.invalid() : false;
 
 		if (!(invalid && (touched || dirty))) {
 			return null;
 		}
 
-		const rawErrors =
-			typeof state.errors === 'function' ? state.errors() : null;
+		const rawErrors = typeof state.errors === 'function' ? state.errors() : null;
 
 		if (!rawErrors) return null;
 
-		const errorsArray = Array.isArray(rawErrors)
-			? rawErrors
-			: Object.values(rawErrors);
+		const errorsArray = Array.isArray(rawErrors) ? rawErrors : Object.values(rawErrors);
 
 		if (!errorsArray.length) return null;
 
@@ -118,6 +108,17 @@ export class InputComponent implements AfterViewInit {
 
 		return null;
 	});
+
+	constructor() {
+		effect(() => {
+			const state = this.formField()?.();
+			const value = state?.value?.();
+
+			if (state && !this._equal(this.wModel(), value)) {
+				this.wModel.set(value as InputValue | null);
+			}
+		});
+	}
 
 	/* ---------------- Lifecycle ---------------- */
 	ngAfterViewInit() {
@@ -136,9 +137,7 @@ export class InputComponent implements AfterViewInit {
 		if (nativeType === 'checkbox' && target instanceof HTMLInputElement) {
 			if (option != null && this.items().length && !this.formField()) {
 				const current = this.wModel() as InputValue;
-				const list = Array.isArray(current)
-					? [...current]
-					: [];
+				const list = Array.isArray(current) ? [...current] : [];
 				const idx = list.indexOf(option);
 
 				if (target.checked && idx === -1) {
@@ -157,6 +156,8 @@ export class InputComponent implements AfterViewInit {
 			value = target.value;
 		}
 
+		this._setFieldValue(value);
+
 		if (!this.formField()) {
 			this.wModel.set(value);
 		}
@@ -169,6 +170,8 @@ export class InputComponent implements AfterViewInit {
 	}
 
 	onClear() {
+		this._setFieldValue(null);
+
 		if (!this.formField()) {
 			this.wModel.set(null);
 		}
@@ -189,5 +192,29 @@ export class InputComponent implements AfterViewInit {
 	isItemChecked(item: string): boolean {
 		const model = this.wModel();
 		return Array.isArray(model) ? (model as readonly unknown[]).includes(item) : !!model;
+	}
+
+	private _setFieldValue(value: InputValue | null): void {
+		const state = this.formField()?.();
+
+		if (state?.value?.set) {
+			state.value.set(value);
+		}
+	}
+
+	private _equal(a: unknown, b: unknown): boolean {
+		if (a === b) {
+			return true;
+		}
+
+		if (Array.isArray(a) || Array.isArray(b)) {
+			try {
+				return JSON.stringify(a) === JSON.stringify(b);
+			} catch {
+				return false;
+			}
+		}
+
+		return false;
 	}
 }
