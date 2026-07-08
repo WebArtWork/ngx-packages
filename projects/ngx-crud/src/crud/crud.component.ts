@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { CoreService } from '@wawjs/ngx-core';
+import { AlertService } from '@wawjs/ngx-ui';
 import { CrudDocument, CrudOptions, CrudServiceInterface, TableConfig } from './crud.interface';
 
 /**
@@ -57,6 +58,9 @@ export abstract class CrudComponent<
 
 	/** ChangeDetectorRef handles on push strategy */
 	private __cdr = inject(ChangeDetectorRef);
+
+	/** AlertService handles destructive action confirmation. */
+	private __alertService = inject(AlertService);
 
 	/** Injector is used for signal effects created in methods. */
 	private __injector = inject(Injector);
@@ -326,13 +330,28 @@ export abstract class CrudComponent<
 
 	/** Requests confirmation before deleting the provided document. */
 	protected async delete(doc: Document) {
-		this.crudService.delete(doc).subscribe({
-			next: () => {
-				this.refreshDocuments();
-			},
-			error: (error: unknown) => {
-				this.handleCrudError(error);
-			},
+		this.__alertService.question({
+			text: `Are we sure to delete this ${this._module || 'item'} ?`,
+			timeout: 0,
+			progress: false,
+			buttons: [
+				{
+					text: 'Delete',
+					callback: () => {
+						this.crudService.delete(doc).subscribe({
+							next: () => {
+								this.refreshDocuments();
+							},
+							error: (error: unknown) => {
+								this.handleCrudError(error);
+							},
+						});
+					},
+				},
+				{
+					text: 'Cancel',
+				},
+			],
 		});
 	}
 

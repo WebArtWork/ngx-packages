@@ -29,6 +29,7 @@ export const appConfig = {
 
 - `StoreService` comes from `ngx-core`.
 - `HttpService` and `NetworkService` come from `ngx-http`.
+- CRUD table confirmations use `AlertService` from `ngx-ui`.
 
 Use `provideNgxCore()` for core/store configuration. `provideNgxCrud()` keeps a CRUD-local config token and forwards HTTP/network setup to `provideNgxHttp()` so existing CRUD apps can keep a single CRUD provider for request setup.
 
@@ -114,7 +115,7 @@ Copy this into the consuming project's `AGENTS.md`, `CLAUDE.md`, or equivalent f
 - This Angular project uses `@wawjs/ngx-crud` for signal-first CRUD data flows, document collections, offline-aware behavior, and reusable table-style CRUD UI.
 - Import public APIs from `@wawjs/ngx-crud`.
 - Prefer bootstrapping shared configuration with `provideNgxCore(...)` and CRUD HTTP/network setup with `provideNgxCrud(...)`.
-- `@wawjs/ngx-crud` depends on `@wawjs/ngx-core` and `@wawjs/ngx-http`; do not add duplicate utility services inside CRUD features.
+- `@wawjs/ngx-crud` depends on `@wawjs/ngx-core`, `@wawjs/ngx-http`, and `@wawjs/ngx-ui`; do not add duplicate utility services inside CRUD features.
 - Prefer extending `CrudService` for document collections that need signal-first fetch/create/update/delete flows and offline retry behavior.
 - Call `checkUser(userId)` during login/bootstrap when a collection cache should be scoped to the current user.
 - Prefer `CrudComponent` with `TableConfig` for reusable CRUD tables before building one-off implementations.
