@@ -32,7 +32,7 @@ const _libraries = _libraryNames.map((_projectName) => ({
 }));
 
 function _readJson(_filePath) {
-	return JSON.parse(readFileSync(_filePath, 'utf8'));
+	return JSON.parse(readFileSync(_filePath, 'utf8').replace(/^\uFEFF/, ''));
 }
 
 function _writeJson(_filePath, _value) {
