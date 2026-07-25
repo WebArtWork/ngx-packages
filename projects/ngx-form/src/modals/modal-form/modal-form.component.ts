@@ -1,4 +1,5 @@
 import {
+	ApplicationRef,
 	Component,
 	inject,
 	signal,
@@ -50,6 +51,7 @@ import { FormModalButton, FormService } from '../../services/form.service';
 export class ModalFormComponent {
 	private readonly _coreService = inject(CoreService);
 	private readonly _formService = inject(FormService);
+	private readonly _appRef = inject(ApplicationRef);
 
 	private readonly _formComponent = viewChild(FormComponent);
 
@@ -65,12 +67,24 @@ export class ModalFormComponent {
 	resetOnSubmit = false;
 
 	handleSubmit(values?: Record<string, unknown>): void {
+		if (this.submitting()) {
+			return;
+		}
+
 		this.submitting.set(true);
 
 		try {
-			this._sync(values);
-			this.submit(this.submition);
-			this.close();
+			this._appRef.tick();
+			this._sync(this._formComponent()?.values ?? values);
+
+			const primaryButton = this.modalButtons[0];
+
+			if (primaryButton) {
+				primaryButton.click(this.submition, this.close);
+			} else {
+				this.submit(this.submition);
+				this.close();
+			}
 		} finally {
 			this.submitting.set(false);
 
@@ -90,6 +104,7 @@ export class ModalFormComponent {
 			return;
 		}
 
+		this._appRef.tick();
 		this._sync(this._formComponent()?.values);
 		button.click(this.submition, this.close);
 

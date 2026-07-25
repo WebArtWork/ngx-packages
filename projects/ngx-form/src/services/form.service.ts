@@ -359,7 +359,23 @@ export class FormService extends CrudService<Form> {
 
 		this._traverseComponents(form.components, (component) => {
 			if (component.key && !(component.key in model)) {
-				model[component.key] = null;
+				const type = component.props?.['type'];
+				const isTextInput =
+					component.name === 'Input' &&
+					type !== 'checkbox' &&
+					type !== 'radio' &&
+					type !== 'number' &&
+					type !== 'range' &&
+					type !== 'date' &&
+					type !== 'month' &&
+					type !== 'week' &&
+					type !== 'time' &&
+					type !== 'datetime' &&
+					type !== 'datetime-local';
+
+				// Angular signal forms interpret a null text input as numeric,
+				// which rejects ordinary text entered into a fresh field.
+				model[component.key] = isTextInput ? '' : null;
 			}
 		});
 

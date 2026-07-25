@@ -157,6 +157,12 @@ export abstract class CrudComponent<
 						}
 
 						loadEffect?.destroy();
+						this.documents.update(() =>
+							this.crudService
+								.documents()
+								.filter(this.localDocumentsFilter)
+								.map(doc => this.crudService.getSignal(doc)),
+						);
 						resolve();
 						this.__cdr.markForCheck();
 					},
