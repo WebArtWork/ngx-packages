@@ -26,6 +26,9 @@ jobs:
             - name: Rebuild lightningcss
               run: npm rebuild lightningcss
 
+            - name: Build libraries
+              run: npm run build
+
             - name: Build apps
               run: npm run build:apps
 
