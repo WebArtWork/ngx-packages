@@ -234,6 +234,68 @@ toggleTheme() {
 \tconst nextMode = this.themeService.mode() === 'light' ? 'dark' : 'light';
 \tthis.themeService.setMode(nextMode);
 }`,
+		},
+	{
+		slug: 'link-component',
+		name: 'LinkComponent',
+		description:
+			'Display-only contact and action link with semantic, type-specific href generation.',
+		summary:
+			'LinkComponent is the non-editable counterpart to InputComponent. It renders a semantic anchor for contact details and external actions without introducing a hidden input or label wrapper.',
+		highlights: [
+			'Generates mailto:, tel:, sms:, WhatsApp, and normalized HTTPS URLs from a value and type.',
+			'Accepts an explicit href for custom protocols or destinations.',
+			'Adds noopener noreferrer automatically for links opened in a new tab.',
+		],
+		availableItems: ['link.component.ts', 'link.type.ts'],
+		properties: [
+			{
+				name: 'LinkType',
+				signature: "'email' | 'tel' | 'url' | 'sms' | 'whatsapp' | 'custom'",
+				description: 'Selects the generated href scheme when href is not supplied explicitly.',
+				category: 'Types',
+				docType: 'Type',
+				sourceFile: 'link.type.ts',
+			},
+			{
+				name: 'value / type / href',
+				signature: 'input values',
+				description:
+					'value is displayed and used to derive the target; href overrides generated targets.',
+				category: 'Inputs',
+				docType: 'Component',
+				sourceFile: 'link.component.ts',
+			},
+		],
+		methods: [
+			{
+				name: 'wClick',
+				signature: 'output<MouseEvent>()',
+				description: 'Emits when an enabled link is activated.',
+				category: 'Outputs',
+				docType: 'Component',
+				sourceFile: 'link.component.ts',
+			},
+		],
+		sections: [
+			{
+				title: 'Accessibility',
+				items: [
+					'Use this component for navigation or contact actions, not as a substitute for a form control.',
+					'It uses a real anchor element, preserving native keyboard and screen-reader behavior.',
+				],
+			},
+		],
+		code: `import { LinkComponent } from '@wawjs/ngx-ui';
+
+@Component({
+	imports: [LinkComponent],
+	template: \`
+		<wlink label="Email" type="email" value="hello@example.com" icon="email" />
+		<wlink label="Website" type="url" value="example.com" target="_blank" />
+	\`,
+})
+export class ContactComponent {}`,
 	},
 ];
 

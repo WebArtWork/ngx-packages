@@ -18,8 +18,7 @@ export class NetworkService {
 	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 	private readonly _config = {
 		...DEFAULT_NETWORK_CONFIG,
-		...(inject(CONFIG_TOKEN, { optional: true })?.network ||
-			({} as NetworkConfig)),
+		...(inject(CONFIG_TOKEN, { optional: true })?.network || ({} as NetworkConfig)),
 	};
 
 	/** Internal mutable signals. */
@@ -69,7 +68,9 @@ export class NetworkService {
 			this._fails++;
 
 			this._latencyMs.set(null);
-			// `isOnline` may still be true per OS; we let online/offline events keep it in sync.
+			if (this._fails >= this._config.maxConsecutiveFails) {
+				this._isOnline.set(false);
+			}
 		}
 
 		this._updateClassification();

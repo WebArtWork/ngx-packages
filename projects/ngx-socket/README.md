@@ -40,15 +40,17 @@ export const appConfig = {
 
 ## Available Features
 
-| Name | Description |
-| --- | --- |
-| `SocketService` | Socket.IO wrapper for connection setup, event listeners, and emits |
-| `provideNgxSocket` | Environment provider for socket configuration |
-| `SocketConfig`, `Config` | Public configuration types |
+| Name                     | Description                                                        |
+| ------------------------ | ------------------------------------------------------------------ |
+| `SocketService`          | Socket.IO wrapper for connection setup, event listeners, and emits |
+| `provideNgxSocket`       | Environment provider for socket configuration                      |
+| `SocketConfig`, `Config` | Public configuration types                                         |
 
 ## Socket Service
 
 `SocketService` manages client connection setup and event communication.
+
+Subscriptions registered before the socket connects are attached on connection. Emits made while it is reconnecting are queued and sent once; the service does not create timer-based retry loops.
 
 ### Methods
 

@@ -14,14 +14,14 @@ const _libs = [
 	'ngx-datetime',
 	'ngx-translate',
 	'ngx-http',
+	'ngx-ui',
 	'ngx-crud',
 	'ngx-socket',
 	'ngx-rtc',
 	'ngx-tinymce',
-	'ngx-ui',
 	'ngx-form',
 	'ngx-map',
-	'ngx-fabric'
+	'ngx-fabric',
 ];
 
 const _failedLibs = [];
@@ -32,7 +32,7 @@ for (const _lib of _libs) {
 	const _result = spawnSync(_ngCommand, [..._ngArgs, 'build', _lib], {
 		cwd: _rootDir,
 		stdio: 'inherit',
-		shell: false
+		shell: false,
 	});
 
 	if (_result.error || _result.status !== 0) {

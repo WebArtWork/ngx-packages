@@ -50,6 +50,10 @@ New documents receive a Mongo-compatible `_id` before they enter the local signa
 
 Prefer the `documents` signal as the source of truth. Build local component and service projections with `computed()`.
 
+### Mutation retry behavior
+
+Create, update, unique, and delete mutations are persisted for offline recovery. Only requests that fail with a connectivity error (`HttpErrorResponse.status === 0`) stay queued for a later retry. Any API response error, including validation, authorization, conflict, not-found, and server errors, is removed from the queue and delivered through the operation Observable and `errCallback`. This prevents invalid mutations from being sent repeatedly after connectivity changes.
+
 ### Core document methods
 
 - `prepareDocument(_id?)`
@@ -116,7 +120,7 @@ Copy this into the consuming project's `AGENTS.md`, `CLAUDE.md`, or equivalent f
 - Import public APIs from `@wawjs/ngx-crud`.
 - Prefer bootstrapping shared configuration with `provideNgxCore(...)` and CRUD HTTP/network setup with `provideNgxCrud(...)`.
 - `@wawjs/ngx-crud` depends on `@wawjs/ngx-core`, `@wawjs/ngx-http`, and `@wawjs/ngx-ui`; do not add duplicate utility services inside CRUD features.
-- Prefer extending `CrudService` for document collections that need signal-first fetch/create/update/delete flows and offline retry behavior.
+- Prefer extending `CrudService` for document collections that need signal-first fetch/create/update/delete flows and offline retry behavior. Only connectivity failures are retried; API rejections are removed from the queue.
 - Call `checkUser(userId)` during login/bootstrap when a collection cache should be scoped to the current user.
 - Prefer `CrudComponent` with `TableConfig` for reusable CRUD tables before building one-off implementations.
 - Keep collection-specific behavior in child services by overriding `beforeCreate`, `afterCreate`, `beforeUpdate`, `afterUpdate`, and related hooks instead of forking the base library behavior.

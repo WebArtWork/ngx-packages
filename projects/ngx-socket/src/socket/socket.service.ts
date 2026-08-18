@@ -2,6 +2,14 @@ import { isPlatformBrowser } from '@angular/common';
 import { PLATFORM_ID, Service, inject } from '@angular/core';
 import { Config, CONFIG_TOKEN, DEFAULT_CONFIG } from '../config.interface';
 
+type SocketListener = (message: unknown) => void;
+
+interface PendingEmit {
+	to: string;
+	message: unknown;
+	room: unknown;
+}
+
 @Service()
 export class SocketService {
 	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
@@ -14,6 +22,9 @@ export class SocketService {
 	private _io: any;
 	private _connected = false;
 	private _opts: any = {};
+	private readonly _listeners = new Map<string, Set<SocketListener>>();
+	private readonly _boundListeners = new Map<string, Set<SocketListener>>();
+	private _pendingEmits: PendingEmit[] = [];
 
 	constructor() {
 		if (!this._isBrowser || !this._config.io) {
@@ -58,12 +69,18 @@ export class SocketService {
 			return;
 		}
 
+		this._io?.disconnect();
+		this._connected = false;
+		this._boundListeners.clear();
+
 		const ioFunc = this._config.io.default ? this._config.io.default : this._config.io;
 
 		this._io = ioFunc(this._url, this._opts);
 
 		this._io.on('connect', () => {
 			this._connected = true;
+			this._bindListeners();
+			this._flushPendingEmits();
 		});
 
 		this._io.on('disconnect', (reason: any) => {
@@ -83,45 +100,65 @@ export class SocketService {
 		}
 
 		this._connected = false;
+		this._pendingEmits = [];
 	}
 
-	on(to: string, cb: (message: any) => void = () => {}): void {
+	on(to: string, cb: SocketListener = () => {}): void {
 		if (!this._config.socket) {
 			return;
 		}
 
-		if (!this._io) {
-			console.warn('Socket client not loaded.');
-			return;
-		}
+		const listeners = this._listeners.get(to) || new Set<SocketListener>();
+		listeners.add(cb);
+		this._listeners.set(to, listeners);
 
-		if (!this._connected) {
-			setTimeout(() => {
-				this.on(to, cb);
-			}, 100);
-			return;
+		if (this._connected) {
+			this._bindListener(to, cb);
 		}
-
-		this._io.on(to, cb);
 	}
 
-	emit(to: string, message: any, room: any = false): void {
+	emit(to: string, message: unknown, room: unknown = false): void {
 		if (!this._config.socket) {
 			return;
 		}
 
-		if (!this._io) {
-			console.warn('Socket client not loaded.');
-			return;
-		}
-
 		if (!this._connected) {
-			setTimeout(() => {
-				this.emit(to, message, room);
-			}, 100);
+			this._pendingEmits.push({ to, message, room });
 			return;
 		}
 
 		this._io.emit(to, message, room);
+	}
+
+	private _bindListeners(): void {
+		for (const [to, listeners] of this._listeners) {
+			for (const listener of listeners) {
+				this._bindListener(to, listener);
+			}
+		}
+	}
+
+	private _bindListener(to: string, listener: SocketListener): void {
+		if (!this._io) {
+			return;
+		}
+
+		const bound = this._boundListeners.get(to) || new Set<SocketListener>();
+		if (bound.has(listener)) {
+			return;
+		}
+
+		this._io.on(to, listener);
+		bound.add(listener);
+		this._boundListeners.set(to, bound);
+	}
+
+	private _flushPendingEmits(): void {
+		const pendingEmits = this._pendingEmits;
+		this._pendingEmits = [];
+
+		for (const pending of pendingEmits) {
+			this._io.emit(pending.to, pending.message, pending.room);
+		}
 	}
 }

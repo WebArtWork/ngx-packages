@@ -1,0 +1,22 @@
+@let _label = label(); @let _icon = icon(); @let _href = linkHref(); @let _disabled =
+disabled();
+
+<div class="wlink" [class._disabled]="_disabled">
+	@if (_label) {
+	<span class="wlink__label" [translate]="_label"></span>
+	}
+
+	<a
+		[class]="['wlink__anchor', wClass()]"
+		[attr.aria-disabled]="_disabled || !_href ? 'true' : null"
+		[attr.href]="isClickable() ? _href : null"
+		[attr.rel]="linkRel()"
+		[attr.target]="target()"
+		(click)="onClick($event)"
+	>
+		@if (_icon) {
+		<span class="wlink__icon material-icons" aria-hidden="true">{{ _icon }}</span>
+		}
+		<span class="wlink__value">{{ value() }}</span>
+	</a>
+</div>

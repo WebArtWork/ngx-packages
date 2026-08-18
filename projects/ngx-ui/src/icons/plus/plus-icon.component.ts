@@ -1,8 +1,7 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { Component, input } from '@angular/core';
 
 @Component({
 	selector: 'plus-icon',
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<svg
 			class="plus-icon"

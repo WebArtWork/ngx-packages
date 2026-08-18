@@ -1,9 +1,6 @@
-import {
-	Component,
-	OnDestroy,
-	OnInit,
-	ViewEncapsulation,
-} from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { PLATFORM_ID, inject } from '@angular/core';
 import { ButtonDirective } from '../button/button.directive';
 import { PlusIconComponent } from '../icons/plus/plus-icon.component';
 
@@ -15,6 +12,7 @@ import { PlusIconComponent } from '../icons/plus/plus-icon.component';
 	imports: [ButtonDirective, PlusIconComponent],
 })
 export class ModalComponent implements OnInit, OnDestroy {
+	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 	closable = true;
 	close: () => void = () => {};
 	onOpen?: () => void;
@@ -27,13 +25,16 @@ export class ModalComponent implements OnInit, OnDestroy {
 	panelClass = '';
 
 	get contentClasses(): string {
-		return ['wawjs-modal__content', `wawjs-modal__content--${this.size || 'mid'}`, this.panelClass]
+		return [
+			'wawjs-modal__content',
+			`wawjs-modal__content--${this.size || 'mid'}`,
+			this.panelClass,
+		]
 			.filter(Boolean)
 			.join(' ');
 	}
 
-	private readonly _popStateHandler = (e: PopStateEvent) =>
-		this.popStateListener(e);
+	private readonly _popStateHandler = (e: PopStateEvent) => this.popStateListener(e);
 
 	ngOnInit(): void {
 		if (typeof this.onClickOutside !== 'function') {
@@ -44,11 +45,15 @@ export class ModalComponent implements OnInit, OnDestroy {
 			this.onOpen();
 		}
 
-		window.addEventListener('popstate', this._popStateHandler);
+		if (this._isBrowser) {
+			window.addEventListener('popstate', this._popStateHandler);
+		}
 	}
 
 	ngOnDestroy(): void {
-		window.removeEventListener('popstate', this._popStateHandler);
+		if (this._isBrowser) {
+			window.removeEventListener('popstate', this._popStateHandler);
+		}
 	}
 
 	onBackdropClick(): void {

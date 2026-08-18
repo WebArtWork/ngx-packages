@@ -282,11 +282,21 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 		mutation: QueuedMutation<Document>,
 		options: CrudOptions<Document> = {},
 	): Promise<void> {
-		const resp = await this._request<Document>(
-			mutation.operation,
-			mutation.doc,
-			mutation.name,
-		);
+		let resp: Document;
+
+		try {
+			resp = await this._request<Document>(
+				mutation.operation,
+				mutation.doc,
+				mutation.name,
+			);
+		} catch (error) {
+			if (!this._isRetryableMutationError(error)) {
+				this._removeQueued(mutation.id);
+			}
+
+			throw error;
+		}
 
 		this._removeQueued(mutation.id);
 
@@ -310,7 +320,13 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 
 		try {
 			for (const mutation of [...this._queue]) {
-				await this._syncMutation(mutation);
+				try {
+					await this._syncMutation(mutation);
+				} catch (error) {
+					if (this._isRetryableMutationError(error)) {
+						break;
+					}
+				}
 			}
 		} finally {
 			this._isFlushing = false;
@@ -562,6 +578,14 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 				error: reject,
 			});
 		});
+	}
+
+	private _isRetryableMutationError(error: unknown): boolean {
+		if (!error || typeof error !== 'object' || !('status' in error)) {
+			return false;
+		}
+
+		return (error as { status?: unknown }).status === 0;
 	}
 
 	private async _before(

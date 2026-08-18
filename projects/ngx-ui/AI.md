@@ -13,8 +13,9 @@ Use this file as context for coding agents when an Angular project depends on `@
 - For SSR or CSS-only defaults, import `node_modules/@wawjs/ngx-ui/styles.css` in `angular.json` styles before app styles.
 - Keep `projects/ngx-ui/src/theme/theme.tokens.ts` and `projects/ngx-ui/styles.css` synchronized whenever token defaults or token keys change.
 - All styled components use BEM SCSS and `ViewEncapsulation.None`. Prefer CSS custom property overrides on app-owned ancestors over direct internal class overrides.
-- Prefer package components/services before one-off equivalents: `ButtonComponent`, `ButtonDirective`, `InputComponent`, `SelectComponent`, `FileComponent`, `TableComponent`, `MaterialComponent`, `BurgerComponent`, `ThemeComponent`, `ModalService`, and `AlertService`.
-- Use the actual selectors: `<wbutton>`, `button[wbutton]`, `<winput>`, `<wselect>`, `<ngx-file>`, `<wtable>`, `<material-icon>`, `<icon-burger>`, and `<icon-theme>`.
+- Prefer package components/services before one-off equivalents: `ButtonComponent`, `ButtonDirective`, `InputComponent`, `LinkComponent`, `SelectComponent`, `FileComponent`, `TableComponent`, `MaterialComponent`, `BurgerComponent`, `ThemeComponent`, `ModalService`, and `AlertService`.
+- Use the actual selectors: `<wbutton>`, `button[wbutton]`, `<winput>`, `<wlink>`, `<wselect>`, `<ngx-file>`, `<wtable>`, `<material-icon>`, `<icon-burger>`, and `<icon-theme>`.
+- Use `<wlink>` for display-only email, phone, URL, SMS, WhatsApp, or custom links. It renders a semantic anchor and derives `mailto:`, `tel:`, `https:`, `sms:`, or WhatsApp targets; do not wrap links in labels or add hidden inputs unless a real form contract needs one.
 - Include `<wbutton-styles />` once when an app uses only `ButtonDirective` without rendering `ButtonComponent`.
 - Keep SSR safety intact. Theme token injection must stay guarded with Angular platform checks; do not add unguarded `window`, `document`, or browser storage access.
 ```
@@ -89,6 +90,7 @@ When documenting or changing this package, mention both the runtime provider pat
 | `ButtonDirective` | `<button wbutton>` / `<a wbutton>` | `.wbutton` |
 | `ButtonStylesComponent` | `<wbutton-styles>` | `.wbutton` styles |
 | `InputComponent` | `<winput>` | `.winput` |
+| `LinkComponent` | `<wlink>` | `.wlink` |
 | `SelectComponent` | `<wselect>` | `.wselect` |
 | `FileComponent` | `<ngx-file>` | `.wfile` |
 | `TableComponent` | `<wtable>` | `.wtable` |

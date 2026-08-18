@@ -1503,6 +1503,7 @@ async saveSettings() {
 					'create/update/unique/delete queue themselves when NetworkService reports offline.',
 					'Pending changes are persisted in a collection-level queue, not inside each document.',
 					'When connectivity returns, flushQueue() replays mutations in order.',
+					'Only connectivity failures remain queued. Server rejections are discarded so invalid mutations cannot replay indefinitely.',
 				],
 			},
 		],

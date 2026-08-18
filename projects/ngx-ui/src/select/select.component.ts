@@ -177,8 +177,9 @@ export class SelectComponent implements ControlValueAccessor {
 
 			try {
 				const state = f();
-				if (state?.value?.set) {
-					state.value.set(this.wModel() as any);
+				const value = this.wModel();
+				if (state?.value?.set && !this._equal(state.value(), value)) {
+					state.value.set(value as any);
 				}
 			} catch {
 				// ignore invalid field shape

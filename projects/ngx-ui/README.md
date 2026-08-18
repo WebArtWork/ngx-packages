@@ -152,6 +152,7 @@ Public state:
 | `ButtonDirective` | `<button wbutton>` / `<a wbutton>` | `.wbutton` |
 | `ButtonStylesComponent` | `<wbutton-styles>` | injects `.wbutton` styles |
 | `InputComponent` | `<winput>` | `.winput` |
+| `LinkComponent` | `<wlink>` | `.wlink` |
 | `SelectComponent` | `<wselect>` | `.wselect` |
 | `FileComponent` | `<ngx-file>` | `.wfile` |
 | `TableComponent` | `<wtable>` | `.wtable` |
@@ -178,6 +179,27 @@ When using only `ButtonDirective`, render `<wbutton-styles />` once in the app s
 <winput label="Message" type="textarea" [(wModel)]="message" />
 <winput label="I agree" type="checkbox" [(wModel)]="agreed" />
 ```
+
+### Links
+
+`LinkComponent` is the display-only counterpart to `InputComponent`. It renders a semantic anchor with a safe, type-specific href; it does not create or wrap a hidden form input.
+
+```html
+<wlink label="Email" type="email" value="hello@example.com" icon="email" />
+<wlink label="Phone" type="tel" value="+38 (067) 123-45-67" icon="call" />
+<wlink label="Website" type="url" value="example.com" target="_blank" icon="open_in_new" />
+```
+
+| `type` | Generated href |
+| --- | --- |
+| `email` | `mailto:` |
+| `tel` | `tel:` |
+| `url` | Adds `https://` when no scheme is supplied. |
+| `sms` | `sms:` |
+| `whatsapp` | `https://wa.me/` |
+| `custom` | Requires an explicit `href`. |
+
+Set `href` to override generated targets. External links receive `rel="noopener noreferrer"` by default when `target="_blank"`.
 
 ### Select
 

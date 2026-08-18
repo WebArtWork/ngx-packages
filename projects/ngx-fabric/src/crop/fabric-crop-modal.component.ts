@@ -5,8 +5,8 @@ import {
 	ElementRef,
 	OnDestroy,
 	PLATFORM_ID,
-	ViewChild,
 	inject,
+	viewChild,
 } from '@angular/core';
 import { DOCUMENT, isPlatformBrowser } from '@angular/common';
 import { ButtonComponent } from '@wawjs/ngx-ui';
@@ -48,10 +48,7 @@ type ImageElement = HTMLImageElement | HTMLCanvasElement;
 
 				<label>
 					<span>Format</span>
-					<select
-						[value]="format"
-						(change)="setFormat($any($event.target).value)"
-					>
+					<select [value]="format" (change)="setFormat($any($event.target).value)">
 						<option value="png">PNG</option>
 						<option value="jpeg">JPEG</option>
 						<option value="webp">WEBP</option>
@@ -60,10 +57,7 @@ type ImageElement = HTMLImageElement | HTMLCanvasElement;
 
 				<label>
 					<span>Aspect</span>
-					<select
-						[value]="aspectValue"
-						(change)="setAspect($any($event.target).value)"
-					>
+					<select [value]="aspectValue" (change)="setAspect($any($event.target).value)">
 						<option value="free">Free</option>
 						<option value="1">1:1</option>
 						<option value="1.3333333333">4:3</option>
@@ -72,29 +66,17 @@ type ImageElement = HTMLImageElement | HTMLCanvasElement;
 					</select>
 				</label>
 
-				<wbutton
-					type="secondary"
-					[disableSubmit]="true"
-					(wClick)="fitImage()"
-				>
+				<wbutton type="secondary" [disableSubmit]="true" (wClick)="fitImage()">
 					<span class="material-icons">fit_screen</span>
 					Fit
 				</wbutton>
 			</div>
 
 			<footer class="fabric-crop__footer">
-				<wbutton
-					type="secondary"
-					[disableSubmit]="true"
-					(wClick)="cancel()"
-				>
+				<wbutton type="secondary" [disableSubmit]="true" (wClick)="cancel()">
 					Cancel
 				</wbutton>
-				<wbutton
-					[disableSubmit]="true"
-					[disabled]="!isReady"
-					(wClick)="crop()"
-				>
+				<wbutton [disableSubmit]="true" [disabled]="!isReady" (wClick)="crop()">
 					Crop image
 				</wbutton>
 			</footer>
@@ -197,8 +179,7 @@ export class FabricCropModalComponent implements AfterViewInit, OnDestroy {
 	private readonly _platformId = inject(PLATFORM_ID);
 	private readonly _document = inject(DOCUMENT);
 
-	@ViewChild('canvasEl', { static: true })
-	private readonly _canvasEl?: ElementRef<HTMLCanvasElement>;
+	private readonly _canvasEl = viewChild<ElementRef<HTMLCanvasElement>>('canvasEl');
 
 	image!: FabricCropImageInput;
 	title = 'Crop image';
@@ -225,12 +206,14 @@ export class FabricCropModalComponent implements AfterViewInit, OnDestroy {
 	private _objectScale = 1;
 
 	ngAfterViewInit(): void {
-		if (!isPlatformBrowser(this._platformId) || !this._canvasEl) {
+		const canvasEl = this._canvasEl();
+
+		if (!isPlatformBrowser(this._platformId) || !canvasEl) {
 			return;
 		}
 
 		this.aspectValue = this.aspectRatio ? String(this.aspectRatio) : 'free';
-		this._canvas = new Canvas(this._canvasEl.nativeElement, {
+		this._canvas = new Canvas(canvasEl.nativeElement, {
 			width: this.width,
 			height: this.height,
 			backgroundColor: 'rgb(248, 250, 252)',
@@ -278,10 +261,7 @@ export class FabricCropModalComponent implements AfterViewInit, OnDestroy {
 
 		const sourceWidth = this._sourceWidth();
 		const sourceHeight = this._sourceHeight();
-		this._objectScale = Math.min(
-			this.width / sourceWidth,
-			this.height / sourceHeight,
-		);
+		this._objectScale = Math.min(this.width / sourceWidth, this.height / sourceHeight);
 		this.zoom = 1;
 
 		this._fabricImage.set({
@@ -325,17 +305,7 @@ export class FabricCropModalComponent implements AfterViewInit, OnDestroy {
 
 		canvas.width = outputWidth;
 		canvas.height = outputHeight;
-		context.drawImage(
-			this._imageElement,
-			sx,
-			sy,
-			sw,
-			sh,
-			0,
-			0,
-			outputWidth,
-			outputHeight,
-		);
+		context.drawImage(this._imageElement, sx, sy, sw, sh, 0, 0, outputWidth, outputHeight);
 
 		const mime = `image/${this.format}`;
 		const base64 = canvas.toDataURL(mime, this.quality);

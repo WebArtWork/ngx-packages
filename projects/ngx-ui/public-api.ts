@@ -36,6 +36,12 @@ export * from './src/input/input.type';
 export * from './src/input/manual-input.directives';
 
 /*
+ * Link
+ */
+export * from './src/link/link.component';
+export * from './src/link/link.type';
+
+/*
  * Material
  */
 export * from './src/material/material.component';
