@@ -96,7 +96,7 @@ jobs:
 
                   for app in "${apps[@]}"; do
                     if [ "$app" = "wawjs.dev" ]; then
-                      domain="wawjs.dev.site"
+                      domain="wawjs.dev"
                     else
                       domain="${app%-app}.webart.work"
                     fi

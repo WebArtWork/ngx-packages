@@ -43,7 +43,6 @@ function _parseArgs(_args) {
 	const _options = {
 		access: '',
 		dryRun: false,
-		noBump: false,
 		otp: '',
 		registry: '',
 		tag: ''
@@ -54,8 +53,6 @@ function _parseArgs(_args) {
 
 		if (_arg === '--dry-run') {
 			_options.dryRun = true;
-		} else if (_arg === '--no-bump') {
-			_options.noBump = true;
 		} else if (_arg === '--tag') {
 			_options.tag = _readOptionValue(_args, _index, _arg);
 			_index += 1;
@@ -101,8 +98,7 @@ function _printUsage() {
 	console.log(`Usage: npm run publish -- [options]
 
 Options:
-  --dry-run          Build and run npm publish with --dry-run, without bumping versions.
-  --no-bump          Do not bump source versions after a successful publish.
+  --dry-run          Build and run npm publish with --dry-run without changing source versions.
   --tag <tag>        Publish with an npm dist-tag.
   --otp <code>       Pass an npm one-time password.
   --registry <url>   Publish to a specific npm registry.
@@ -204,6 +200,18 @@ function _syncSourcePackages(_version) {
 
 	for (const _library of _libraries) {
 		_setPackageVersion(_library.packageJsonPath, _version);
+	}
+}
+
+function _syncDistPackages(_version) {
+	for (const _library of _libraries) {
+		const _packageJsonPath = path.join(_library.distDir, 'package.json');
+
+		if (!existsSync(_packageJsonPath)) {
+			throw new Error(`Missing package manifest for ${_library.projectName}: ${_packageJsonPath}`);
+		}
+
+		_setPackageVersion(_packageJsonPath, _version);
 	}
 }
 
@@ -352,25 +360,31 @@ try {
 	}
 
 	const _options = _parseArgs(process.argv.slice(2));
-	const _publishVersion = _getRootVersion();
-	const _nextVersion = _incrementPatchVersion(_publishVersion);
+	const _sourceVersion = _getRootVersion();
+	const _publishVersion = _incrementPatchVersion(_sourceVersion);
 
-	_validateSetup(_publishVersion);
+	_validateSetup(_sourceVersion);
 
-	console.log(`Publishing libraries with version ${_publishVersion}`);
+	console.log(`Preparing libraries for release ${_publishVersion}`);
 
 	if (_options.dryRun) {
-		console.log('Dry run enabled: npm publish will receive --dry-run and source versions will not be bumped.');
+		console.log('Dry run enabled: npm publish will receive --dry-run and source versions will not be changed.');
 	}
 
-	_syncSourcePackages(_publishVersion);
-
-	const _buildFailures = _buildLibraries(_publishVersion);
+	const _buildFailures = _buildLibraries(_sourceVersion);
 
 	if (_buildFailures.length > 0) {
 		_printFailures('Publishing stopped because one or more builds failed.', _buildFailures);
 		process.exit(1);
 	}
+
+	if (!_options.dryRun) {
+		console.log(`\nBumping source package versions to ${_publishVersion}`);
+		_syncSourcePackages(_publishVersion);
+	}
+
+	console.log(`Syncing generated package manifests to ${_publishVersion}`);
+	_syncDistPackages(_publishVersion);
 
 	const _npmConfig = _createNpmUserConfig(_options);
 	const _publishOptions = {
@@ -390,18 +404,14 @@ try {
 	}
 
 	if (_publishFailures.length > 0) {
-		_printFailures('Some libraries were not published automatically. Source versions were not bumped.', _publishFailures);
+		_printFailures('Some libraries were not published automatically. Retry the listed packages with their prepared release version.', _publishFailures);
 		process.exit(1);
 	}
 
 	if (_options.dryRun) {
-		console.log('\nDry run completed successfully. Source versions were not bumped.');
-	} else if (_options.noBump) {
-		console.log('\nAll libraries were published successfully. Source versions were left unchanged because --no-bump was used.');
+		console.log('\nDry run completed successfully. Source versions were not changed.');
 	} else {
-		console.log(`\nBumping source version to ${_nextVersion}`);
-		_syncSourcePackages(_nextVersion);
-		console.log('\nAll libraries were published successfully.');
+		console.log(`\nAll libraries were published successfully with version ${_publishVersion}.`);
 	}
 } catch (_error) {
 	const _message = _error instanceof Error ? _error.message : String(_error);
