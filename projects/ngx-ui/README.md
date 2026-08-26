@@ -148,7 +148,7 @@ Public state:
 
 | Export | Selector / usage | BEM root |
 | --- | --- | --- |
-| `ButtonComponent` | `<wbutton>` | `.wbutton` |
+| `ButtonComponent` | `<wbutton>` (deprecated, use `ButtonDirective`) | `.wbutton` |
 | `ButtonDirective` | `<button wbutton>` / `<a wbutton>` | `.wbutton` |
 | `ButtonStylesComponent` | `<wbutton-styles>` | injects `.wbutton` styles |
 | `InputComponent` | `<winput>` | `.winput` |
@@ -161,6 +161,29 @@ Public state:
 | `ThemeComponent` | `<icon-theme>` | `.icon-theme` |
 | `ModalService` | programmatic modals | `.wawjs-modal` |
 | `AlertService` | programmatic alerts | `.walert` |
+| `TagComponent` | `<wtag>` | `.wtag` |
+| `BadgeComponent` | `<wbadge>` | `.wbadge` |
+| `AvatarComponent` | `<wavatar>` | `.wavatar` |
+| `SpinnerComponent` | `<wspinner>` | `.wspinner` |
+| `ChipComponent` | `<wchip>` | `.wchip` |
+| `BreadcrumbComponent` | `<wbreadcrumb>` | `.wbreadcrumb` |
+| `AccordionComponent` / `AccordionPanelComponent` | `<waccordion>` / `<waccordion-panel>` | `.waccordion` |
+| `TabsComponent` / `TabPanelComponent` | `<wtabs>` / `<wtab>` | `.wtabs` |
+| `CardComponent` | `<wcard>` | `.wcard` |
+| `MenuComponent` / `MenubarComponent` | `<wmenu>` / `<wmenubar>` | `.wmenu` / `.wmenubar` |
+| `TooltipDirective` | `[wtooltip]` | `.wtooltip` |
+| `TooltipStylesComponent` | `<wtooltip-styles>` | injects `.wtooltip` styles |
+| `ConfirmService` | programmatic confirm modal | `.wconfirm` |
+| `ConfirmPopupDirective` | `[wconfirmPopup]` | `.wconfirm-popup` |
+| `ConfirmPopupStylesComponent` | `<wconfirm-popup-styles>` | injects `.wconfirm-popup` styles |
+| `DividerComponent` | `<wdivider>` | `.wdivider` |
+| `ProgressBarComponent` | `<wprogressbar>` | `.wprogressbar` |
+| `ToggleComponent` | `<wtoggle>` | `.wtoggle` |
+| `MeterGroupComponent` | `<wmetergroup>` | `.wmetergroup` |
+| `TimelineComponent` | `<wtimeline>` | `.wtimeline` |
+| `OrderListComponent` | `<worderlist>` | `.worderlist` |
+| `ChartComponent` | `<wchart>` | `.wchart` |
+| `EditorComponent` | `<weditor>` | `.weditor` |
 
 ### Buttons
 
@@ -171,6 +194,13 @@ Public state:
 ```
 
 When using only `ButtonDirective`, render `<wbutton-styles />` once in the app shell so the directive styles are present.
+
+`ButtonDirective` also supports `icon`, `iconPos`, `loading`, `loadingIcon`, `size` (`small`/`large`), `outlined`, `text`, `raised`, `rounded`, `plain`, `badge`, `badgeSeverity`, `ariaLabel`, and `autofocus`:
+
+```html
+<button wbutton icon="save" [loading]="saving()" (wClick)="save()">Save</button>
+<button wbutton size="small" outlined type="danger">Delete</button>
+```
 
 ### Inputs
 
@@ -242,6 +272,149 @@ alert.question({
 	text: 'Delete this item?',
 	buttons: [{ text: 'Delete', callback: () => remove() }],
 });
+```
+
+### Tag, Badge, Chip, Avatar
+
+```html
+<wtag type="success" icon="check">Active</wtag>
+<wbadge type="danger" [value]="3" />
+<wchip [value]="'Angular'" icon="code" [removable]="true" (wRemove)="remove()" />
+<wavatar label="Kristina Petrova" />
+<wavatar image="/avatars/1.png" size="large" />
+```
+
+### Breadcrumb
+
+```html
+<wbreadcrumb [items]="[{ label: 'Settings', routerLink: '/settings' }, { label: 'Profile' }]" />
+```
+
+### Accordion
+
+```html
+<waccordion>
+	<waccordion-panel header="Billing">Billing details here.</waccordion-panel>
+	<waccordion-panel header="Security">Security settings here.</waccordion-panel>
+</waccordion>
+```
+
+Pass `[multiple]="true"` on `<waccordion>` to allow more than one panel open at once.
+
+### Tabs
+
+```html
+<wtabs [(activeIndex)]="tab">
+	<wtab header="Overview">Overview content.</wtab>
+	<wtab header="Activity">Activity content.</wtab>
+</wtabs>
+```
+
+### Card
+
+```html
+<wcard title="Invoice #1042" subtitle="Due Aug 30">
+	Invoice line items go here.
+</wcard>
+```
+
+### Menu And Menubar
+
+```html
+<wmenu [items]="items" [popup]="true" #menu />
+<button wbutton (wClick)="menu.toggle($event)">Actions</button>
+
+<wmenubar [items]="navItems" (wSelect)="onSelect($event)" />
+```
+
+`MenuItem` supports `label`, `icon`, `command`, `routerLink`, `href`, `disabled`, `separator`, and nested `items` for submenus.
+
+### Tooltip
+
+```html
+<span wtooltip="Shown on hover" tooltipPosition="top">Hover me</span>
+```
+
+Render `<wtooltip-styles />` once in the app shell so the directive's floating panel is styled.
+
+### Confirm
+
+```ts
+import { inject } from '@angular/core';
+import { ConfirmService } from '@wawjs/ngx-ui';
+
+const confirm = inject(ConfirmService);
+
+confirm.confirm({
+	message: 'Delete this item?',
+	accept: () => remove(),
+});
+```
+
+```html
+<button wconfirmPopup="Are you sure?" (wAccept)="remove()">Delete</button>
+```
+
+Render `<wconfirm-popup-styles />` once in the app shell when using `[wconfirmPopup]`.
+
+### Divider, ProgressBar, Toggle, MeterGroup
+
+```html
+<wdivider>OR</wdivider>
+<wdivider layout="vertical" />
+
+<wprogressbar [value]="uploadPercent()" />
+<wprogressbar mode="indeterminate" />
+
+<wtoggle [(checked)]="notificationsEnabled" ariaLabel="Notifications" />
+
+<wmetergroup
+	[items]="[
+		{ label: 'Images', value: 12 },
+		{ label: 'Documents', value: 8 },
+		{ label: 'Video', value: 4 }
+	]"
+/>
+```
+
+### Timeline
+
+```html
+<wtimeline
+	[items]="[
+		{ label: 'Order placed', date: 'Aug 1', icon: 'shopping_cart' },
+		{ label: 'Shipped', date: 'Aug 3', icon: 'local_shipping' },
+		{ label: 'Delivered', date: 'Aug 5', icon: 'check' }
+	]"
+/>
+```
+
+### OrderList
+
+```html
+<worderlist [(items)]="priorityList" bindLabel="name" />
+```
+
+### Chart
+
+`ChartComponent` is a thin wrapper around [Chart.js](https://www.chartjs.org/), an optional peer dependency — install `chart.js` yourself if you use `<wchart>`.
+
+```html
+<wchart
+	type="bar"
+	[data]="{
+		labels: ['Mon', 'Tue', 'Wed'],
+		datasets: [{ label: 'Visits', data: [12, 19, 7] }]
+	}"
+/>
+```
+
+### Editor
+
+Lightweight `contenteditable`-based rich text editor for basic bold/italic/list formatting. For a full-featured editor (tables, media embeds, plugins), use `@wawjs/ngx-tinymce` instead.
+
+```html
+<weditor [(wModel)]="bioHtml" placeholder="Write your bio..." />
 ```
 
 ### Theme Icon And Burger

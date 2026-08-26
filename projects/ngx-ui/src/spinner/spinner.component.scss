@@ -1,0 +1,40 @@
+:host {
+	display: inline-flex;
+}
+
+.wspinner {
+	animation: wspinner-rotate 1400ms linear infinite;
+}
+
+.wspinner__track {
+	stroke: var(--c-border);
+}
+
+.wspinner__arc {
+	stroke: var(--c-primary);
+	stroke-linecap: round;
+	stroke-dasharray: 90, 150;
+	stroke-dashoffset: 0;
+	animation: wspinner-dash 1400ms ease-in-out infinite;
+}
+
+@keyframes wspinner-rotate {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+@keyframes wspinner-dash {
+	0% {
+		stroke-dasharray: 1, 150;
+		stroke-dashoffset: 0;
+	}
+	50% {
+		stroke-dasharray: 90, 150;
+		stroke-dashoffset: -35;
+	}
+	100% {
+		stroke-dasharray: 90, 150;
+		stroke-dashoffset: -124;
+	}
+}

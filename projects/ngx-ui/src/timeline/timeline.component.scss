@@ -1,0 +1,96 @@
+:host {
+	display: block;
+}
+
+.wtimeline {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.wtimeline--vertical .wtimeline__item {
+	display: flex;
+	gap: var(--sp-4);
+}
+
+.wtimeline--horizontal {
+	display: flex;
+}
+
+.wtimeline--horizontal .wtimeline__item {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+}
+
+.wtimeline--horizontal .wtimeline__marker-col {
+	flex-direction: row;
+	align-items: center;
+}
+
+.wtimeline--horizontal .wtimeline__connector {
+	width: auto;
+	height: 2px;
+	flex: 1;
+}
+
+.wtimeline__marker-col {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.wtimeline__marker {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+
+	width: 1.75rem;
+	height: 1.75rem;
+
+	background: var(--c-primary);
+	color: var(--c-text-secondary);
+	border-radius: var(--radius-pill);
+}
+
+.wtimeline__marker .material-icons {
+	font-family: 'Material Icons';
+	font-weight: normal;
+	font-style: normal;
+	font-size: 1rem;
+	line-height: 1;
+}
+
+.wtimeline__connector {
+	width: 2px;
+	flex: 1;
+	min-height: var(--sp-4);
+	background: var(--c-border);
+	margin: var(--sp-2) 0;
+}
+
+.wtimeline__content {
+	padding-bottom: var(--sp-5);
+}
+
+.wtimeline__date {
+	color: var(--c-text-muted);
+	font-family: var(--ff-base);
+	font-size: 0.75rem;
+	margin-bottom: var(--sp-1);
+}
+
+.wtimeline__label {
+	color: var(--c-text-primary);
+	font-family: var(--ff-base);
+	font-weight: 600;
+	font-size: 0.9375rem;
+}
+
+.wtimeline__text {
+	color: var(--c-text-muted);
+	font-family: var(--ff-base);
+	font-size: 0.875rem;
+	margin-top: var(--sp-1);
+}

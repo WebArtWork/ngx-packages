@@ -1,0 +1,21 @@
+<div class="wtabs">
+	<div class="wtabs__nav" role="tablist">
+		@for (panel of panels(); track panel; let i = $index) {
+		<button
+			type="button"
+			role="tab"
+			class="wtabs__nav-item"
+			[class._active]="activeIndex() === i"
+			[class._disabled]="panel.disabled()"
+			[attr.aria-selected]="activeIndex() === i ? 'true' : 'false'"
+			(click)="select(i)"
+		>
+			<span [translate]="panel.header()"></span>
+		</button>
+		}
+	</div>
+
+	<div class="wtabs__body">
+		<ng-content></ng-content>
+	</div>
+</div>

@@ -1,0 +1,47 @@
+<ul class="worderlist">
+	@for (item of items(); track item; let i = $index; let first = $first; let
+	last = $last) {
+	<li class="worderlist__item">
+		<span class="worderlist__label">{{ label(item) }}</span>
+
+		<div class="worderlist__actions">
+			<button
+				wbutton
+				type="light"
+				size="small"
+				icon="keyboard_double_arrow_up"
+				[disableSubmit]="true"
+				[disabled]="first"
+				(wClick)="moveTop(i)"
+			></button>
+			<button
+				wbutton
+				type="light"
+				size="small"
+				icon="keyboard_arrow_up"
+				[disableSubmit]="true"
+				[disabled]="first"
+				(wClick)="moveUp(i)"
+			></button>
+			<button
+				wbutton
+				type="light"
+				size="small"
+				icon="keyboard_arrow_down"
+				[disableSubmit]="true"
+				[disabled]="last"
+				(wClick)="moveDown(i)"
+			></button>
+			<button
+				wbutton
+				type="light"
+				size="small"
+				icon="keyboard_double_arrow_down"
+				[disableSubmit]="true"
+				[disabled]="last"
+				(wClick)="moveBottom(i)"
+			></button>
+		</div>
+	</li>
+	}
+</ul>

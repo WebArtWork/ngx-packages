@@ -1,0 +1,19 @@
+@let _value = value(); @let _mode = mode();
+
+<div
+	class="wprogressbar"
+	[class]="['wprogressbar--' + _mode, extraClass() || '']"
+	role="progressbar"
+	[attr.aria-valuenow]="_mode === 'determinate' ? _value : null"
+	aria-valuemin="0"
+	aria-valuemax="100"
+>
+	<div
+		class="wprogressbar__bar"
+		[style.width.%]="_mode === 'determinate' ? _value : null"
+	>
+		@if (_mode === 'determinate' && showValue()) {
+		<span class="wprogressbar__label">{{ _value }}%</span>
+		}
+	</div>
+</div>

@@ -41,7 +41,7 @@
 			<div class="wtable__actions">
 				@if (config().headerButtons) { @for (button of
 				config().headerButtons; track button) { @if (button) {
-				<wbutton
+				<button wbutton
 					[disableSubmit]="true"
 					[extraClass]="
 						'wtable__action-btn ' + (button.class || '')
@@ -55,15 +55,15 @@
 					} @if (button.text) {
 					<span class="wtable__action-text">{{ button.text }}</span>
 					}
-				</wbutton>
+				</button>
 				} } } @if (config().create) {
-				<wbutton
+				<button wbutton
 					[disableSubmit]="true"
 					[extraClass]="'wtable__action-btn'"
 					(wClick)="config().create()"
 				>
 					<i class="material-icons" title="Add"> add </i>
-				</wbutton>
+				</button>
 				}
 			</div>
 		</div>
@@ -299,7 +299,7 @@
 							<!-- Pagination -->
 							@if (_cfg.perPage !== -1 && _cfg.allDocs) {
 							<div class="wtable__pager">
-								<wbutton
+								<button wbutton
 									[extraClass]="'wtable__pager-btn'"
 									[isMultipleClicksAllowed]="true"
 									[disabled]="_cfg.page === 1"
@@ -308,9 +308,9 @@
 									<span class="material-icons"
 										>keyboard_double_arrow_left</span
 									>
-								</wbutton>
+								</button>
 
-								<wbutton
+								<button wbutton
 									[extraClass]="'wtable__pager-btn'"
 									[isMultipleClicksAllowed]="true"
 									[disabled]="_cfg.page === 1"
@@ -319,9 +319,9 @@
 									<span class="material-icons"
 										>chevron_left</span
 									>
-								</wbutton>
+								</button>
 
-								<wbutton
+								<button wbutton
 									[extraClass]="'wtable__pager-btn'"
 									[isMultipleClicksAllowed]="true"
 									[disabled]="_cfg.page * _cfg.perPage > totalCount()"
@@ -330,9 +330,9 @@
 									<span class="material-icons"
 										>chevron_right</span
 									>
-								</wbutton>
+								</button>
 
-								<wbutton
+								<button wbutton
 									[extraClass]="'wtable__pager-btn'"
 									[isMultipleClicksAllowed]="true"
 									[disabled]="isLast()"
@@ -341,11 +341,11 @@
 									<span class="material-icons"
 										>keyboard_double_arrow_right</span
 									>
-								</wbutton>
+								</button>
 							</div>
 							} @if (!_cfg.allDocs) {
 							<div class="wtable__pager">
-								<wbutton
+								<button wbutton
 									[extraClass]="'wtable__pager-btn'"
 									[isMultipleClicksAllowed]="true"
 									[disabled]="_cfg.page === 1"
@@ -354,9 +354,9 @@
 									<span class="material-icons"
 										>chevron_left</span
 									>
-								</wbutton>
+								</button>
 
-								<wbutton
+								<button wbutton
 									[extraClass]="'wtable__pager-btn'"
 									[disabled]="normalizedRows().length !== _cfg.perPage"
 									[isMultipleClicksAllowed]="true"
@@ -365,7 +365,7 @@
 									<span class="material-icons"
 										>chevron_right</span
 									>
-								</wbutton>
+								</button>
 							</div>
 							}
 						</div>

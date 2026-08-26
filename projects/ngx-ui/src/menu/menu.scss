@@ -1,0 +1,149 @@
+/* Shared by wmenu, wmenubar, and wmenu-item */
+
+.wmenu {
+	display: flex;
+	flex-direction: column;
+
+	margin: 0;
+	padding: var(--sp-2);
+	list-style: none;
+
+	background: var(--c-bg-secondary);
+	border: 1px solid var(--c-border);
+	border-radius: var(--radius-card);
+	box-shadow: var(--shadow-sm);
+
+	min-width: 12rem;
+}
+
+.wmenu._popup {
+	position: absolute;
+	z-index: 1000;
+	display: none;
+
+	&._visible {
+		display: flex;
+	}
+}
+
+.wmenubar {
+	display: flex;
+	align-items: center;
+	gap: var(--sp-2);
+
+	margin: 0;
+	padding: var(--sp-2);
+	list-style: none;
+
+	background: var(--c-bg-secondary);
+	border: 1px solid var(--c-border);
+	border-radius: var(--radius-card);
+}
+
+.wmenu__item {
+	position: relative;
+}
+
+.wmenu__separator {
+	height: 1px;
+	margin: var(--sp-2) 0;
+	background: var(--c-border);
+}
+
+.wmenu__link {
+	display: flex;
+	align-items: center;
+	gap: var(--sp-2);
+	width: 100%;
+
+	cursor: pointer;
+	background: transparent;
+	border: 0;
+	border-radius: var(--radius);
+
+	color: var(--c-text-primary);
+	font-family: var(--ff-base);
+	font-size: 0.875rem;
+	text-decoration: none;
+	text-align: left;
+
+	padding: var(--sp-3) var(--sp-4);
+
+	transition: background-color var(--motion-fast) var(--easing);
+
+	&:hover:not(._disabled):not(:disabled) {
+		background: var(--c-bg-tertiary);
+	}
+
+	&:focus-visible {
+		outline: none;
+		box-shadow: var(--focus-ring);
+	}
+
+	&._disabled,
+	&:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+}
+
+.wmenu__icon.material-icons {
+	font-family: 'Material Icons';
+	font-weight: normal;
+	font-style: normal;
+	font-size: 1.125rem;
+	line-height: 1;
+}
+
+.wmenu__caret.material-icons {
+	position: absolute;
+	right: var(--sp-3);
+	top: 50%;
+	transform: translateY(-50%);
+
+	font-family: 'Material Icons';
+	font-weight: normal;
+	font-style: normal;
+	font-size: 1rem;
+	line-height: 1;
+	color: var(--c-text-muted);
+	pointer-events: none;
+}
+
+/* Nested submenus: flyout to the right, shown on hover/focus */
+.wmenu__item .wmenu__submenu {
+	position: absolute;
+	top: 0;
+	left: 100%;
+	z-index: 1000;
+	display: none;
+
+	margin: 0;
+	padding: var(--sp-2);
+	list-style: none;
+
+	background: var(--c-bg-secondary);
+	border: 1px solid var(--c-border);
+	border-radius: var(--radius-card);
+	box-shadow: var(--shadow-sm);
+
+	min-width: 12rem;
+}
+
+.wmenu__item._has-children:hover > .wmenu__submenu,
+.wmenu__item._has-children:focus-within > .wmenu__submenu {
+	display: flex;
+	flex-direction: column;
+}
+
+/* Top-level items inside wmenubar drop their submenu downward instead.
+   Direct child combinators go through the wmenu-item host tag since each
+   <wmenu-item> renders its own <li class="wmenu__item"> inside its template. */
+.wmenubar > wmenu-item > .wmenu__item > .wmenu__submenu {
+	top: 100%;
+	left: 0;
+}
+
+.wmenubar > wmenu-item > .wmenu__item > .wmenu__caret {
+	display: none;
+}

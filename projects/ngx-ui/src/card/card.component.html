@@ -1,0 +1,21 @@
+@let _title = title(); @let _subtitle = subtitle();
+
+<div class="wcard" [class]="extraClass() || ''">
+	<ng-content select="[wcardHeader]"></ng-content>
+
+	@if (_title || _subtitle) {
+	<div class="wcard__head">
+		@if (_title) {
+		<div class="wcard__title" [translate]="_title"></div>
+		} @if (_subtitle) {
+		<div class="wcard__subtitle" [translate]="_subtitle"></div>
+		}
+	</div>
+	}
+
+	<div class="wcard__body">
+		<ng-content></ng-content>
+	</div>
+
+	<ng-content select="[wcardFooter]"></ng-content>
+</div>

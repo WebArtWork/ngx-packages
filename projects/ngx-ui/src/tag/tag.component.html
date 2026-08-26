@@ -1,0 +1,16 @@
+@let _value = value(); @let _icon = icon();
+
+<span
+	class="wtag"
+	[class]="[typeClass(), rounded() ? 'wtag--rounded' : '', extraClass() || '']"
+>
+	@if (_icon) {
+	<span class="wtag__icon material-icons" aria-hidden="true">{{
+		_icon
+	}}</span>
+	} @if (_value) {
+	<span class="wtag__value" [translate]="_value"></span>
+	} @else {
+	<span class="wtag__value"><ng-content></ng-content></span>
+	}
+</span>

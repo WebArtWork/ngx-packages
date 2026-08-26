@@ -1,0 +1,43 @@
+:host {
+	display: block;
+}
+
+.wconfirm {
+	display: flex;
+	gap: var(--sp-4);
+
+	padding: var(--sp-5);
+}
+
+.wconfirm__icon.material-icons {
+	font-family: 'Material Icons';
+	font-weight: normal;
+	font-style: normal;
+	font-size: 1.75rem;
+	line-height: 1;
+	color: var(--c-primary);
+}
+
+.wconfirm__body {
+	flex: 1;
+}
+
+.wconfirm__header {
+	color: var(--c-text-primary);
+	font-family: var(--ff-base);
+	font-weight: 600;
+	font-size: 1.0625rem;
+	margin-bottom: var(--sp-2);
+}
+
+.wconfirm__message {
+	color: var(--c-text-primary);
+	font-family: var(--ff-base);
+	font-size: 0.9375rem;
+}
+
+.wconfirm__actions {
+	display: flex;
+	align-items: flex-start;
+	gap: var(--sp-3);
+}

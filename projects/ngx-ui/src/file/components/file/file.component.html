@@ -76,7 +76,7 @@ _disabled = isDisabled(); @let _dragging = isDragging();
 		}
 
 		<div class="wfile__actions">
-			<wbutton
+			<button wbutton
 				type="primary"
 				[disableSubmit]="true"
 				[disabled]="_disabled"
@@ -84,10 +84,10 @@ _disabled = isDisabled(); @let _dragging = isDragging();
 			>
 				<span class="material-icons">upload_file</span>
 				<span translate>Browse</span>
-			</wbutton>
+			</button>
 
 			@if (clearable() && _files.length) {
-			<wbutton
+			<button wbutton
 				type="light"
 				[disableSubmit]="true"
 				[disabled]="_disabled"
@@ -95,7 +95,7 @@ _disabled = isDisabled(); @let _dragging = isDragging();
 			>
 				<span class="material-icons">close</span>
 				<span translate>Clear</span>
-			</wbutton>
+			</button>
 			}
 		</div>
 	</div>

@@ -1,0 +1,35 @@
+:host {
+	display: block;
+}
+
+.wcard {
+	background: var(--c-bg-secondary);
+	border: 1px solid var(--c-border);
+	border-radius: var(--radius-card);
+	box-shadow: var(--shadow-sm);
+
+	padding: var(--sp-5);
+}
+
+.wcard__head {
+	margin-bottom: var(--sp-4);
+}
+
+.wcard__title {
+	color: var(--c-text-primary);
+	font-family: var(--ff-base);
+	font-weight: 600;
+	font-size: 1.125rem;
+}
+
+.wcard__subtitle {
+	color: var(--c-text-muted);
+	font-family: var(--ff-base);
+	font-size: 0.875rem;
+	margin-top: var(--sp-1);
+}
+
+.wcard__body {
+	color: var(--c-text-primary);
+	font-family: var(--ff-base);
+}

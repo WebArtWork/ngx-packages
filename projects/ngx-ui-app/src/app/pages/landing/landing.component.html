@@ -1,4 +1,7 @@
 <section class="ui-shell">
+	<wtooltip-styles />
+	<wconfirm-popup-styles />
+
 	<header class="hero">
 		<div>
 			<p class="eyebrow">Component Surface</p>
@@ -85,6 +88,105 @@
 		<section class="panel table-panel">
 			<h2>Table</h2>
 			<wtable [rows]="rows" [columns]="columns" [config]="tableConfig" title="UI modules" />
+		</section>
+
+		<section class="panel">
+			<h2>Breadcrumb</h2>
+			<wbreadcrumb [items]="breadcrumbItems" />
+		</section>
+
+		<section class="panel">
+			<h2>Components</h2>
+			<div class="chip-row">
+				@for (item of statusItems; track item._id) {
+				<wtag [type]="item._id === 'ready' ? 'success' : item._id === 'review' ? 'warning' : 'danger'">
+					{{ item.name }}
+				</wtag>
+				}
+				<wbadge type="danger" [value]="3" />
+				<wavatar label="Kristina Petrova" />
+				<wchip value="Angular" icon="code" [removable]="true" (wRemove)="showAlert('Chip removed')" />
+			</div>
+			<wdivider>More</wdivider>
+			<div class="chip-row">
+				<wspinner size="1.5rem" />
+				<wprogressbar [value]="uploadPercent()" />
+				<span wtooltip="Toggle notifications" tooltipPosition="top">
+					<wtoggle [(checked)]="notificationsEnabled" ariaLabel="Notifications" />
+				</span>
+			</div>
+		</section>
+
+		<section class="panel">
+			<h2>Accordion</h2>
+			<waccordion>
+				<waccordion-panel header="Billing">Billing details here.</waccordion-panel>
+				<waccordion-panel header="Security">Security settings here.</waccordion-panel>
+			</waccordion>
+		</section>
+
+		<section class="panel">
+			<h2>Tabs</h2>
+			<wtabs [(activeIndex)]="activeTab">
+				<wtab header="Overview">Overview content.</wtab>
+				<wtab header="Activity">Activity content.</wtab>
+			</wtabs>
+		</section>
+
+		<section class="panel">
+			<h2>Menu &amp; Menubar</h2>
+			<wmenu [items]="menuItems" [popup]="true" #menu />
+			<wbutton type="light" [disableSubmit]="true" (wClick)="menu.toggle($event)">
+				Actions
+			</wbutton>
+			<wmenubar [items]="navItems" (wSelect)="showAlert($event.label + ' selected')" />
+		</section>
+
+		<section class="panel">
+			<h2>Card</h2>
+			<wcard title="Invoice #1042" subtitle="Due Aug 30">
+				Invoice line items go here.
+			</wcard>
+		</section>
+
+		<section class="panel">
+			<h2>Timeline</h2>
+			<wtimeline [items]="timelineItems" />
+		</section>
+
+		<section class="panel">
+			<h2>MeterGroup</h2>
+			<wmetergroup [items]="meterItems" />
+		</section>
+
+		<section class="panel">
+			<h2>OrderList</h2>
+			<worderlist [(items)]="priorityList" />
+		</section>
+
+		<section class="panel">
+			<h2>Editor</h2>
+			<weditor [(wModel)]="bioHtml" placeholder="Write your bio..." />
+		</section>
+
+		<section class="panel">
+			<h2>Chart</h2>
+			<wchart type="bar" [data]="chartData" />
+		</section>
+
+		<section class="panel">
+			<h2>Confirm</h2>
+			<div class="button-row">
+				<wbutton type="danger" [disableSubmit]="true" (wClick)="confirmDelete()">
+					Delete (service)
+				</wbutton>
+				<button wconfirmPopup="Are you sure?" (wAccept)="deletedCount.set(deletedCount() + 1)">
+					Delete (popup)
+				</button>
+			</div>
+			@if (deletedCount()) {
+			<p class="meta">Confirmed {{ deletedCount() }} time(s).</p>
+			}
 		</section>
 	</div>
 </section>

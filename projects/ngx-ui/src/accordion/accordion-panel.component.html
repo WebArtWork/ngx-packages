@@ -1,0 +1,24 @@
+@let _expanded = expanded();
+
+<div class="waccordion-panel" [class._expanded]="_expanded">
+	<button
+		type="button"
+		class="waccordion-panel__header"
+		[class._disabled]="disabled()"
+		[attr.aria-expanded]="_expanded ? 'true' : 'false'"
+		(click)="toggle()"
+	>
+		<span class="waccordion-panel__title" [translate]="header()"></span>
+		<span
+			class="waccordion-panel__icon material-icons"
+			aria-hidden="true"
+			>expand_more</span
+		>
+	</button>
+
+	@if (_expanded) {
+	<div class="waccordion-panel__body">
+		<ng-content></ng-content>
+	</div>
+	}
+</div>

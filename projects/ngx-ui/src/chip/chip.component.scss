@@ -1,0 +1,51 @@
+:host {
+	display: inline-flex;
+}
+
+.wchip {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--sp-2);
+
+	background: var(--c-bg-tertiary);
+	color: var(--c-text-primary);
+	border-radius: var(--radius-pill);
+	font-family: var(--ff-base);
+	font-size: 0.875rem;
+	line-height: 1;
+
+	padding: var(--sp-2) var(--sp-4);
+}
+
+.wchip__image {
+	width: 1.5rem;
+	height: 1.5rem;
+	margin-inline-start: calc(-1 * var(--sp-2));
+	border-radius: var(--radius-pill);
+	object-fit: cover;
+}
+
+.wchip__icon.material-icons {
+	font-family: 'Material Icons';
+	font-weight: normal;
+	font-style: normal;
+	font-size: 1rem;
+	line-height: 1;
+}
+
+.wchip__remove {
+	display: inline-flex;
+	cursor: pointer;
+	background: transparent;
+	border: 0;
+	padding: 0;
+	color: inherit;
+}
+
+.wchip__remove.material-icons {
+	font-family: 'Material Icons';
+	font-weight: normal;
+	font-style: normal;
+	font-size: 0.875rem;
+	line-height: 1;
+}

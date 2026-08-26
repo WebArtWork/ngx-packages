@@ -1,0 +1,24 @@
+@let _value = value(); @let _icon = icon(); @let _image = image();
+
+<span class="wchip" [class]="extraClass() || ''">
+	@if (_image) {
+	<img class="wchip__image" [src]="_image" alt="" />
+	} @else if (_icon) {
+	<span class="wchip__icon material-icons" aria-hidden="true">{{
+		_icon
+	}}</span>
+	} @if (_value) {
+	<span class="wchip__value" [translate]="_value"></span>
+	} @else {
+	<span class="wchip__value"><ng-content></ng-content></span>
+	} @if (removable()) {
+	<button
+		type="button"
+		class="wchip__remove material-icons"
+		(click)="wRemove.emit()"
+		[translate]="{ ariaLabel: 'Remove' }"
+	>
+		close
+	</button>
+	}
+</span>

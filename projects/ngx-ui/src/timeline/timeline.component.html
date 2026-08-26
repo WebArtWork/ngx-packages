@@ -1,0 +1,31 @@
+<ol class="wtimeline" [class]="'wtimeline--' + layout()">
+	@for (item of items(); track item.label; let last = $last) {
+	<li class="wtimeline__item">
+		<div class="wtimeline__marker-col">
+			<span
+				class="wtimeline__marker"
+				[style.background]="item.color || null"
+			>
+				@if (item.icon) {
+				<span class="material-icons" aria-hidden="true">{{
+					item.icon
+				}}</span>
+				}
+			</span>
+			@if (!last) {
+			<span class="wtimeline__connector"></span>
+			}
+		</div>
+
+		<div class="wtimeline__content">
+			@if (item.date) {
+			<div class="wtimeline__date">{{ item.date }}</div>
+			}
+			<div class="wtimeline__label" [translate]="item.label"></div>
+			@if (item.content) {
+			<div class="wtimeline__text" [translate]="item.content"></div>
+			}
+		</div>
+	</li>
+	}
+</ol>

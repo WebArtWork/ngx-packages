@@ -22,7 +22,13 @@
 		"@angular/router": ">=22.0.0",
 		"@wawjs/ngx-core": ">=22.0.3",
 		"@wawjs/ngx-translate": ">=22.0.3",
-		"rxjs": ">=7.5.0"
+		"rxjs": ">=7.5.0",
+		"chart.js": ">=4.0.0"
+	},
+	"peerDependenciesMeta": {
+		"chart.js": {
+			"optional": true
+		}
 	},
 	"engines": {
 		"node": ">=24",

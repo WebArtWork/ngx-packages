@@ -1,0 +1,43 @@
+:host {
+	display: block;
+}
+
+.worderlist {
+	display: flex;
+	flex-direction: column;
+
+	margin: 0;
+	padding: 0;
+	list-style: none;
+
+	border: 1px solid var(--c-border);
+	border-radius: var(--radius-card);
+	overflow: hidden;
+}
+
+.worderlist__item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--sp-3);
+
+	padding: var(--sp-3) var(--sp-4);
+
+	background: var(--c-bg-secondary);
+
+	& + & {
+		border-top: 1px solid var(--c-border);
+	}
+}
+
+.worderlist__label {
+	color: var(--c-text-primary);
+	font-family: var(--ff-base);
+	font-size: 0.875rem;
+}
+
+.worderlist__actions {
+	display: flex;
+	gap: var(--sp-1);
+	flex-shrink: 0;
+}

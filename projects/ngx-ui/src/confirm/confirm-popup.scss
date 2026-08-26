@@ -1,0 +1,48 @@
+/* Works for [wconfirmPopup] when wconfirm-popup-styles is present */
+.wconfirm-popup {
+	position: absolute;
+	z-index: 1000;
+
+	max-width: 18rem;
+
+	background: var(--c-bg-secondary);
+	border: 1px solid var(--c-border);
+	border-radius: var(--radius-card);
+	box-shadow: var(--shadow-md);
+
+	padding: var(--sp-4);
+}
+
+.wconfirm-popup__message {
+	color: var(--c-text-primary);
+	font-family: var(--ff-base);
+	font-size: 0.875rem;
+	margin-bottom: var(--sp-3);
+}
+
+.wconfirm-popup__actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: var(--sp-2);
+}
+
+.wconfirm-popup__btn {
+	cursor: pointer;
+	border-radius: var(--radius-btn);
+	border: 1px solid transparent;
+	font-family: var(--ff-base);
+	font-size: 0.8125rem;
+	font-weight: 500;
+	padding: var(--sp-2) var(--sp-4);
+}
+
+.wconfirm-popup__btn--reject {
+	background: var(--c-bg-tertiary);
+	color: var(--c-text-primary);
+	border-color: var(--c-border);
+}
+
+.wconfirm-popup__btn--accept {
+	background: var(--c-primary);
+	color: var(--c-text-secondary);
+}

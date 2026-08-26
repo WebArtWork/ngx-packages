@@ -1,0 +1,10 @@
+<ul
+	class="wmenu"
+	[class._popup]="popup()"
+	[class._visible]="!popup() || visible()"
+	(clickOutside)="popup() && hide()"
+>
+	@for (item of items(); track item) {
+	<wmenu-item [item]="item" (wSelect)="onSelect($event)" />
+	}
+</ul>

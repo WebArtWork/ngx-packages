@@ -1,0 +1,23 @@
+<div class="weditor" [class._disabled]="disabled()">
+	<div class="weditor__toolbar">
+		@for (cmd of commands(); track cmd.command) {
+		<button
+			type="button"
+			class="weditor__btn material-icons"
+			[disabled]="disabled()"
+			(mousedown)="$event.preventDefault()"
+			(click)="exec(cmd.command, cmd.value)"
+		>
+			{{ cmd.icon }}
+		</button>
+		}
+	</div>
+
+	<div
+		#editorEl
+		class="weditor__content"
+		[attr.contenteditable]="!disabled()"
+		[attr.data-placeholder]="placeholder()"
+		(input)="onInput($event)"
+	></div>
+</div>

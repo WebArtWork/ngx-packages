@@ -10,14 +10,14 @@ import {
 	signal,
 } from '@angular/core';
 import { TranslateDirective } from '@wawjs/ngx-translate';
-import { ButtonComponent } from '../../../button/button.component';
+import { ButtonDirective } from '../../../button/button.directive';
 import { fileDefaults } from '../../file.const';
 
 export type FileView = 'dropzone' | 'list';
 
 @Component({
 	selector: 'ngx-file',
-	imports: [NgTemplateOutlet, TranslateDirective, ButtonComponent],
+	imports: [NgTemplateOutlet, TranslateDirective, ButtonDirective],
 	templateUrl: './file.component.html',
 	styleUrl: './file.component.scss',
 	encapsulation: ViewEncapsulation.None,

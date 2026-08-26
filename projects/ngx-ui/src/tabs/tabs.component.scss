@@ -1,0 +1,46 @@
+:host {
+	display: block;
+}
+
+.wtabs__nav {
+	display: flex;
+	gap: var(--sp-2);
+	border-bottom: 1px solid var(--c-border);
+}
+
+.wtabs__nav-item {
+	cursor: pointer;
+	background: transparent;
+	border: 0;
+	border-bottom: 2px solid transparent;
+
+	color: var(--c-text-muted);
+	font-family: var(--ff-base);
+	font-weight: 500;
+	font-size: 0.9375rem;
+
+	padding: var(--sp-3) var(--sp-4);
+
+	transition:
+		color var(--motion) var(--easing),
+		border-color var(--motion) var(--easing);
+
+	&:hover {
+		color: var(--c-text-primary);
+	}
+
+	&:focus-visible {
+		outline: none;
+		box-shadow: var(--focus-ring);
+	}
+
+	&._active {
+		color: var(--c-primary);
+		border-bottom-color: var(--c-primary);
+	}
+
+	&._disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+}

@@ -1,0 +1,72 @@
+:host {
+	display: inline-flex;
+}
+
+.wtag {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--sp-2);
+
+	border-radius: var(--radius);
+	font-family: var(--ff-base);
+	letter-spacing: var(--letter-spacing);
+	font-weight: 500;
+	font-size: 0.75rem;
+	line-height: 1;
+
+	padding: var(--sp-2) var(--sp-3);
+
+	border: 1px solid transparent;
+}
+
+.wtag--rounded {
+	border-radius: var(--radius-pill);
+}
+
+.wtag__icon.material-icons {
+	font-family: 'Material Icons';
+	font-weight: normal;
+	font-style: normal;
+	font-size: 0.875rem;
+	line-height: 1;
+}
+
+/* ===== Modifiers (token-driven) ===== */
+
+.wtag--primary {
+	background: var(--c-primary);
+	color: var(--c-text-secondary);
+}
+
+.wtag--secondary {
+	background: var(--c-secondary);
+	color: var(--c-text-secondary);
+}
+
+.wtag--success {
+	background: var(--c-primary);
+	color: var(--c-text-secondary);
+}
+
+.wtag--danger {
+	background: var(--c-danger);
+	color: var(--c-on-danger);
+}
+
+.wtag--warning,
+.wtag--info {
+	background: var(--c-bg-tertiary);
+	color: var(--c-text-primary);
+	border-color: var(--c-border);
+}
+
+.wtag--light {
+	background: var(--c-bg-secondary);
+	color: var(--c-text-primary);
+	border-color: var(--c-border);
+}
+
+.wtag--dark {
+	background: var(--c-text-primary);
+	color: var(--c-bg-secondary);
+}

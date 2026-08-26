@@ -1,0 +1,60 @@
+@let _item = item();
+
+@if (_item.separator) {
+<li class="wmenu__separator" role="separator"></li>
+} @else {
+<li class="wmenu__item" [class._has-children]="!!_item.items?.length">
+	@if (_item.routerLink) {
+	<a
+		class="wmenu__link"
+		[class._disabled]="_item.disabled"
+		[routerLink]="_item.routerLink"
+		(click)="onClick($event)"
+	>
+		@if (_item.icon) {
+		<span class="wmenu__icon material-icons" aria-hidden="true">{{
+			_item.icon
+		}}</span>
+		}
+		<span class="wmenu__label" [translate]="_item.label"></span>
+	</a>
+	} @else if (_item.href) {
+	<a
+		class="wmenu__link"
+		[class._disabled]="_item.disabled"
+		[href]="_item.href"
+		(click)="onClick($event)"
+	>
+		@if (_item.icon) {
+		<span class="wmenu__icon material-icons" aria-hidden="true">{{
+			_item.icon
+		}}</span>
+		}
+		<span class="wmenu__label" [translate]="_item.label"></span>
+	</a>
+	} @else {
+	<button
+		type="button"
+		class="wmenu__link"
+		[disabled]="_item.disabled"
+		(click)="onClick($event)"
+	>
+		@if (_item.icon) {
+		<span class="wmenu__icon material-icons" aria-hidden="true">{{
+			_item.icon
+		}}</span>
+		}
+		<span class="wmenu__label" [translate]="_item.label"></span>
+	</button>
+	} @if (_item.items?.length) {
+	<span class="wmenu__caret material-icons" aria-hidden="true"
+		>chevron_right</span
+	>
+	<ul class="wmenu__submenu">
+		@for (child of _item.items; track child) {
+		<wmenu-item [item]="child" (wSelect)="onChildSelect($event)" />
+		}
+	</ul>
+	}
+</li>
+}

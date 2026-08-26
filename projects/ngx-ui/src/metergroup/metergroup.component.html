@@ -1,0 +1,26 @@
+<div class="wmetergroup">
+	<div class="wmetergroup__bar">
+		@for (item of items(); track item.label; let i = $index) {
+		<span
+			class="wmetergroup__segment"
+			[class]="'wmetergroup__segment--' + ((i % 5) + 1)"
+			[style.width.%]="percent(item.value)"
+			[style.background]="item.color || null"
+		></span>
+		}
+	</div>
+
+	<ul class="wmetergroup__legend">
+		@for (item of items(); track item.label; let i = $index) {
+		<li class="wmetergroup__legend-item">
+			<span
+				class="wmetergroup__legend-dot"
+				[class]="'wmetergroup__segment--' + ((i % 5) + 1)"
+				[style.background]="item.color || null"
+			></span>
+			<span [translate]="item.label"></span>
+			<span class="wmetergroup__legend-value">{{ item.value }}</span>
+		</li>
+		}
+	</ul>
+</div>

@@ -1,17 +1,44 @@
 import { Component, inject, signal } from '@angular/core';
 import {
+	AccordionComponent,
+	AccordionPanelComponent,
 	AlertService,
+	AvatarComponent,
+	BadgeComponent,
+	BreadcrumbComponent,
 	BurgerComponent,
 	ButtonComponent,
+	CardComponent,
+	ChartComponent,
+	ChipComponent,
+	ConfirmPopupDirective,
+	ConfirmPopupStylesComponent,
+	ConfirmService,
+	DividerComponent,
+	EditorComponent,
 	FileComponent,
 	InputComponent,
 	LinkComponent,
 	MaterialComponent,
+	MenuComponent,
+	MenubarComponent,
+	MenuItem,
+	MeterGroupComponent,
 	ModalService,
+	OrderListComponent,
+	ProgressBarComponent,
 	SelectComponent,
+	SpinnerComponent,
 	TableComponent,
+	TabPanelComponent,
+	TabsComponent,
+	TagComponent,
 	ThemeComponent,
 	ThemeService,
+	TimelineComponent,
+	ToggleComponent,
+	TooltipDirective,
+	TooltipStylesComponent,
 } from 'ngx-ui';
 import { SelectValue } from 'ngx-ui';
 
@@ -24,15 +51,40 @@ interface UiRow {
 
 @Component({
 	imports: [
+		AccordionComponent,
+		AccordionPanelComponent,
+		AvatarComponent,
+		BadgeComponent,
+		BreadcrumbComponent,
 		BurgerComponent,
 		ButtonComponent,
+		CardComponent,
+		ChartComponent,
+		ChipComponent,
+		ConfirmPopupDirective,
+		ConfirmPopupStylesComponent,
+		DividerComponent,
+		EditorComponent,
 		FileComponent,
 		InputComponent,
 		LinkComponent,
 		MaterialComponent,
+		MenuComponent,
+		MenubarComponent,
+		MeterGroupComponent,
+		OrderListComponent,
+		ProgressBarComponent,
 		SelectComponent,
+		SpinnerComponent,
 		TableComponent,
+		TabPanelComponent,
+		TabsComponent,
+		TagComponent,
 		ThemeComponent,
+		TimelineComponent,
+		ToggleComponent,
+		TooltipDirective,
+		TooltipStylesComponent,
 	],
 	templateUrl: './landing.component.html',
 	styleUrl: './landing.component.scss',
@@ -40,6 +92,7 @@ interface UiRow {
 export class LandingComponent {
 	private readonly _alertService = inject(AlertService);
 	private readonly _modalService = inject(ModalService);
+	private readonly _confirmService = inject(ConfirmService);
 	protected readonly themeService = inject(ThemeService);
 
 	protected readonly search = signal('');
@@ -52,6 +105,67 @@ export class LandingComponent {
 		{ _id: 'review', name: 'Review' },
 		{ _id: 'blocked', name: 'Blocked' },
 	];
+
+	protected readonly activeTab = signal(0);
+	protected readonly notificationsEnabled = signal(true);
+	protected readonly uploadPercent = signal(64);
+	protected readonly bioHtml = signal('<p>Write something <strong>bold</strong>.</p>');
+	protected readonly priorityList = signal(['Button', 'File picker', 'Dynamic form renderer']);
+	protected readonly deletedCount = signal(0);
+
+	protected readonly menuItems: MenuItem[] = [
+		{ label: 'View', icon: 'visibility', command: () => this.showAlert('View selected') },
+		{ label: 'Edit', icon: 'edit', command: () => this.showAlert('Edit selected') },
+		{ separator: true, label: '' },
+		{ label: 'Delete', icon: 'delete', command: () => this.showAlert('Delete selected') },
+	];
+
+	protected readonly navItems: MenuItem[] = [
+		{ label: 'Dashboard', icon: 'dashboard' },
+		{
+			label: 'Components',
+			icon: 'widgets',
+			items: [
+				{ label: 'Buttons', icon: 'smart_button' },
+				{ label: 'Tables', icon: 'table_chart' },
+			],
+		},
+		{ label: 'Settings', icon: 'settings' },
+	];
+
+	protected readonly breadcrumbItems = [
+		{ label: 'ngx-ui' },
+		{ label: 'Components' },
+		{ label: 'Landing' },
+	];
+
+	protected readonly meterItems = [
+		{ label: 'Ready', value: this.statusItems.length },
+		{ label: 'Review', value: 1 },
+		{ label: 'Blocked', value: 0 },
+	];
+
+	protected readonly timelineItems = [
+		{ label: 'Package published', date: 'Aug 1', icon: 'inventory_2' },
+		{ label: 'New components added', date: 'Aug 20', icon: 'widgets' },
+		{ label: 'Docs updated', date: 'Aug 26', icon: 'check' },
+	];
+
+	protected readonly chartData = {
+		labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+		datasets: [{ label: 'Visits', data: [12, 19, 7, 15, 22] }],
+	};
+
+	protected confirmDelete(): void {
+		this._confirmService.confirm({
+			message: 'Delete this item?',
+			accept: () => this.deletedCount.set(this.deletedCount() + 1),
+		});
+	}
+
+	protected onPriorityChange(): void {
+		// items model updates in place via [(items)]
+	}
 
 	protected readonly columns = ['name', 'status', 'owner'];
 	protected readonly rows: UiRow[] = [

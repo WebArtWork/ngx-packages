@@ -1,0 +1,52 @@
+:host {
+	display: inline-flex;
+}
+
+.wavatar {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	overflow: hidden;
+
+	width: 2.5rem;
+	height: 2.5rem;
+
+	background: var(--c-bg-tertiary);
+	color: var(--c-text-primary);
+	font-family: var(--ff-base);
+	font-weight: 600;
+	font-size: 1rem;
+}
+
+.wavatar--small {
+	width: 1.75rem;
+	height: 1.75rem;
+	font-size: 0.75rem;
+}
+
+.wavatar--large {
+	width: 3.5rem;
+	height: 3.5rem;
+	font-size: 1.25rem;
+}
+
+.wavatar--circle {
+	border-radius: var(--radius-pill);
+}
+
+.wavatar--square {
+	border-radius: var(--radius);
+}
+
+.wavatar__image {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.wavatar__icon.material-icons {
+	font-family: 'Material Icons';
+	font-weight: normal;
+	font-style: normal;
+	line-height: 1;
+}

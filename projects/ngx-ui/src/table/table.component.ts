@@ -18,7 +18,7 @@ import {
 } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { StoreService } from '@wawjs/ngx-core';
-import { ButtonComponent } from '../button/button.component';
+import { ButtonDirective } from '../button/button.directive';
 import {
 	ActionsDirective,
 	CellDirective,
@@ -32,7 +32,7 @@ import {
 	templateUrl: './table.component.html',
 	styleUrl: './table.component.scss',
 	encapsulation: ViewEncapsulation.None,
-	imports: [ButtonComponent, NgTemplateOutlet, RouterLink],
+	imports: [ButtonDirective, NgTemplateOutlet, RouterLink],
 })
 export class TableComponent implements OnInit, AfterContentInit {
 	private readonly _router = inject(Router);

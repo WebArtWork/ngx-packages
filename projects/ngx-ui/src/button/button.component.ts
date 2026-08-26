@@ -13,6 +13,12 @@ import {
 } from './button.const';
 import { ButtonType } from './button.type';
 
+/**
+ * @deprecated Wraps `<button>` in an extra `wbutton` host element for no
+ * behavioral benefit. Use `ButtonDirective` (`[wbutton]` on a native
+ * `<button>` or `<a>`) instead, e.g. `<button wbutton type="primary">`.
+ * Will be removed in the next Angular major version bump.
+ */
 @Component({
 	selector: 'wbutton',
 	templateUrl: './button.component.html',

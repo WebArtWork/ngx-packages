@@ -1,0 +1,15 @@
+@let _value = value();
+
+<span
+	class="wbadge"
+	[class]="[
+		typeClass(),
+		size() ? 'wbadge--' + size() : '',
+		_value == null ? 'wbadge--dot' : '',
+		extraClass() || ''
+	]"
+>
+	@if (_value != null) {
+	{{ _value }}
+	}
+</span>

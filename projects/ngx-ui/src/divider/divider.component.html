@@ -1,0 +1,12 @@
+<div
+	class="wdivider"
+	[class]="[
+		'wdivider--' + layout(),
+		'wdivider--' + type(),
+		extraClass() || ''
+	]"
+	role="separator"
+	[attr.aria-orientation]="layout()"
+>
+	<span class="wdivider__content"><ng-content></ng-content></span>
+</div>

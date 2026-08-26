@@ -1,0 +1,13 @@
+<label class="wtoggle" [class._disabled]="disabled()">
+	<input
+		type="checkbox"
+		class="wtoggle__input"
+		[checked]="checked()"
+		[disabled]="disabled()"
+		[attr.aria-label]="ariaLabel() || null"
+		(change)="onToggle($any($event.target).checked)"
+	/>
+	<span class="wtoggle__track">
+		<span class="wtoggle__thumb"></span>
+	</span>
+</label>

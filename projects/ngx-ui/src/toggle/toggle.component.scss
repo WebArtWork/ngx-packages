@@ -1,0 +1,65 @@
+:host {
+	display: inline-flex;
+}
+
+.wtoggle {
+	position: relative;
+	display: inline-flex;
+	cursor: pointer;
+
+	&._disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+}
+
+.wtoggle__input {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+.wtoggle__track {
+	display: inline-flex;
+	align-items: center;
+
+	width: 2.75rem;
+	height: 1.5rem;
+
+	background: var(--c-bg-tertiary);
+	border: 1px solid var(--c-border);
+	border-radius: var(--radius-pill);
+
+	transition: background-color var(--motion) var(--easing);
+}
+
+.wtoggle__thumb {
+	width: 1.125rem;
+	height: 1.125rem;
+	margin-left: 0.125rem;
+
+	background: var(--c-bg-secondary);
+	border-radius: var(--radius-pill);
+	box-shadow: var(--shadow-sm);
+
+	transition: transform var(--motion) var(--easing);
+}
+
+.wtoggle__input:checked ~ .wtoggle__track {
+	background: var(--c-primary);
+	border-color: var(--c-primary);
+}
+
+.wtoggle__input:checked ~ .wtoggle__track .wtoggle__thumb {
+	transform: translateX(1.25rem);
+}
+
+.wtoggle__input:focus-visible ~ .wtoggle__track {
+	box-shadow: var(--focus-ring);
+}

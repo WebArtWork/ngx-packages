@@ -1,0 +1,46 @@
+<nav class="wbreadcrumb" [class]="extraClass() || ''" aria-label="Breadcrumb">
+	<ol class="wbreadcrumb__list">
+		@if (homeIcon()) {
+		<li class="wbreadcrumb__item">
+			<a routerLink="/" class="wbreadcrumb__link wbreadcrumb__link--home">
+				<span class="material-icons" aria-hidden="true">{{
+					homeIcon()
+				}}</span>
+			</a>
+			<span class="wbreadcrumb__separator material-icons" aria-hidden="true"
+				>chevron_right</span
+			>
+		</li>
+		} @for (item of items(); track item.label; let last = $last) {
+		<li class="wbreadcrumb__item">
+			@if (item.disabled || last) {
+			<span
+				class="wbreadcrumb__link wbreadcrumb__link--current"
+				[attr.aria-current]="last ? 'page' : null"
+				[translate]="item.label"
+			></span>
+			} @else if (item.routerLink) {
+			<a
+				class="wbreadcrumb__link"
+				[routerLink]="item.routerLink"
+				[translate]="item.label"
+			></a>
+			} @else if (item.href) {
+			<a
+				class="wbreadcrumb__link"
+				[href]="item.href"
+				[translate]="item.label"
+			></a>
+			} @else {
+			<span class="wbreadcrumb__link" [translate]="item.label"></span>
+			} @if (!last) {
+			<span
+				class="wbreadcrumb__separator material-icons"
+				aria-hidden="true"
+				>chevron_right</span
+			>
+			}
+		</li>
+		}
+	</ol>
+</nav>
