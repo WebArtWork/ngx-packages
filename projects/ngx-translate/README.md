@@ -50,6 +50,42 @@ export const appConfig = {
 };
 ```
 
+## Auto-Detecting the Initial Language
+
+Set `detectLanguage` to pick the initial language from device/browser signals
+when there is no explicit `language` and no persisted language yet. A detected
+code is only used if it matches one of the configured `languages`.
+
+```ts
+provideTranslate({
+	defaultLanguage: 'en',
+	languages: ['en', 'de', 'fr', 'es', 'pt'],
+	detectLanguage: true, // uses default order: ['browser', 'timezone']
+});
+```
+
+`true` runs the built-in detectors in order — `'browser'` (`navigator.languages`
+/ `navigator.language`) then `'timezone'` (`Intl.DateTimeFormat` resolved
+timezone, mapped through a coarse built-in table) — and stops at the first
+match found among the configured languages. Pass an explicit array to control
+order, drop a detector, or add a custom one:
+
+```ts
+import { detectTimezoneLanguage, provideTranslate } from '@wawjs/ngx-translate';
+
+provideTranslate({
+	defaultLanguage: 'en',
+	languages: ['en', 'de', 'fr'],
+	detectLanguage: [
+		'browser',
+		() => detectTimezoneLanguage({ 'Europe/Zurich': 'de', 'Europe/Paris': 'fr' }),
+	],
+});
+```
+
+Detection only runs in the browser (SSR-safe no-op on the server) and never
+overrides an explicit `language` or a previously persisted selection.
+
 ## Available Features
 
 | Name                                                                                        | Description                                                             |
@@ -235,4 +271,5 @@ Copy this into the consuming project's `AGENTS.md`, `CLAUDE.md`, or equivalent f
 - Translation JSON can use object maps or compact string arrays; array payloads must keep the same order as the default language array.
 - Prefer `LanguageService` for active language state, validation, defaults, and persistence before adding app-specific language utilities.
 - Keep SSR-safe behavior intact. Do not add unguarded direct access to browser storage for language persistence when the package already handles it.
+- Use `detectLanguage: true` (or an explicit `LanguageDetector[]`) instead of hand-rolling `navigator.language`/timezone detection; it only applies when there is no explicit `language` and no persisted language.
 ```

@@ -10,6 +10,7 @@ export * from './src/translate/translate.type';
 /*
  *	Language
  */
+export * from './src/language/language-detector';
 export * from './src/language/language.const';
 export * from './src/language/language.interface';
 export * from './src/language/language.service';

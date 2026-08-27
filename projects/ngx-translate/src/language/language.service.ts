@@ -1,5 +1,11 @@
 import { isPlatformBrowser } from '@angular/common';
 import { PLATFORM_ID, Service, inject, signal } from '@angular/core';
+import {
+	DEFAULT_LANGUAGE_DETECTORS,
+	LanguageDetector,
+	detectBrowserLanguage,
+	detectTimezoneLanguage,
+} from './language-detector';
 import { DEFAULT_LANGUAGES } from './language.const';
 import { Language, LanguageInput, ProvideLanguageConfig } from './language.interface';
 
@@ -33,10 +39,13 @@ export class LanguageService {
 		}
 
 		const storedLanguage = this._config.persistLanguage ? this._getStoredLanguage() : null;
+		const detectedLanguage =
+			this._config.language || storedLanguage ? '' : this._detectLanguage();
 
 		const initialLanguage =
 			this._config.language ||
 			storedLanguage ||
+			detectedLanguage ||
 			this._config.defaultLanguage ||
 			this._languages()[0]?.code ||
 			'';
@@ -146,6 +155,42 @@ export class LanguageService {
 
 	private _normalizeCode(code: string): string {
 		return (code || '').trim().toLowerCase();
+	}
+
+	private _detectLanguage(): string {
+		if (!this._isBrowser || !this._config.detectLanguage) {
+			return '';
+		}
+
+		const detectors =
+			this._config.detectLanguage === true
+				? DEFAULT_LANGUAGE_DETECTORS
+				: this._config.detectLanguage;
+
+		for (const detector of detectors) {
+			const normalizedCode = this._normalizeCode(this._runDetector(detector) || '');
+
+			if (normalizedCode && this.hasLanguage(normalizedCode)) {
+				return normalizedCode;
+			}
+		}
+
+		return '';
+	}
+
+	private _runDetector(detector: LanguageDetector): string | null | undefined {
+		if (typeof detector === 'function') {
+			return detector({ languages: this.languages() });
+		}
+
+		switch (detector) {
+			case 'browser':
+				return detectBrowserLanguage();
+			case 'timezone':
+				return detectTimezoneLanguage();
+			default:
+				return null;
+		}
 	}
 
 	private _getStoredLanguage(): string | null {

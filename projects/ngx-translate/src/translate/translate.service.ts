@@ -61,6 +61,7 @@ export class TranslateService {
 			defaultLanguage: this._config.defaultLanguage,
 			languages: this._config.languages,
 			persistLanguage: this._config.persistLanguage,
+			detectLanguage: this._config.detectLanguage,
 		});
 
 		const initialLanguage = this._languageService.language();
