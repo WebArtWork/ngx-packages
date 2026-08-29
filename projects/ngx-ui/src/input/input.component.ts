@@ -44,6 +44,8 @@ export class InputComponent implements AfterViewInit {
 	readonly type = input<InputType>(inputDefaults.type);
 	readonly name = input(inputDefaults.name);
 	readonly label = input(inputDefaults.label);
+	/** Accessible name used when no visible `label` is set (e.g. compact/toolbar usage). */
+	readonly ariaLabel = input<string>('');
 	readonly placeholder = input(inputDefaults.placeholder);
 	readonly items = input<string[]>(inputDefaults.items); // radio/checkbox
 

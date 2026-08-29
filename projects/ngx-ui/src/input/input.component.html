@@ -1,5 +1,5 @@
 @let _formField = formField(); @let _type = type(); @let _name = name(); @let
-_label = label(); @let _disabled = disabled(); @let _items = items(); @let
+_label = label(); @let _ariaLabel = ariaLabel(); @let _disabled = disabled(); @let _items = items(); @let
 _wClass = wClass(); @let _clearable = clearable(); @let _placeholder =
 placeholder(); @let _error = fieldError(); @switch (_type) { @case ('text')
 @case ('password') @case ('email') @case ('search') @case ('tel') @case ('url')
@@ -30,6 +30,7 @@ placeholder(); @let _error = fieldError(); @switch (_type) { @case ('text')
 			[attr.aria-invalid]="_error ? true : null"
 			[attr.aria-describedby]="_error ? errorId : null"
 			[attr.aria-required]="isRequired() || null"
+			[attr.aria-label]="!_label ? (_ariaLabel || null) : null"
 			[manualType]="
 					_type === 'password'
 						? (showPassword() ? 'text' : 'password')
@@ -54,6 +55,7 @@ placeholder(); @let _error = fieldError(); @switch (_type) { @case ('text')
 			[attr.aria-invalid]="_error ? true : null"
 			[attr.aria-describedby]="_error ? errorId : null"
 			[attr.aria-required]="isRequired() || null"
+			[attr.aria-label]="!_label ? (_ariaLabel || null) : null"
 			[attr.type]="
 					_type === 'password'
 						? (showPassword() ? 'text' : 'password')
@@ -115,6 +117,7 @@ placeholder(); @let _error = fieldError(); @switch (_type) { @case ('text')
 			[attr.aria-invalid]="_error ? true : null"
 			[attr.aria-describedby]="_error ? errorId : null"
 			[attr.aria-required]="isRequired() || null"
+			[attr.aria-label]="!_label ? (_ariaLabel || null) : null"
 			#inputEl
 		></textarea>
 		} @else {
@@ -132,6 +135,7 @@ placeholder(); @let _error = fieldError(); @switch (_type) { @case ('text')
 			[attr.aria-invalid]="_error ? true : null"
 			[attr.aria-describedby]="_error ? errorId : null"
 			[attr.aria-required]="isRequired() || null"
+			[attr.aria-label]="!_label ? (_ariaLabel || null) : null"
 			#inputEl
 		></textarea>
 		}
@@ -144,7 +148,7 @@ placeholder(); @let _error = fieldError(); @switch (_type) { @case ('text')
 } @case ('radio') {
 <div
 	role="radiogroup"
-	[attr.aria-label]="_label || null"
+	[attr.aria-label]="_label || _ariaLabel || null"
 	[attr.aria-invalid]="_error ? true : null"
 	[attr.aria-describedby]="_error ? errorId : null"
 	[attr.aria-required]="isRequired() || null"
@@ -195,7 +199,7 @@ placeholder(); @let _error = fieldError(); @switch (_type) { @case ('text')
 } @case ('checkbox') { @if (_items.length) {
 <div
 	role="group"
-	[attr.aria-label]="_label || null"
+	[attr.aria-label]="_label || _ariaLabel || null"
 	[attr.aria-invalid]="_error ? true : null"
 	[attr.aria-describedby]="_error ? errorId : null"
 	[attr.aria-required]="isRequired() || null"
@@ -239,6 +243,7 @@ placeholder(); @let _error = fieldError(); @switch (_type) { @case ('text')
 		[attr.aria-invalid]="_error ? true : null"
 		[attr.aria-describedby]="_error ? errorId : null"
 		[attr.aria-required]="isRequired() || null"
+		[attr.aria-label]="!_label ? (_ariaLabel || null) : null"
 		type="checkbox"
 		#inputEl
 	/>
@@ -257,6 +262,7 @@ placeholder(); @let _error = fieldError(); @switch (_type) { @case ('text')
 		[attr.aria-invalid]="_error ? true : null"
 		[attr.aria-describedby]="_error ? errorId : null"
 		[attr.aria-required]="isRequired() || null"
+		[attr.aria-label]="!_label ? (_ariaLabel || null) : null"
 		#inputEl
 	/>
 	}

@@ -58,6 +58,8 @@ export class SelectComponent implements ControlValueAccessor {
 	readonly bindLabel = input(selectDefaults.bindLabel);
 	readonly bindValue = input(selectDefaults.bindValue);
 	readonly label = input(selectDefaults.label);
+	/** Accessible name used when no visible `label` is set (e.g. compact/toolbar usage). */
+	readonly ariaLabel = input<string>('');
 	readonly searchable = input(selectDefaults.searchable);
 	readonly searchableBy = input(selectDefaults.searchableBy);
 	readonly items = input<unknown[]>(selectDefaults.items);

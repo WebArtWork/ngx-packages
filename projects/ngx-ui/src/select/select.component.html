@@ -24,6 +24,7 @@
 		[attr.aria-controls]="_show ? listboxId : null"
 		[attr.aria-activedescendant]="activeDescendantId()"
 		[attr.aria-labelledby]="_label ? labelId : null"
+		[attr.aria-label]="!_label ? (ariaLabel() || null) : null"
 		tabindex="0"
 	>
 		<!-- header (click target) -->
