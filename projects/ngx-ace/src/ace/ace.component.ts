@@ -90,6 +90,9 @@ export class AceComponent implements AfterViewInit {
 	// Escape hatch (advanced options)
 	readonly config = input<AceConfigInterface | undefined>(undefined);
 
+	// accessible name for the underlying editor
+	readonly ariaLabel = input<string | undefined>(undefined);
+
 	// host class toggle
 	readonly useAceClass = input(true);
 

@@ -43,7 +43,7 @@ export const appConfig = {
 | Name               | Description                                                                      |
 | ------------------ | -------------------------------------------------------------------------------- |
 | `MapComponent`     | Google Maps wrapper with markers, map clicks, and optional click-to-place marker |
-| `AddressComponent` | Address search input with Photon predictions and a pick-from-map modal           |
+| `AddressComponent` | Address search input with Photon predictions and an accessible, labeled pick-from-map button/modal |
 | `MapService`       | Forward and reverse geocoding through a Photon-compatible backend proxy          |
 | `provideNgxMap`    | Environment provider for map package defaults                                    |
 
@@ -55,6 +55,12 @@ export const appConfig = {
 | `predictionLimit`      | `7`                   | Maximum prediction count for forward geocoding      |
 | `lastCenterStorageKey` | `waw_map_last_center` | Browser storage key for the last selected center    |
 | `resolveUserLocation`  | `true`                | Whether `MapComponent` attempts browser geolocation |
+
+## Accessibility
+
+- `AddressComponent` renders its map-picker trigger as a real `<button type="button" aria-label="Pick location on the map">` (not an icon-only, unlabeled click handler), so it has a keyboard-operable, screen-reader-friendly accessible name.
+- The pick-from-map modal (`PickerComponent`) shows a visible instruction ("Click a location on the map to select it.") so the click-only map interaction has a textual equivalent for assistive technology users.
+- `PickerComponent`/`AddressComponent`'s map modal is opened through `@wawjs/ngx-ui`'s `ModalService`, which already provides `role="dialog"`, focus trapping, and Escape-to-close.
 
 ## License
 

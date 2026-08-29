@@ -39,6 +39,8 @@ export const appConfig = {
 - Width and height fall back to the container size through `ResizeObserver`.
 - Event outputs follow camelCase Angular bindings, for example `objectAdded` for Fabric's `object:added`.
 - Prefer `injectFabricCropModalService()` for new crop actions so the crop modal service and component load only when the user opens the crop workflow.
+- Pass `[ariaLabel]="'...'"` on `FabricComponent` to give the `<canvas>` an accessible name (rendered as `aria-label`/`role="img"` on the host canvas element).
+- `FabricCropModalComponent`'s crop stage is keyboard-reachable (`tabindex="0"`) and exposes `role="application"` with an `aria-label` plus `aria-describedby` pointing at the live status text; it still delegates dialog chrome (focus trap, Escape, `role="dialog"`) to `@wawjs/ngx-ui`'s `ModalService` via `FabricCropModalService`. Full keyboard-driven crop-frame resizing is out of scope for this pass — Fabric.js object manipulation remains pointer-driven.
 
 ## AI Coding Agents
 

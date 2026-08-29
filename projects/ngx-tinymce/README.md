@@ -40,6 +40,7 @@ export const appConfig = {
 - The component is SSR-safe and only touches the TinyMCE global in the browser.
 - TinyMCE script loading is lazy; configure `baseURL` and `fileName` to match where you host the editor assets.
 - Per-instance `config` input merges over the defaults registered with `provideNgxTinymce()`.
+- Pass `[ariaLabel]="'...'"` on `TinymceComponent` to give the editor an accessible name; it is set on the source `<textarea>`/inline `<div>` and, once TinyMCE initializes, on the editor's container and iframe body.
 
 ## AI Coding Agents
 

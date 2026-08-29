@@ -32,6 +32,10 @@ export const appConfig = {
 - `registerAceMode()` and `registerAceTheme()` for lazy feature loading
 - `AceConfigInterface`, `AceConfig`, and related types
 
+## Accessibility
+
+- Pass `[ariaLabel]="'...'"` on `AceComponent` (or `AceDirective`) to give the editor an accessible name. It is applied both as a host `aria-label` and, once the editor initializes, as `aria-label` on Ace's own hidden text input so screen readers announce it correctly.
+
 ## AI Coding Agents
 
 This package includes [AI.md](AI.md) with copyable instructions for Codex, Claude Code, Cursor, and other coding agents.

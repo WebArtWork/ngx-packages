@@ -4,6 +4,8 @@
 	[width]="width() ?? undefined"
 	[height]="height() ?? undefined"
 	[disabled]="disabled()"
+	[attr.aria-label]="ariaLabel()"
+	[attr.role]="ariaLabel() ? 'img' : null"
 	(drop)="drop.emit($event)"
 	(dragover)="dragover.emit($event)"
 	(dragenter)="dragenter.emit($event)"

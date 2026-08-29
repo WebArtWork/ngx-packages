@@ -26,11 +26,17 @@ type ImageElement = HTMLImageElement | HTMLCanvasElement;
 		<section class="fabric-crop">
 			<header class="fabric-crop__header">
 				<h2>{{ title }}</h2>
-				<p>{{ status }}</p>
+				<p id="fabric-crop-status">{{ status }}</p>
 			</header>
 
 			<div class="fabric-crop__stage">
-				<canvas #canvasEl></canvas>
+				<canvas
+					#canvasEl
+					tabindex="0"
+					role="application"
+					aria-label="Crop frame"
+					aria-describedby="fabric-crop-status"
+				></canvas>
 			</div>
 
 			<div class="fabric-crop__controls">

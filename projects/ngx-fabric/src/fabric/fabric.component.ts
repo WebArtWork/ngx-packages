@@ -57,6 +57,9 @@ export class FabricComponent implements AfterViewInit {
 	readonly config = input<FabricConfigInterface | undefined>(undefined);
 	readonly useFabricClass = input(true);
 
+	// accessible name for the canvas host element
+	readonly ariaLabel = input<string | undefined>(undefined);
+
 	readonly dataLoaded = output<unknown>();
 	readonly drop = output<unknown>();
 	readonly dragover = output<unknown>();

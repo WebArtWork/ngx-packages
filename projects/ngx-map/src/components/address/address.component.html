@@ -7,9 +7,17 @@
 		[wModel]="search()"
 		(wBlur)="onBlur()"
 		[label]="label()"
-		[icons]="icons"
 		type="text"
 	/>
+
+	<button
+		type="button"
+		class="waw-address__pin"
+		aria-label="Pick location on the map"
+		(click)="openPicker()"
+	>
+		<span class="material-icons" aria-hidden="true">place</span>
+	</button>
 
 	@if (focused() && predictions().length > 0) {
 		<div class="waw-address__dropdown">

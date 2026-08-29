@@ -10,6 +10,12 @@ import { LatLngLiteral } from '../../map.interface';
 			:host {
 				display: block;
 			}
+
+			.picker__hint {
+				margin: 0 0 var(--sp-2);
+				color: var(--c-text-secondary);
+				font-size: 0.9rem;
+			}
 		`,
 	],
 })

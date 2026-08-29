@@ -35,11 +35,22 @@
 
 .wchip__remove {
 	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 1.5rem;
+	min-height: 1.5rem;
+	margin: calc(-1 * var(--sp-1));
 	cursor: pointer;
 	background: transparent;
 	border: 0;
+	border-radius: var(--radius-pill);
 	padding: 0;
 	color: inherit;
+
+	&:focus-visible {
+		outline: 2px solid var(--c-primary);
+		outline-offset: 1px;
+	}
 }
 
 .wchip__remove.material-icons {

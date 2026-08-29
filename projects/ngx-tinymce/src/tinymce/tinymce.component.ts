@@ -29,12 +29,13 @@ let _loaderPromise: Promise<void> | null = null;
 	exportAs: 'ngxTinymce',
 	template: `
 		@if (inline()) {
-			<div [attr.id]="_editorId()"><ng-content /></div>
+			<div [attr.id]="_editorId()" [attr.aria-label]="ariaLabel()"><ng-content /></div>
 		} @else {
 			<textarea
 				class="tinymce-selector"
 				[attr.id]="_editorId()"
 				[attr.placeholder]="placeholder()"
+				[attr.aria-label]="ariaLabel()"
 			></textarea>
 		}
 
@@ -83,6 +84,7 @@ export class TinymceComponent implements ControlValueAccessor {
 
 	readonly config = input<TinymceInitOptions | null>(null);
 	readonly placeholder = input('');
+	readonly ariaLabel = input<string | undefined>(undefined);
 	readonly inline = input(false, { transform: booleanAttribute });
 	readonly disabled = input(false, { transform: booleanAttribute });
 	readonly delay = input(0, { transform: numberAttribute });
@@ -218,6 +220,7 @@ export class TinymceComponent implements ControlValueAccessor {
 					editor.setContent(this._value);
 				}
 				this._applyDisabledState();
+				this._applyAriaLabel(editor);
 				userOptions.init_instance_callback?.(editor);
 				this.load.set(false);
 				this.ready.emit(editor);
@@ -291,6 +294,28 @@ export class TinymceComponent implements ControlValueAccessor {
 		}
 
 		this._instance.mode?.set(mode);
+	}
+
+	private _applyAriaLabel(editor: TinymceEditor): void {
+		const label = this.ariaLabel();
+		if (!label) {
+			return;
+		}
+
+		try {
+			const container = (editor as { getContainer?: () => HTMLElement }).getContainer?.();
+			container?.setAttribute('aria-label', label);
+
+			const iframeDoc = (
+				editor as { iframeElement?: HTMLIFrameElement }
+			).iframeElement?.contentDocument;
+			const body = iframeDoc?.body;
+			if (body) {
+				body.setAttribute('aria-label', label);
+			}
+		} catch {
+			// ignore: best-effort a11y wiring, must not break initialization
+		}
 	}
 
 	private _destroyEditor(): void {

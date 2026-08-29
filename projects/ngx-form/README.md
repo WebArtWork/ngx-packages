@@ -72,6 +72,11 @@ Passed to the modal service `show()` method when opening form modals:
 | `onClose` | `() => void` | Callback fired when the modal closes |
 | `[x: string]` | `unknown` | Additional data passed through to the component |
 
+## Accessibility
+
+- `ModalFormComponent`/`ModalUniqueComponent` are plain content components rendered through the injected `modalService` (`NgxFormConfig.modalService`, typically `@wawjs/ngx-ui`'s `ModalService`); they do not hand-roll dialog chrome, so they inherit `role="dialog"`, focus trapping, and Escape-to-close from that service.
+- `FormComponentComponent` passes the underlying signal-forms field node (`field`) into each rendered field template's context, so consuming templates (registered via `FormService.addTemplateComponent`) are responsible for wiring `aria-invalid`, `aria-describedby`, and `aria-required` from that field's validity/required state to the actual control markup. `@wawjs/ngx-form` itself never renders raw `<input>`/`<label>` markup, so this wiring belongs in the consumer's field templates (or in `@wawjs/ngx-ui` input components used there).
+
 ## Package Boundaries
 
 - `@wawjs/ngx-form` — dynamic form logic, field schemas, form services, and form modal flows.

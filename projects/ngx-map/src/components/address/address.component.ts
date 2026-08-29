@@ -6,7 +6,7 @@ import {
 	output,
 	signal,
 } from '@angular/core';
-import { InputComponent, InputIconAction, InputValue, ModalService } from '@wawjs/ngx-ui';
+import { InputComponent, InputValue, ModalService } from '@wawjs/ngx-ui';
 import { CoreService } from '@wawjs/ngx-core';
 import { GeoAddress, LatLngLiteral } from '../../map.interface';
 import { MapService } from '../../map.service';
@@ -61,6 +61,29 @@ import { PickerComponent } from '../../modals/picker/picker.component';
 				color: var(--c-text-muted);
 				pointer-events: none;
 			}
+
+			.waw-address__pin {
+				position: absolute;
+				right: var(--sp-2);
+				top: 50%;
+				transform: translateY(-50%);
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				border: 0;
+				background: transparent;
+				color: var(--c-text-muted);
+				cursor: pointer;
+				border-radius: var(--radius);
+				padding: var(--sp-1);
+			}
+
+			.waw-address__pin:hover,
+			.waw-address__pin:focus-visible {
+				color: var(--c-text-primary);
+				background: var(--c-bg-tertiary);
+				outline: none;
+			}
 		`,
 	],
 	imports: [InputComponent],
@@ -92,19 +115,14 @@ export class AddressComponent {
 	readonly predictions = signal<GeoAddress[]>([]);
 	readonly focused = signal(false);
 
-	readonly icons: InputIconAction[] = [
-		{
-			icon: 'place',
-			click: () => {
-				this._modalService.show({
-					component: PickerComponent,
-					mapClick: async (latLng: LatLngLiteral) => {
-						await this._pickLatLng(latLng);
-					},
-				});
+	openPicker(): void {
+		this._modalService.show({
+			component: PickerComponent,
+			mapClick: async (latLng: LatLngLiteral) => {
+				await this._pickLatLng(latLng);
 			},
-		},
-	];
+		});
+	}
 
 	onFocus(): void {
 		if (this._blurTimer) {

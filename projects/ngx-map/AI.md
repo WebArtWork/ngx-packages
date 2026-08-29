@@ -34,3 +34,9 @@ export const appConfig = {
 - Use `@wawjs/ngx-map` for map, address, and geocoding behavior.
 - Use `@angular/google-maps` only for lower-level direct Google Maps needs.
 - Use `@wawjs/ngx-ui` and `@wawjs/ngx-http` for UI and HTTP concerns.
+
+## Accessibility
+
+- `AddressComponent`'s map-picker trigger is a real labeled `<button>` (not an icon-only click handler) so it stays keyboard-operable with a real accessible name; don't reintroduce `InputIconAction`-based icon buttons without an accessible name.
+- The pick-from-map modal shows a visible instruction line as a textual equivalent to the click-only map interaction.
+- Map/address modals rely on `@wawjs/ngx-ui`'s `ModalService` for dialog semantics, focus trapping, and Escape-to-close — do not hand-roll modal chrome in this package.

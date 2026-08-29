@@ -52,6 +52,9 @@ export class AceDirective implements OnInit, OnDestroy {
 	// escape hatch: [config]="options"
 	readonly config = input<AceConfigInterface | undefined>(undefined);
 
+	// accessible name for the underlying Ace editor's hidden text input
+	readonly ariaLabel = input<string | undefined>(undefined, { alias: 'ariaLabel' });
+
 	// -------- outputs --------
 	readonly blur = output<unknown>();
 	readonly focus = output<unknown>();
@@ -75,6 +78,7 @@ export class AceDirective implements OnInit, OnDestroy {
 			this.mode();
 			this.theme();
 			this.config();
+			this.ariaLabel();
 
 			const editor = this._instance;
 			if (!editor) return;
@@ -209,6 +213,8 @@ export class AceDirective implements OnInit, OnDestroy {
 
 			if (disabled) editor.blur?.();
 
+			this._applyAriaLabel(editor);
+
 			// ensure layout refresh after toggling renderer flags
 			editor.renderer?.updateFull?.();
 		} catch {
@@ -216,6 +222,22 @@ export class AceDirective implements OnInit, OnDestroy {
 		}
 
 		this._scheduleResize(editor);
+	}
+
+	private _applyAriaLabel(editor: any): void {
+		try {
+			const label = this.ariaLabel();
+			const textarea = editor.textInput?.getElement?.();
+			if (textarea) {
+				if (label) {
+					textarea.setAttribute('aria-label', label);
+				} else {
+					textarea.removeAttribute('aria-label');
+				}
+			}
+		} catch {
+			// ignore
+		}
 	}
 
 	private async initAce(): Promise<void> {
