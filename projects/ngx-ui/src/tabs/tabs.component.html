@@ -10,7 +10,7 @@
 			[class._active]="activeIndex() === i"
 			[class._disabled]="panel.disabled()"
 			[attr.aria-selected]="activeIndex() === i ? 'true' : 'false'"
-			[attr.tabindex]="activeIndex() === i ? 0 : -1"
+			[attr.tabindex]="rovingIndex() === i ? 0 : -1"
 			[disabled]="panel.disabled()"
 			(click)="select(i)"
 			(keydown)="onKeydown($event, i)"

@@ -8,6 +8,7 @@ export * from './src/core/config.interface';
 export * from './src/core/core.prototype';
 export * from './src/core/core.service';
 export * from './src/core/core.type';
+export * from './src/core/escape-stack.util';
 export * from './src/core/mongodate.pipe';
 export * from './src/core/number.pipe';
 export * from './src/core/pagination.pipe';

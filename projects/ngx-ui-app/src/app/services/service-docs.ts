@@ -307,6 +307,7 @@ export class ContactComponent {}`,
 			'AccordionPanelComponent exposes a two-way expanded model so panels can be opened programmatically.',
 			'Single-open mode collapses other panels automatically when one opens.',
 			'Panels can be individually disabled.',
+			'Each header/body pair is linked via aria-controls/aria-labelledby (role="region" on the body) for screen readers.',
 		],
 		availableItems: ['accordion.component.ts', 'accordion-panel.component.ts'],
 		properties: [
@@ -471,6 +472,7 @@ export class ContactComponent {}`,
 		highlights: [
 			'type and data are required inputs.',
 			'Accepts the same ChartData/ChartOptions shapes as Chart.js.',
+			'Renders a visually-hidden data table alongside the canvas as a screen-reader fallback; pass description for its aria-label/caption.',
 		],
 		availableItems: ['chart.component.ts'],
 		properties: [
@@ -560,6 +562,7 @@ export class ContactComponent {}`,
 		highlights: [
 			'confirm() merges DEFAULT_CONFIRM_CONFIG with the supplied Confirm options and shows it via ModalService.',
 			'[wconfirmPopup] renders an anchored popup with accept/reject outputs, no ModalService involved.',
+			'The dialog uses role="alertdialog" with aria-labelledby/aria-describedby; the popup moves focus in on open, closes on Escape, and restores focus to the trigger on close.',
 		],
 		availableItems: [
 			'confirm.service.ts',
@@ -698,6 +701,7 @@ confirm.confirm({
 		highlights: [
 			'MenuItem supports label, icon, command, routerLink, href, disabled, separator, and nested items.',
 			'popup mode requires calling toggle($event) from a template reference, typically from a trigger button.',
+			'role="menu"/"menubar"/"menuitem" with Arrow/Home/End/Escape keyboard navigation and Left/Right into and out of submenus.',
 		],
 		availableItems: ['menu.component.ts', 'menu-item.component.ts', 'menu.interface.ts', 'menubar.component.ts'],
 		properties: [
@@ -875,7 +879,11 @@ confirm.confirm({
 		description: 'Tabbed content container built from TabsComponent and projected TabPanelComponent items.',
 		summary:
 			'TabsComponent renders a tab strip from projected TabPanelComponent children, tracking the active tab through a two-way activeIndex model.',
-		highlights: ['activeIndex is a two-way model.', 'Individual TabPanelComponent entries can be disabled.'],
+		highlights: [
+			'activeIndex is a two-way model.',
+			'Individual TabPanelComponent entries can be disabled.',
+			'Roving tabindex with Left/Right/Home/End keyboard navigation, per the WAI-ARIA APG Tabs pattern.',
+		],
 		availableItems: ['tabs.component.ts', 'tab-panel.component.ts'],
 		properties: [
 			{
@@ -996,7 +1004,10 @@ confirm.confirm({
 		name: 'TooltipDirective',
 		description: 'Floating tooltip directive applied to any host element.',
 		summary: 'TooltipDirective attaches a floating panel that shows the wtooltip text on hover or focus, positioned relative to the host element.',
-		highlights: ['tooltipPosition supports top, bottom, left, and right placements.'],
+		highlights: [
+			'tooltipPosition supports top, bottom, left, and right placements.',
+			'Uses role="tooltip" with aria-describedby on the host, and closes on Escape.',
+		],
 		availableItems: ['tooltip.directive.ts', 'tooltip-styles.component.ts'],
 		properties: [
 			{

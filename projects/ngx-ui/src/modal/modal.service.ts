@@ -55,8 +55,14 @@ export class ModalService {
 				this._document.body.classList.remove('modalOpened');
 			}
 
-			if (previouslyFocused && typeof previouslyFocused.focus === 'function') {
+			if (
+				previouslyFocused &&
+				typeof previouslyFocused.focus === 'function' &&
+				this._document.contains(previouslyFocused)
+			) {
 				previouslyFocused.focus();
+			} else {
+				(this._document.body as HTMLElement | null)?.focus?.();
 			}
 		};
 

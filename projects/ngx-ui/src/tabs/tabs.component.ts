@@ -1,6 +1,7 @@
 import {
 	Component,
 	ViewEncapsulation,
+	computed,
 	contentChildren,
 	effect,
 	model,
@@ -35,6 +36,23 @@ export class TabsComponent {
 			});
 		});
 	}
+
+	/**
+	 * The tab that should hold the single roving `tabindex="0"` stop. Falls
+	 * back to the first non-disabled tab if the active tab itself is
+	 * disabled, so the tablist never becomes entirely Tab-unreachable.
+	 */
+	readonly rovingIndex = computed(() => {
+		const panels = this.panels();
+		const active = this.activeIndex();
+
+		if (!panels[active]?.disabled()) {
+			return active;
+		}
+
+		const fallback = panels.findIndex(panel => !panel.disabled());
+		return fallback === -1 ? active : fallback;
+	});
 
 	tabId(index: number): string {
 		return `${this._idPrefix}-tab-${index}`;

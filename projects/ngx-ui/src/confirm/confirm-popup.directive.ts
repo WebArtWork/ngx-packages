@@ -9,7 +9,7 @@ import {
 	input,
 	output,
 } from '@angular/core';
-import { generateA11yId } from '@wawjs/ngx-core';
+import { generateA11yId, pushEscapeHandler } from '@wawjs/ngx-core';
 import { DEFAULT_CONFIRM_CONFIG } from './interfaces/confirm.interface';
 
 @Directive({
@@ -38,7 +38,7 @@ export class ConfirmPopupDirective implements OnDestroy {
 	private readonly _messageId = generateA11yId('wconfirm-popup-message');
 	private _panelEl?: HTMLElement;
 	private _removeDocClick?: () => void;
-	private _removeKeydown?: () => void;
+	private _unregisterEscape?: () => void;
 
 	toggle(event: Event): void {
 		event.stopPropagation();
@@ -77,7 +77,7 @@ export class ConfirmPopupDirective implements OnDestroy {
 		this._renderer.setProperty(rejectBtn, 'textContent', this.rejectLabel());
 		this._renderer.listen(rejectBtn, 'click', () => {
 			this.wReject.emit();
-			this.hide();
+			this.hide({ restoreFocus: true });
 		});
 		this._renderer.appendChild(actions, rejectBtn);
 
@@ -88,7 +88,7 @@ export class ConfirmPopupDirective implements OnDestroy {
 		this._renderer.setProperty(acceptBtn, 'textContent', this.acceptLabel());
 		this._renderer.listen(acceptBtn, 'click', () => {
 			this.wAccept.emit();
-			this.hide();
+			this.hide({ restoreFocus: true });
 		});
 		this._renderer.appendChild(actions, acceptBtn);
 
@@ -106,19 +106,12 @@ export class ConfirmPopupDirective implements OnDestroy {
 			() => this.hide(),
 		);
 
-		this._removeKeydown = this._renderer.listen(
-			this._document,
-			'keydown',
-			(event: KeyboardEvent) => {
-				if (event.key === 'Escape') {
-					event.stopPropagation();
-					this.hide();
-				}
-			},
+		this._unregisterEscape = pushEscapeHandler(this._document, () =>
+			this.hide({ restoreFocus: true }),
 		);
 	}
 
-	hide(): void {
+	hide(options?: { restoreFocus?: boolean }): void {
 		const hadPanel = !!this._panelEl;
 
 		if (this._panelEl) {
@@ -129,10 +122,14 @@ export class ConfirmPopupDirective implements OnDestroy {
 		this._removeDocClick?.();
 		this._removeDocClick = undefined;
 
-		this._removeKeydown?.();
-		this._removeKeydown = undefined;
+		this._unregisterEscape?.();
+		this._unregisterEscape = undefined;
 
-		if (hadPanel && typeof this._elementRef.nativeElement.focus === 'function') {
+		if (
+			hadPanel &&
+			options?.restoreFocus &&
+			typeof this._elementRef.nativeElement.focus === 'function'
+		) {
 			this._elementRef.nativeElement.focus();
 		}
 	}

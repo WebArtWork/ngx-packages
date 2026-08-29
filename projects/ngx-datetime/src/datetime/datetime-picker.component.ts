@@ -1,8 +1,11 @@
 import {
 	Component,
 	ElementRef,
+	Injector,
+	afterNextRender,
 	computed,
 	forwardRef,
+	inject,
 	input,
 	model,
 	signal,
@@ -53,6 +56,7 @@ export class DatetimePickerComponent implements ControlValueAccessor {
 
 	private readonly _trigger = viewChild<ElementRef<HTMLElement>>('trigger');
 	private readonly _panel = viewChild<ElementRef<HTMLElement>>('panel');
+	private readonly _injector = inject(Injector);
 
 	protected readonly isRangeMode = computed(
 		() => this.mode() === 'date-range' || this.mode() === 'datetime-range',
@@ -99,7 +103,7 @@ export class DatetimePickerComponent implements ControlValueAccessor {
 		}
 
 		this.isOpen.set(true);
-		queueMicrotask(() => this._focusPanel());
+		afterNextRender(() => this._focusPanel(), { injector: this._injector });
 	}
 
 	protected close(): void {

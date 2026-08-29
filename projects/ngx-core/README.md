@@ -73,6 +73,8 @@ export const appConfig = {
 | `MetaService` | Route-aware title/meta/link management |
 | `MetaGuard` | Optional guard for route-driven metadata flows |
 | `ClickOutsideDirective` | Standalone outside-click directive |
+| `generateA11yId` | Stable, hydration-safe id generator for wiring ARIA relationships (`aria-describedby`, `aria-controls`, ...) |
+| `pushEscapeHandler` | Shared Escape-to-close stack so stacked modals/popups close one at a time instead of all at once |
 | Pipes | `arr`, `mongodate`, `number`, `pagination`, `safe`, `search`, `splice`, `split` |
 
 ## Core Service
@@ -329,6 +331,32 @@ isValidEmail(email: string) {
 	return this.utilService.valid(email, 'email');
 }
 ```
+
+## Accessibility Helpers
+
+`generateA11yId(prefix?)` returns a stable, monotonically increasing id (`` `${prefix}-${n}` ``) for wiring ARIA relationships (`aria-describedby`, `aria-labelledby`, `aria-controls`, ...) on components that have no other natural unique id. It uses a simple incrementing counter — the same technique Angular CDK/Material use — rather than `crypto.randomUUID()`, so ids stay identical between server-rendered and client-hydrated output (both render the same components in the same order).
+
+```ts
+import { generateA11yId } from '@wawjs/ngx-core';
+
+export class MyFieldComponent {
+	protected readonly errorId = generateA11yId('my-field-error');
+}
+```
+
+`@wawjs/ngx-ui` uses this for `Modal`, `Tooltip`, `Select`, `Tabs`, `Accordion`, and `Input`'s error-message association — reuse it instead of inventing another id scheme.
+
+`pushEscapeHandler(doc, handler)` registers an Escape-to-close callback for an overlay (modal, popup, dropdown) and returns an unregister function to call on close. Only the most-recently-registered (topmost) handler runs when Escape is pressed — with a lone `document.addEventListener('keydown', ...)` per overlay, stacked overlays (two modals, two popups) all close on a single Escape press instead of one at a time; this fixes that by keeping one shared listener and a stack.
+
+```ts
+import { pushEscapeHandler } from '@wawjs/ngx-core';
+
+const unregister = pushEscapeHandler(document, () => this.close());
+// later, when the overlay closes on its own (not via Escape):
+unregister();
+```
+
+`@wawjs/ngx-ui`'s `Modal` and `ConfirmPopupDirective` use this.
 
 ## Dom Service
 

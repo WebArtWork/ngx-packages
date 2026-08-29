@@ -1,6 +1,8 @@
 import {
 	Component,
 	ElementRef,
+	Injector,
+	afterNextRender,
 	computed,
 	inject,
 	input,
@@ -86,6 +88,7 @@ export class DatetimeCalendarComponent {
 	}
 
 	private readonly _grid = viewChild<ElementRef<HTMLElement>>('grid');
+	private readonly _injector = inject(Injector);
 
 	protected isActiveDay(date: Date): boolean {
 		return this._timeService.isSameDay(date, this.activeDate());
@@ -131,14 +134,17 @@ export class DatetimeCalendarComponent {
 	}
 
 	private _focusDate(date: Date): void {
-		queueMicrotask(() => {
-			const grid = this._grid()?.nativeElement;
-			if (!grid) return;
+		afterNextRender(
+			() => {
+				const grid = this._grid()?.nativeElement;
+				if (!grid) return;
 
-			const key = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
-			const button = grid.querySelector<HTMLElement>(`[data-ymd="${key}"]`);
-			button?.focus();
-		});
+				const key = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+				const button = grid.querySelector<HTMLElement>(`[data-ymd="${key}"]`);
+				button?.focus();
+			},
+			{ injector: this._injector },
+		);
 	}
 
 	protected selectDay(day: DatetimeCalendarDay): void {

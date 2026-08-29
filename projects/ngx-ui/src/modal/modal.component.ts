@@ -10,6 +10,7 @@ import {
 import { isPlatformBrowser } from '@angular/common';
 import { PLATFORM_ID, inject } from '@angular/core';
 import { FocusTrap, FocusTrapFactory } from '@angular/cdk/a11y';
+import { pushEscapeHandler } from '@wawjs/ngx-core';
 import { ButtonDirective } from '../button/button.directive';
 import { PlusIconComponent } from '../icons/plus/plus-icon.component';
 
@@ -54,8 +55,8 @@ export class ModalComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	private _focusTrap?: FocusTrap;
+	private _unregisterEscape?: () => void;
 	private readonly _popStateHandler = (e: PopStateEvent) => this.popStateListener(e);
-	private readonly _keydownHandler = (e: KeyboardEvent) => this.onDocumentKeydown(e);
 
 	ngOnInit(): void {
 		if (typeof this.onClickOutside !== 'function') {
@@ -68,7 +69,11 @@ export class ModalComponent implements OnInit, AfterViewInit, OnDestroy {
 
 		if (this._isBrowser) {
 			window.addEventListener('popstate', this._popStateHandler);
-			document.addEventListener('keydown', this._keydownHandler);
+			this._unregisterEscape = pushEscapeHandler(document, () => {
+				if (this.closable) {
+					this.close();
+				}
+			});
 		}
 	}
 
@@ -95,21 +100,14 @@ export class ModalComponent implements OnInit, AfterViewInit, OnDestroy {
 	ngOnDestroy(): void {
 		if (this._isBrowser) {
 			window.removeEventListener('popstate', this._popStateHandler);
-			document.removeEventListener('keydown', this._keydownHandler);
 		}
 
+		this._unregisterEscape?.();
 		this._focusTrap?.destroy();
 	}
 
 	onBackdropClick(): void {
 		this.onClickOutside?.();
-	}
-
-	private onDocumentKeydown(event: KeyboardEvent): void {
-		if (event.key === 'Escape' && this.closable) {
-			event.stopPropagation();
-			this.close();
-		}
 	}
 
 	private popStateListener(_: Event): void {

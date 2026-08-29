@@ -85,11 +85,20 @@ export class MenuItemComponent {
 					event.preventDefault();
 				}
 				break;
-			case 'Escape':
-				event.preventDefault();
-				event.stopPropagation();
-				this.wEscape.emit();
+			case 'Escape': {
+				// Only consume/stop the keystroke when it actually closed a
+				// submenu level here — otherwise let it bubble (e.g. so an
+				// ancestor modal can still close on the same Escape).
+				const closedSubmenu = this._focusParent(link);
+
+				if (closedSubmenu) {
+					event.preventDefault();
+					event.stopPropagation();
+				} else {
+					this.wEscape.emit();
+				}
 				break;
+			}
 		}
 	}
 

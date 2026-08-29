@@ -39,7 +39,7 @@ import {
 			<thead>
 				<tr>
 					<th scope="col">Label</th>
-					@for (dataset of data().datasets; track dataset.label) {
+					@for (dataset of data().datasets; track $index) {
 						<th scope="col">{{ dataset.label }}</th>
 					}
 				</tr>
