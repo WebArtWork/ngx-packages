@@ -1,6 +1,6 @@
 {
 	"name": "@wawjs/ngx-socket",
-	"version": "22.0.3",
+	"version": "22.0.4",
 	"description": "Angular Socket.IO integration package from Web Art Work.",
 	"license": "MIT",
 	"repository": "WebArtWork/ngx-socket",
