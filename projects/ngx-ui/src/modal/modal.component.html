@@ -3,7 +3,14 @@
 	(click)="onBackdropClick()"
 >
 	<div
+		#content
 		[class]="contentClasses"
+		[attr.role]="role"
+		[attr.aria-modal]="true"
+		[attr.aria-label]="ariaLabel || null"
+		[attr.aria-labelledby]="ariaLabelledBy || null"
+		[attr.aria-describedby]="ariaDescribedBy || null"
+		tabindex="-1"
 		(click)="$event.stopPropagation()"
 	>
 		<div class="wawjs-modal__body">

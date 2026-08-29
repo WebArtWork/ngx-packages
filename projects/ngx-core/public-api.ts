@@ -1,6 +1,7 @@
 /*
  *	Core
  */
+export * from './src/core/a11y-id.util';
 export * from './src/core/arr.pipe';
 export * from './src/core/click-outside.directive';
 export * from './src/core/config.interface';

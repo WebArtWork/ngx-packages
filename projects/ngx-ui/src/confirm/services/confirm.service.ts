@@ -15,6 +15,9 @@ export class ConfirmService {
 			component: ConfirmDialogComponent,
 			size: 'small',
 			panelClass: 'wconfirm-modal',
+			role: 'alertdialog',
+			ariaLabelledBy: 'wconfirm-header',
+			ariaDescribedBy: 'wconfirm-message',
 			...merged,
 		} satisfies Modal);
 	}

@@ -1,10 +1,12 @@
 import {
 	Component,
+	ElementRef,
 	computed,
 	inject,
 	input,
 	model,
 	output,
+	viewChild,
 } from '@angular/core';
 import {
 	DatetimeCalendarDay,
@@ -81,6 +83,62 @@ export class DatetimeCalendarComponent {
 
 	protected nextMonth(): void {
 		this.activeDate.set(this._timeService.addMonths(this.activeDate(), 1));
+	}
+
+	private readonly _grid = viewChild<ElementRef<HTMLElement>>('grid');
+
+	protected isActiveDay(date: Date): boolean {
+		return this._timeService.isSameDay(date, this.activeDate());
+	}
+
+	protected onGridKeydown(event: KeyboardEvent, day: DatetimeCalendarDay): void {
+		let target: Date | null = null;
+
+		switch (event.key) {
+			case 'ArrowLeft':
+				target = this._timeService.addDays(day.date, -1);
+				break;
+			case 'ArrowRight':
+				target = this._timeService.addDays(day.date, 1);
+				break;
+			case 'ArrowUp':
+				target = this._timeService.addDays(day.date, -7);
+				break;
+			case 'ArrowDown':
+				target = this._timeService.addDays(day.date, 7);
+				break;
+			case 'Home':
+				target = this._timeService.startOfWeek(day.date, this.locale());
+				break;
+			case 'End':
+				target = this._timeService.addDays(
+					this._timeService.startOfWeek(day.date, this.locale()),
+					6,
+				);
+				break;
+			case 'Enter':
+			case ' ':
+				event.preventDefault();
+				this.selectDay(day);
+				return;
+			default:
+				return;
+		}
+
+		event.preventDefault();
+		this.activeDate.set(target);
+		this._focusDate(target);
+	}
+
+	private _focusDate(date: Date): void {
+		queueMicrotask(() => {
+			const grid = this._grid()?.nativeElement;
+			if (!grid) return;
+
+			const key = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+			const button = grid.querySelector<HTMLElement>(`[data-ymd="${key}"]`);
+			button?.focus();
+		});
 	}
 
 	protected selectDay(day: DatetimeCalendarDay): void {

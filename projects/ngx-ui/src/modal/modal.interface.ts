@@ -28,6 +28,25 @@ export interface ModalConfig {
 	timeout?: number;
 	close?: () => void;
 	closable?: boolean;
+
+	/**
+	 * ARIA role for the modal panel. Defaults to `dialog`; use `alertdialog`
+	 * for modals that demand an immediate response (errors, confirmations).
+	 */
+	role?: 'dialog' | 'alertdialog';
+
+	/**
+	 * Accessible name for the modal when no visible heading id is available.
+	 * Prefer `ariaLabelledBy` when the content component renders its own
+	 * heading element.
+	 */
+	ariaLabel?: string;
+
+	/** Id of an element (usually a heading) inside the modal that labels it. */
+	ariaLabelledBy?: string;
+
+	/** Id of an element inside the modal that describes it. */
+	ariaDescribedBy?: string;
 }
 
 export interface Modal extends ModalConfig {

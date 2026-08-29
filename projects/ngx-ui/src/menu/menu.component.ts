@@ -13,6 +13,7 @@ import { MenuItem } from './menu.interface';
 export class MenuComponent {
 	readonly items = input<MenuItem[]>([]);
 	readonly popup = input<boolean>(false);
+	readonly ariaLabel = input<string>('Menu');
 
 	readonly wSelect = output<MenuItem>();
 

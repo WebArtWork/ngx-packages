@@ -75,6 +75,10 @@ Supported picker modes:
 - `date-range`
 - `datetime-range`
 
+### Accessibility
+
+`DatetimeCalendarComponent`'s day grid follows the WAI-ARIA APG grid pattern: only one day is in the Tab order at a time (roving `tabindex`), and Arrow keys/Home/End move focus a day/week at a time within the visible month. `DatetimePickerComponent`'s trigger button is associated with its `label` via `for`/`id`, exposes `aria-haspopup="dialog"` and `aria-expanded`/`aria-controls` for the panel, moves focus into the panel when it opens, closes on <kbd>Escape</kbd>, and restores focus to the trigger on close.
+
 ## Time Service
 
 `TimeService` provides date formatting, timezone conversion, range helpers, and common date arithmetic.

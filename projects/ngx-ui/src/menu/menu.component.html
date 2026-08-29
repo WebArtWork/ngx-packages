@@ -1,10 +1,12 @@
 <ul
 	class="wmenu"
+	role="menu"
+	[attr.aria-label]="ariaLabel()"
 	[class._popup]="popup()"
 	[class._visible]="!popup() || visible()"
 	(clickOutside)="popup() && hide()"
 >
 	@for (item of items(); track item) {
-	<wmenu-item [item]="item" (wSelect)="onSelect($event)" />
+	<wmenu-item [item]="item" (wSelect)="onSelect($event)" (wEscape)="popup() && hide()" />
 	}
 </ul>

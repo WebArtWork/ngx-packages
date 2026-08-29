@@ -1,12 +1,15 @@
 import {
 	Component,
+	ElementRef,
 	computed,
 	forwardRef,
 	input,
 	model,
 	signal,
+	viewChild,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { generateA11yId } from '@wawjs/ngx-core';
 import { DatetimeCalendarComponent } from './datetime-calendar.component';
 import {
 	DatetimePickerMode,
@@ -43,6 +46,13 @@ export class DatetimePickerComponent implements ControlValueAccessor {
 	protected readonly activeDate = signal(new Date());
 	protected readonly startTime = signal('00:00');
 	protected readonly endTime = signal('00:00');
+
+	private readonly _idPrefix = generateA11yId('ngx-datetime-picker');
+	protected readonly triggerId = `${this._idPrefix}-trigger`;
+	protected readonly panelId = `${this._idPrefix}-panel`;
+
+	private readonly _trigger = viewChild<ElementRef<HTMLElement>>('trigger');
+	private readonly _panel = viewChild<ElementRef<HTMLElement>>('panel');
 
 	protected readonly isRangeMode = computed(
 		() => this.mode() === 'date-range' || this.mode() === 'datetime-range',
@@ -83,12 +93,40 @@ export class DatetimePickerComponent implements ControlValueAccessor {
 			return;
 		}
 
-		this.isOpen.update(isOpen => !isOpen);
+		if (this.isOpen()) {
+			this.close();
+			return;
+		}
+
+		this.isOpen.set(true);
+		queueMicrotask(() => this._focusPanel());
 	}
 
 	protected close(): void {
+		const wasOpen = this.isOpen();
+
 		this.isOpen.set(false);
 		this._onTouched();
+
+		if (wasOpen) {
+			this._trigger()?.nativeElement.focus();
+		}
+	}
+
+	protected onPanelKeydown(event: KeyboardEvent): void {
+		if (event.key === 'Escape') {
+			event.preventDefault();
+			event.stopPropagation();
+			this.close();
+		}
+	}
+
+	private _focusPanel(): void {
+		const panel = this._panel()?.nativeElement;
+		const target = panel?.querySelector<HTMLElement>(
+			'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+		);
+		target?.focus();
 	}
 
 	protected selectDate(date: Date): void {

@@ -10,6 +10,7 @@
 	@if (_label) {
 	<div
 		class="wselect__label"
+		[id]="labelId"
 		[translate]="_label"
 	></div>
 	}
@@ -18,7 +19,11 @@
 		class="wselect__body"
 		[class._active]="_show"
 		role="combobox"
+		[attr.aria-haspopup]="'listbox'"
 		[attr.aria-expanded]="_show ? 'true' : 'false'"
+		[attr.aria-controls]="_show ? listboxId : null"
+		[attr.aria-activedescendant]="activeDescendantId()"
+		[attr.aria-labelledby]="_label ? labelId : null"
 		tabindex="0"
 	>
 		<!-- header (click target) -->
@@ -114,6 +119,7 @@
 			class="wselect__popup"
 			(click)="$event.stopPropagation()"
 			role="listbox"
+			[id]="listboxId"
 			[attr.aria-multiselectable]="_isMulti ? 'true' : null"
 		>
 			@if (_searchable) {
@@ -150,6 +156,7 @@
 				<button
 					type="button"
 					class="wselect__item"
+					[id]="optionId(index)"
 					[class._selected]="isSelected"
 					[class._active]="isActive"
 					(click)="selectOption(item())"

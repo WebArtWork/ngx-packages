@@ -20,12 +20,14 @@
 		}
 	</div>
 
-	<div class="day-grid" role="grid">
+	<div class="day-grid" role="grid" #grid>
 		@for (day of calendarDays(); track day.date.getTime()) {
 			<button
 				type="button"
 				role="gridcell"
 				class="day-button"
+				[attr.data-ymd]="day.date.getFullYear() + '-' + day.date.getMonth() + '-' + day.date.getDate()"
+				[attr.tabindex]="isActiveDay(day.date) ? 0 : -1"
 				[class.outside-month]="!day.inCurrentMonth"
 				[class.today]="day.isToday"
 				[class.selected]="day.isSelected"
@@ -35,6 +37,7 @@
 				[disabled]="day.isDisabled"
 				[attr.aria-selected]="day.isSelected"
 				(click)="selectDay(day)"
+				(keydown)="onGridKeydown($event, day)"
 			>
 				{{ day.label }}
 			</button>

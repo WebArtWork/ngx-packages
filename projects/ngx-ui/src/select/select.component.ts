@@ -18,7 +18,7 @@ import {
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { Field } from '@angular/forms/signals';
-import { ClickOutsideDirective, CoreService } from '@wawjs/ngx-core';
+import { ClickOutsideDirective, CoreService, generateA11yId } from '@wawjs/ngx-core';
 import { TranslateDirective } from '@wawjs/ngx-translate';
 import { InputComponent } from '../input/input.component';
 import { selectDefaults } from './select.const';
@@ -111,6 +111,19 @@ export class SelectComponent implements ControlValueAccessor {
 
 	/** keyboard navigation */
 	readonly activeIndex = signal<number>(-1);
+
+	private readonly _idPrefix = generateA11yId('wselect');
+	readonly labelId = `${this._idPrefix}-label`;
+	readonly listboxId = `${this._idPrefix}-listbox`;
+
+	optionId(index: number): string {
+		return `${this._idPrefix}-option-${index}`;
+	}
+
+	readonly activeDescendantId = computed<string | null>(() => {
+		const idx = this.activeIndex();
+		return idx >= 0 && this.showOptions() ? this.optionId(idx) : null;
+	});
 
 	private readonly _popupListEl =
 		viewChild<ElementRef<HTMLElement>>('popupListEl');

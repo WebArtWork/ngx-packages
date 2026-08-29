@@ -6,6 +6,8 @@
 	<div
 		#alertRef
 		class="walert"
+		[attr.role]="liveRole"
+		aria-atomic="true"
 		[class.walert--info]="type === 'info'"
 		[class.walert--success]="type === 'success'"
 		[class.walert--warning]="type === 'warning'"

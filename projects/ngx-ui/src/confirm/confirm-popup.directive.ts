@@ -9,6 +9,7 @@ import {
 	input,
 	output,
 } from '@angular/core';
+import { generateA11yId } from '@wawjs/ngx-core';
 import { DEFAULT_CONFIRM_CONFIG } from './interfaces/confirm.interface';
 
 @Directive({
@@ -34,8 +35,10 @@ export class ConfirmPopupDirective implements OnDestroy {
 	private readonly _document = inject(DOCUMENT);
 	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
+	private readonly _messageId = generateA11yId('wconfirm-popup-message');
 	private _panelEl?: HTMLElement;
 	private _removeDocClick?: () => void;
+	private _removeKeydown?: () => void;
 
 	toggle(event: Event): void {
 		event.stopPropagation();
@@ -54,8 +57,12 @@ export class ConfirmPopupDirective implements OnDestroy {
 
 		const panel = this._renderer.createElement('div');
 		this._renderer.addClass(panel, 'wconfirm-popup');
+		this._renderer.setAttribute(panel, 'role', 'dialog');
+		this._renderer.setAttribute(panel, 'aria-modal', 'false');
+		this._renderer.setAttribute(panel, 'aria-describedby', this._messageId);
 
 		const message = this._renderer.createElement('div');
+		this._renderer.setAttribute(message, 'id', this._messageId);
 		this._renderer.addClass(message, 'wconfirm-popup__message');
 		this._renderer.setProperty(message, 'textContent', this.wconfirmPopup());
 		this._renderer.appendChild(panel, message);
@@ -91,14 +98,29 @@ export class ConfirmPopupDirective implements OnDestroy {
 		this._panelEl = panel;
 		this._position();
 
+		rejectBtn.focus();
+
 		this._removeDocClick = this._renderer.listen(
 			this._document,
 			'click',
 			() => this.hide(),
 		);
+
+		this._removeKeydown = this._renderer.listen(
+			this._document,
+			'keydown',
+			(event: KeyboardEvent) => {
+				if (event.key === 'Escape') {
+					event.stopPropagation();
+					this.hide();
+				}
+			},
+		);
 	}
 
 	hide(): void {
+		const hadPanel = !!this._panelEl;
+
 		if (this._panelEl) {
 			this._renderer.removeChild(this._document.body, this._panelEl);
 			this._panelEl = undefined;
@@ -106,6 +128,13 @@ export class ConfirmPopupDirective implements OnDestroy {
 
 		this._removeDocClick?.();
 		this._removeDocClick = undefined;
+
+		this._removeKeydown?.();
+		this._removeKeydown = undefined;
+
+		if (hadPanel && typeof this._elementRef.nativeElement.focus === 'function') {
+			this._elementRef.nativeElement.focus();
+		}
 	}
 
 	ngOnDestroy(): void {

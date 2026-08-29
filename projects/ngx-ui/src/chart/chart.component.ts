@@ -5,6 +5,7 @@ import {
 	OnDestroy,
 	PLATFORM_ID,
 	ViewEncapsulation,
+	computed,
 	effect,
 	inject,
 	input,
@@ -21,7 +22,40 @@ import {
 
 @Component({
 	selector: 'wchart',
-	template: `<canvas #canvasEl class="wchart"></canvas>`,
+	template: `
+		<canvas
+			#canvasEl
+			class="wchart"
+			role="img"
+			[attr.aria-label]="description() || 'Chart'"
+		></canvas>
+
+		<table class="wchart__sr-table">
+			<caption>
+				{{
+					description() || 'Chart data'
+				}}
+			</caption>
+			<thead>
+				<tr>
+					<th scope="col">Label</th>
+					@for (dataset of data().datasets; track dataset.label) {
+						<th scope="col">{{ dataset.label }}</th>
+					}
+				</tr>
+			</thead>
+			<tbody>
+				@for (row of tableRows(); track $index) {
+					<tr>
+						<th scope="row">{{ row.label }}</th>
+						@for (value of row.values; track $index) {
+							<td>{{ value }}</td>
+						}
+					</tr>
+				}
+			</tbody>
+		</table>
+	`,
 	styleUrl: './chart.component.scss',
 	encapsulation: ViewEncapsulation.None,
 })
@@ -30,11 +64,24 @@ export class ChartComponent implements OnDestroy {
 	readonly data = input.required<ChartData>();
 	readonly options = input<ChartOptions>();
 
+	/** Accessible summary of what the chart shows, also used as its `aria-label`. */
+	readonly description = input<string>('');
+
 	private readonly _canvasEl =
 		viewChild<ElementRef<HTMLCanvasElement>>('canvasEl');
 
 	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 	private _chart?: Chart;
+
+	readonly tableRows = computed(() => {
+		const data = this.data();
+		const labels = data.labels ?? [];
+
+		return labels.map((label, i) => ({
+			label: String(label),
+			values: data.datasets.map(dataset => dataset.data[i] ?? ''),
+		}));
+	});
 
 	constructor() {
 		Chart.register(...registerables);

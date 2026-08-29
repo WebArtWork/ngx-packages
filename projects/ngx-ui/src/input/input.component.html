@@ -27,6 +27,9 @@ placeholder(); @let _error = fieldError(); @switch (_type) { @case ('text')
 			[formField]="_formField"
 			[class.error]="_error"
 			[class]="['winput__field', _wClass]"
+			[attr.aria-invalid]="_error ? true : null"
+			[attr.aria-describedby]="_error ? errorId : null"
+			[attr.aria-required]="isRequired() || null"
 			[manualType]="
 					_type === 'password'
 						? (showPassword() ? 'text' : 'password')
@@ -48,6 +51,9 @@ placeholder(); @let _error = fieldError(); @switch (_type) { @case ('text')
 			[class.error]="_error"
 			[class]="['winput__field', _wClass]"
 			[attr.name]="_name"
+			[attr.aria-invalid]="_error ? true : null"
+			[attr.aria-describedby]="_error ? errorId : null"
+			[attr.aria-required]="isRequired() || null"
 			[attr.type]="
 					_type === 'password'
 						? (showPassword() ? 'text' : 'password')
@@ -85,7 +91,7 @@ placeholder(); @let _error = fieldError(); @switch (_type) { @case ('text')
 	</div>
 
 	@if (_error) {
-	<div class="winput__error" [translate]="_error"></div>
+	<div class="winput__error" [id]="errorId" role="alert" [translate]="_error"></div>
 	}
 </label>
 } @case ('textarea') {
@@ -106,6 +112,9 @@ placeholder(); @let _error = fieldError(); @switch (_type) { @case ('text')
 			(input)="onInput($event)"
 			[class.error]="_error"
 			[formField]="_formField"
+			[attr.aria-invalid]="_error ? true : null"
+			[attr.aria-describedby]="_error ? errorId : null"
+			[attr.aria-required]="isRequired() || null"
 			#inputEl
 		></textarea>
 		} @else {
@@ -120,74 +129,102 @@ placeholder(); @let _error = fieldError(); @switch (_type) { @case ('text')
 			[value]="wModel() ?? ''"
 			[class.error]="_error"
 			[attr.name]="_name"
+			[attr.aria-invalid]="_error ? true : null"
+			[attr.aria-describedby]="_error ? errorId : null"
+			[attr.aria-required]="isRequired() || null"
 			#inputEl
 		></textarea>
 		}
 	</div>
 
 	@if (_error) {
-	<div class="winput__error" [translate]="_error"></div>
+	<div class="winput__error" [id]="errorId" role="alert" [translate]="_error"></div>
 	}
 </label>
-} @case ('radio') { @if (_formField) { @for (item of _items; track
-$index) {
-<label class="winput__choice" [class.disabled]="_disabled">
-	<input
-		(keydown)="wKeydown.emit($event)"
-		(focus)="wFocus.emit($event)"
-		[manualDisabled]="_disabled"
-		(blur)="wBlur.emit($event)"
-		(input)="onInput($event)"
-		[formField]="_formField"
-		[class]="['winput__native', _wClass]"
-		[class.error]="_error"
-		[value]="item"
-		type="radio"
-		#inputEl
-	/>
-	<span class="winput__choice-mark winput__choice-mark--radio"></span>
-	<span class="winput__choice-text" [translate]="item"></span>
-</label>
-} } @else { @for (item of _items; track $index) {
-<label class="winput__choice" [class.disabled]="_disabled">
-	<input
-		(keydown)="wKeydown.emit($event)"
-		(input)="onInput($event, item)"
-		[checked]="wModel() === item"
-		(focus)="wFocus.emit($event)"
-		(blur)="wBlur.emit($event)"
-		[class]="['winput__native', _wClass]"
-		[disabled]="_disabled"
-		[class.error]="_error"
-		[value]="item"
-		[name]="_name"
-		type="radio"
-		#inputEl
-	/>
-	<span class="winput__choice-mark winput__choice-mark--radio"></span>
-	<span class="winput__choice-text" [translate]="item"></span>
-</label>
-} } } @case ('checkbox') { @if (_items.length) { @for (item of _items;
-track $index) {
-<label class="winput__choice" [class.disabled]="_disabled">
-	<input
-		(keydown)="wKeydown.emit($event)"
-		(input)="onInput($event, item)"
-		[checked]="isItemChecked(item)"
-		(focus)="wFocus.emit($event)"
-		(blur)="wBlur.emit($event)"
-		[name]="_name + $index"
-		[class]="['winput__native', _wClass]"
-		[disabled]="_disabled"
-		[class.error]="_error"
-		type="checkbox"
-		[value]="item"
-		#inputEl
-	/>
-	<span class="winput__choice-mark"></span>
-	<span class="winput__choice-text" [translate]="item"></span>
-</label>
-} } @else {
+} @case ('radio') {
+<div
+	role="radiogroup"
+	[attr.aria-label]="_label || null"
+	[attr.aria-invalid]="_error ? true : null"
+	[attr.aria-describedby]="_error ? errorId : null"
+	[attr.aria-required]="isRequired() || null"
+>
+	@if (_formField) { @for (item of _items; track
+	$index) {
+	<label class="winput__choice" [class.disabled]="_disabled">
+		<input
+			(keydown)="wKeydown.emit($event)"
+			(focus)="wFocus.emit($event)"
+			[manualDisabled]="_disabled"
+			(blur)="wBlur.emit($event)"
+			(input)="onInput($event)"
+			[formField]="_formField"
+			[class]="['winput__native', _wClass]"
+			[class.error]="_error"
+			[value]="item"
+			type="radio"
+			#inputEl
+		/>
+		<span class="winput__choice-mark winput__choice-mark--radio"></span>
+		<span class="winput__choice-text" [translate]="item"></span>
+	</label>
+	} } @else { @for (item of _items; track $index) {
+	<label class="winput__choice" [class.disabled]="_disabled">
+		<input
+			(keydown)="wKeydown.emit($event)"
+			(input)="onInput($event, item)"
+			[checked]="wModel() === item"
+			(focus)="wFocus.emit($event)"
+			(blur)="wBlur.emit($event)"
+			[class]="['winput__native', _wClass]"
+			[disabled]="_disabled"
+			[class.error]="_error"
+			[value]="item"
+			[name]="_name"
+			type="radio"
+			#inputEl
+		/>
+		<span class="winput__choice-mark winput__choice-mark--radio"></span>
+		<span class="winput__choice-text" [translate]="item"></span>
+	</label>
+	} }
+</div>
+@if (_error) {
+<div class="winput__error" [id]="errorId" role="alert" [translate]="_error"></div>
+}
+} @case ('checkbox') { @if (_items.length) {
+<div
+	role="group"
+	[attr.aria-label]="_label || null"
+	[attr.aria-invalid]="_error ? true : null"
+	[attr.aria-describedby]="_error ? errorId : null"
+	[attr.aria-required]="isRequired() || null"
+>
+	@for (item of _items; track $index) {
+	<label class="winput__choice" [class.disabled]="_disabled">
+		<input
+			(keydown)="wKeydown.emit($event)"
+			(input)="onInput($event, item)"
+			[checked]="isItemChecked(item)"
+			(focus)="wFocus.emit($event)"
+			(blur)="wBlur.emit($event)"
+			[name]="_name + $index"
+			[class]="['winput__native', _wClass]"
+			[disabled]="_disabled"
+			[class.error]="_error"
+			type="checkbox"
+			[value]="item"
+			#inputEl
+		/>
+		<span class="winput__choice-mark"></span>
+		<span class="winput__choice-text" [translate]="item"></span>
+	</label>
+	}
+</div>
+@if (_error) {
+<div class="winput__error" [id]="errorId" role="alert" [translate]="_error"></div>
+}
+} @else {
 <label class="winput__choice" [class.disabled]="_disabled">
 	@if (_formField) {
 	<input
@@ -199,6 +236,9 @@ track $index) {
 		[formField]="_formField"
 		[class]="['winput__native', _wClass]"
 		[class.error]="_error"
+		[attr.aria-invalid]="_error ? true : null"
+		[attr.aria-describedby]="_error ? errorId : null"
+		[attr.aria-required]="isRequired() || null"
 		type="checkbox"
 		#inputEl
 	/>
@@ -214,6 +254,9 @@ track $index) {
 		[checked]="!!wModel()"
 		type="checkbox"
 		[name]="_name"
+		[attr.aria-invalid]="_error ? true : null"
+		[attr.aria-describedby]="_error ? errorId : null"
+		[attr.aria-required]="isRequired() || null"
 		#inputEl
 	/>
 	}
@@ -224,4 +267,7 @@ track $index) {
 	<span class="winput__choice-text" [translate]="_label"></span>
 	}
 </label>
+@if (_error) {
+<div class="winput__error" [id]="errorId" role="alert" [translate]="_error"></div>
+}
 } } @default never; }

@@ -1,6 +1,8 @@
-<div
+<button
+	type="button"
 	[class.icon-theme--with-text]="showText()"
 	(click)="nextTheme()"
+	[translate]="{ ariaLabel: ariaLabel() }"
 	class="icon-theme"
 >
 	<!-- Icon box -->
@@ -40,4 +42,4 @@
     "
 	></span>
 	}
-</div>
+</button>

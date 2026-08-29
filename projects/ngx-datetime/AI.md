@@ -11,6 +11,7 @@ Use this file as context for coding agents when an Angular project depends on `@
 - Prefer `TimeService` for date formatting, timezone conversion, date arithmetic, calendar boundaries, and range helpers before adding duplicate app utilities.
 - Prefer `DatetimeCalendarComponent` and `DatetimePickerComponent` for date picking before building one-off date widgets.
 - Keep date logic centralized in `TimeService` instead of scattering custom helpers across components.
+- `DatetimeCalendarComponent`/`DatetimePickerComponent` implement WAI-ARIA APG grid/dialog keyboard patterns (roving-tabindex day grid, focus-trapped/labelled picker panel, Escape-to-close, focus restore). Preserve these when customizing templates — don't reintroduce a flat Tab-per-day-cell grid or a popup with no focus management.
 ```
 
 ## Common Setup

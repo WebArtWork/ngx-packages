@@ -205,10 +205,12 @@ When using only `ButtonDirective`, render `<wbutton-styles />` once in the app s
 ### Inputs
 
 ```html
-<winput label="Email" type="email" [(wModel)]="email" />
+<winput label="Email" type="email" [(wModel)]="email" required />
 <winput label="Message" type="textarea" [(wModel)]="message" />
 <winput label="I agree" type="checkbox" [(wModel)]="agreed" />
 ```
+
+Validation errors (from the `error` input, or from a bound Signal Forms `formField`) render with `role="alert"` and are wired to the control via `aria-describedby`/`aria-invalid`; pass `required` (or rely on the signal-forms field's own required state) for `aria-required`.
 
 ### Links
 
@@ -238,6 +240,16 @@ Set `href` to override generated targets. External links receive `rel="noopener 
 <wselect label="Tags" [items]="tags" [multiple]="true" [searchable]="true" [(wModel)]="tagIds" />
 ```
 
+`<wselect>` implements the WAI-ARIA APG combobox/listbox pattern: `role="combobox"` with `aria-haspopup="listbox"`, `aria-expanded`, `aria-controls`, and `aria-activedescendant` tracking the arrow-key-highlighted option, plus `label` programmatically associated via `aria-labelledby`.
+
+### Table
+
+```html
+<wtable [rows]="rows" [columns]="columns" [config]="config" />
+```
+
+Sortable column headers are keyboard-operable (Enter/Space) and expose `aria-sort`; row-action icons render as real `<button>`s with an accessible name instead of bare `<i>` glyphs; the per-page selector is a `role="listbox"` popup with <kbd>Escape</kbd> support instead of a plain click-toggle `<div>`.
+
 ### File
 
 ```html
@@ -259,6 +271,15 @@ modal.show({
 });
 ```
 
+`ModalComponent` renders `role="dialog"` (or `role="alertdialog"` via `role: 'alertdialog'`), traps focus while open (`@angular/cdk/a11y` `FocusTrapFactory`), restores focus to whatever triggered it on close, and closes on <kbd>Escape</kbd> when `closable` is true. Pass `ariaLabel`, or preferably `ariaLabelledBy`/`ariaDescribedBy` pointing at an id inside your content component, to give the dialog an accessible name:
+
+```ts
+modal.show({
+	component: DetailsComponent,
+	ariaLabelledBy: 'details-modal-title',
+});
+```
+
 ### Alert
 
 ```ts
@@ -273,6 +294,8 @@ alert.question({
 	buttons: [{ text: 'Delete', callback: () => remove() }],
 });
 ```
+
+Alerts render `role="alert"` (errors/questions, announced immediately) or `role="status"` (info/success/warning, announced politely). The auto-dismiss timer pauses on keyboard focus as well as mouse hover, so a focused alert never disappears mid-interaction.
 
 ### Tag, Badge, Chip, Avatar
 
@@ -301,6 +324,8 @@ alert.question({
 
 Pass `[multiple]="true"` on `<waccordion>` to allow more than one panel open at once.
 
+Each panel's header button gets a stable `id`/`aria-controls` pair with its body (`role="region"`, `aria-labelledby`), so the expand/collapse relationship is exposed to assistive technology.
+
 ### Tabs
 
 ```html
@@ -309,6 +334,8 @@ Pass `[multiple]="true"` on `<waccordion>` to allow more than one panel open at 
 	<wtab header="Activity">Activity content.</wtab>
 </wtabs>
 ```
+
+Follows the WAI-ARIA APG Tabs pattern: only the active tab is in the Tab order (roving `tabindex`), Left/Right/Home/End move focus and selection together, and each tab/panel pair is linked via `aria-controls`/`aria-labelledby`.
 
 ### Card
 
@@ -329,13 +356,15 @@ Pass `[multiple]="true"` on `<waccordion>` to allow more than one panel open at 
 
 `MenuItem` supports `label`, `icon`, `command`, `routerLink`, `href`, `disabled`, `separator`, and nested `items` for submenus.
 
+`<wmenu>`/`<wmenubar>` render `role="menu"`/`role="menubar"` with `role="menuitem"` items, support Arrow/Home/End keyboard navigation between items (and Left/Right into and out of submenus), and close on <kbd>Escape</kbd>.
+
 ### Tooltip
 
 ```html
 <span wtooltip="Shown on hover" tooltipPosition="top">Hover me</span>
 ```
 
-Render `<wtooltip-styles />` once in the app shell so the directive's floating panel is styled.
+Render `<wtooltip-styles />` once in the app shell so the directive's floating panel is styled. The tooltip gets `role="tooltip"` and the host element gets a matching `aria-describedby` while it's shown (in addition to the existing show-on-focus behavior), and <kbd>Escape</kbd> dismisses it.
 
 ### Confirm
 
@@ -355,7 +384,7 @@ confirm.confirm({
 <button wconfirmPopup="Are you sure?" (wAccept)="remove()">Delete</button>
 ```
 
-Render `<wconfirm-popup-styles />` once in the app shell when using `[wconfirmPopup]`.
+Render `<wconfirm-popup-styles />` once in the app shell when using `[wconfirmPopup]`. The popup moves focus to its reject button when it opens, closes on <kbd>Escape</kbd>, and restores focus to the triggering element on close.
 
 ### Divider, ProgressBar, Toggle, MeterGroup
 
@@ -406,8 +435,11 @@ Render `<wconfirm-popup-styles />` once in the app shell when using `[wconfirmPo
 		labels: ['Mon', 'Tue', 'Wed'],
 		datasets: [{ label: 'Visits', data: [12, 19, 7] }]
 	}"
+	description="Visits by day, Monday through Wednesday"
 />
 ```
+
+Canvas-rendered charts have no text content for screen readers, so `<wchart>` also renders a visually-hidden `<table>` built from the same `data`, and uses `description` as both the chart's `aria-label` and the table's `<caption>`. Always pass `description` with a short summary of what the chart shows.
 
 ### Editor
 
@@ -421,8 +453,14 @@ Lightweight `contenteditable`-based rich text editor for basic bold/italic/list 
 
 ```html
 <icon-theme [showText]="true" />
-<icon-burger state="three-lines" (updated)="toggleMenu()" />
+<icon-burger
+	state="three-lines"
+	[controls]="'main-nav'"
+	(updated)="toggleMenu()"
+/>
 ```
+
+`icon-burger` reflects its open/closed state via `aria-expanded` and points `aria-controls` at whatever element id you pass to `controls` (e.g. the nav/drawer it toggles). Pass `ariaLabel` to override the default "Open menu" / "Close menu" text.
 
 ## Styling Guidance
 
@@ -437,6 +475,10 @@ CSS custom properties cascade. Override tokens at any container boundary:
 ```
 
 Prefer token overrides over targeting internal BEM elements. If a direct style override is needed, scope it through a parent selector owned by the app.
+
+## Accessibility
+
+See [ACCESSIBILITY.md](ACCESSIBILITY.md) for the current WCAG 2.2 AA / EN 301 549 / WAI-ARIA APG coverage per component, the Vitest + axe-core testing setup, and known gaps.
 
 ## AI Coding Agents
 

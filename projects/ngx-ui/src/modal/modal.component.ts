@@ -1,6 +1,15 @@
-import { Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import {
+	AfterViewInit,
+	Component,
+	ElementRef,
+	OnDestroy,
+	OnInit,
+	ViewEncapsulation,
+	viewChild,
+} from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { PLATFORM_ID, inject } from '@angular/core';
+import { FocusTrap, FocusTrapFactory } from '@angular/cdk/a11y';
 import { ButtonDirective } from '../button/button.directive';
 import { PlusIconComponent } from '../icons/plus/plus-icon.component';
 
@@ -11,8 +20,10 @@ import { PlusIconComponent } from '../icons/plus/plus-icon.component';
 	encapsulation: ViewEncapsulation.None,
 	imports: [ButtonDirective, PlusIconComponent],
 })
-export class ModalComponent implements OnInit, OnDestroy {
+export class ModalComponent implements OnInit, AfterViewInit, OnDestroy {
 	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+	private readonly _focusTrapFactory = inject(FocusTrapFactory);
+
 	closable = true;
 	close: () => void = () => {};
 	onOpen?: () => void;
@@ -24,6 +35,14 @@ export class ModalComponent implements OnInit, OnDestroy {
 	// optional custom class applied to the content panel
 	panelClass = '';
 
+	// accessibility
+	role: 'dialog' | 'alertdialog' = 'dialog';
+	ariaLabel = '';
+	ariaLabelledBy?: string;
+	ariaDescribedBy?: string;
+
+	private readonly _content = viewChild<ElementRef<HTMLElement>>('content');
+
 	get contentClasses(): string {
 		return [
 			'wawjs-modal__content',
@@ -34,7 +53,9 @@ export class ModalComponent implements OnInit, OnDestroy {
 			.join(' ');
 	}
 
+	private _focusTrap?: FocusTrap;
 	private readonly _popStateHandler = (e: PopStateEvent) => this.popStateListener(e);
+	private readonly _keydownHandler = (e: KeyboardEvent) => this.onDocumentKeydown(e);
 
 	ngOnInit(): void {
 		if (typeof this.onClickOutside !== 'function') {
@@ -47,17 +68,48 @@ export class ModalComponent implements OnInit, OnDestroy {
 
 		if (this._isBrowser) {
 			window.addEventListener('popstate', this._popStateHandler);
+			document.addEventListener('keydown', this._keydownHandler);
 		}
+	}
+
+	ngAfterViewInit(): void {
+		if (!this._isBrowser) {
+			return;
+		}
+
+		const element = this._content()?.nativeElement;
+
+		if (!element) {
+			return;
+		}
+
+		this._focusTrap = this._focusTrapFactory.create(element);
+
+		void this._focusTrap.focusInitialElementWhenReady().then(focused => {
+			if (!focused) {
+				element.focus();
+			}
+		});
 	}
 
 	ngOnDestroy(): void {
 		if (this._isBrowser) {
 			window.removeEventListener('popstate', this._popStateHandler);
+			document.removeEventListener('keydown', this._keydownHandler);
 		}
+
+		this._focusTrap?.destroy();
 	}
 
 	onBackdropClick(): void {
 		this.onClickOutside?.();
+	}
+
+	private onDocumentKeydown(event: KeyboardEvent): void {
+		if (event.key === 'Escape' && this.closable) {
+			event.stopPropagation();
+			this.close();
+		}
 	}
 
 	private popStateListener(_: Event): void {

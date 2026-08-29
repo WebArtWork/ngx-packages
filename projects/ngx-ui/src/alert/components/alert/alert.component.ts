@@ -96,6 +96,8 @@ export class AlertComponent implements AfterViewInit, OnDestroy {
 		const el = elRef.nativeElement;
 		el.addEventListener('mouseenter', this._onEnter, false);
 		el.addEventListener('mouseleave', this._onLeave, false);
+		el.addEventListener('focusin', this._onEnter, false);
+		el.addEventListener('focusout', this._onLeave, false);
 	}
 
 	ngOnDestroy(): void {
@@ -108,7 +110,14 @@ export class AlertComponent implements AfterViewInit, OnDestroy {
 			const el = elRef.nativeElement;
 			el.removeEventListener('mouseenter', this._onEnter, false);
 			el.removeEventListener('mouseleave', this._onLeave, false);
+			el.removeEventListener('focusin', this._onEnter, false);
+			el.removeEventListener('focusout', this._onLeave, false);
 		}
+	}
+
+	/** ARIA live-region role: assertive for errors/questions, polite otherwise. */
+	get liveRole(): 'alert' | 'status' {
+		return this.type === 'error' || this.type === 'question' ? 'alert' : 'status';
 	}
 
 	/**

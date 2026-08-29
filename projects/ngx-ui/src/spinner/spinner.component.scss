@@ -38,3 +38,23 @@
 		stroke-dashoffset: -124;
 	}
 }
+
+@media (prefers-reduced-motion: reduce) {
+	.wspinner {
+		animation: wspinner-pulse 1600ms ease-in-out infinite;
+	}
+
+	.wspinner__arc {
+		animation: none;
+	}
+
+	@keyframes wspinner-pulse {
+		0%,
+		100% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.4;
+		}
+	}
+}

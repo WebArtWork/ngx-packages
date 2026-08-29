@@ -1184,6 +1184,14 @@
 						}
 					},
 					"defaultConfiguration": "production"
+				},
+				"test": {
+					"builder": "@angular/build:unit-test",
+					"options": {
+						"tsConfig": "projects/ngx-ui/tsconfig.spec.json",
+						"buildTarget": "::development",
+						"setupFiles": ["projects/ngx-ui/src/testing/setup.ts"]
+					}
 				}
 			}
 		}

@@ -12,6 +12,7 @@ import {
 	viewChild,
 } from '@angular/core';
 import { FormField, type Field } from '@angular/forms/signals';
+import { generateA11yId } from '@wawjs/ngx-core';
 import { TranslateDirective } from '@wawjs/ngx-translate';
 import { MaterialComponent } from '../material/material.component';
 import { ManualDisabledDirective, ManualTypeDirective } from './manual-input.directives';
@@ -48,6 +49,7 @@ export class InputComponent implements AfterViewInit {
 
 	readonly icons = input<InputIconAction[]>(inputDefaults.icons);
 
+	readonly required = input(false);
 	readonly disabled = input(inputDefaults.disabled);
 	readonly focused = input(inputDefaults.focused);
 	readonly clearable = input(inputDefaults.clearable);
@@ -69,7 +71,17 @@ export class InputComponent implements AfterViewInit {
 
 	private readonly _inputEl = viewChild<ElementRef<HTMLInputElement>>('inputEl');
 
+	/** Stable id for the error message, wired to the control via `aria-describedby`. */
+	readonly errorId = generateA11yId('winput-error');
+
 	/* ---------------- Derived state ---------------- */
+	readonly isRequired = computed(() => {
+		if (this.required()) return true;
+
+		const state = this.fieldState();
+		return typeof state?.required === 'function' ? state.required() : false;
+	});
+
 	readonly fieldState = computed(() => {
 		const f = this.formField();
 		return f ? f() : null;

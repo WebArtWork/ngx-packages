@@ -6,7 +6,7 @@ import { MenuItem } from './menu.interface';
 	selector: 'wmenubar',
 	imports: [MenuItemComponent],
 	template: `
-		<ul class="wmenubar">
+		<ul class="wmenubar" role="menubar" [attr.aria-label]="ariaLabel()">
 			@for (item of items(); track item) {
 			<wmenu-item [item]="item" (wSelect)="wSelect.emit($event)" />
 			}
@@ -17,6 +17,7 @@ import { MenuItem } from './menu.interface';
 })
 export class MenubarComponent {
 	readonly items = input<MenuItem[]>([]);
+	readonly ariaLabel = input<string>('Main menu');
 
 	readonly wSelect = output<MenuItem>();
 }

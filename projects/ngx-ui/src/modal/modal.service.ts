@@ -33,6 +33,8 @@ export class ModalService {
 
 		this._document.body.classList.add('modalOpened');
 
+		const previouslyFocused = this._document.activeElement as HTMLElement | null;
+
 		let shell!: DomComponent<ModalComponent> | undefined;
 		let content!: DomComponent<unknown> | undefined;
 
@@ -51,6 +53,10 @@ export class ModalService {
 
 			if (!this._modals.length) {
 				this._document.body.classList.remove('modalOpened');
+			}
+
+			if (previouslyFocused && typeof previouslyFocused.focus === 'function') {
+				previouslyFocused.focus();
 			}
 		};
 

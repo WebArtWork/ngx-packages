@@ -155,6 +155,17 @@ For publishable libraries, be careful with external stylesheet resolution. If ng
 
 Do not introduce global styles from a library unless that is the explicit purpose of the package.
 
+## Accessibility
+
+An accessibility pass (WCAG 2.2 AA / EN 301 549 / WAI-ARIA APG) is applied across `ngx-ui` and, where relevant, other packages (`ngx-datetime`'s calendar/picker). This work is scoped to `ngx-packages` only, not the separate `ngx-prime` repo.
+
+- Prefer native HTML semantics (`button`, `a`, `input`, `label for`, `fieldset`) over ARIA roles on generic elements. Only reach for ARIA when native semantics genuinely can't express the interaction (custom listbox/menu/grid widgets).
+- Every interactive element needs a real accessible name (visible text, `aria-label`, or `aria-labelledby`) — an icon-only button is not enough on its own.
+- Keyboard support is not optional: no control should be operable by pointer/mouse only. Escape must close overlays/popovers/menus without trapping focus; focus must move into a dialog/menu/popover on open and back to the triggering element on close.
+- `@angular/cdk` and `@angular/aria` are peer dependencies of `ngx-ui` for this reason — `@angular/cdk/a11y`'s `FocusTrapFactory` backs `ModalComponent`'s focus trap, and `@angular/aria`'s headless interaction-pattern directives (`accordion`/`combobox`/`grid`/`listbox`/`menu`/`tabs`/`toolbar`/`tree` — no `dialog` pattern exists as of `22.1.2`) are the preferred building block for any new composite widget, applied to internal template markup so a component's public selector/inputs/outputs don't change.
+- `ngx-ui` has a Vitest-based unit-test setup (`npm run test:ui`, or `ng test ngx-ui`) with `axe-core` wired in via `projects/ngx-ui/src/testing/axe.ts`'s `expectNoA11yViolations()` helper, plus a `projects/ngx-ui/src/testing/setup.ts` for jsdom environment gaps (`matchMedia`, `scrollIntoView`). Add a `.spec.ts` next to any interactive component you add or touch, covering at minimum: accessible name, relevant ARIA state, and keyboard operability — see `burger.component.spec.ts`, `modal.component.spec.ts`, `tabs.component.spec.ts`, and `select.component.spec.ts` for the established shape.
+- Do not claim that using `ngx-ui`/`ngx-datetime` makes a consuming application legally accessibility-compliant on its own — compliance also depends on the app's own content, structure, and usage.
+
 ## Configuration And Providers
 
 Prefer provider functions for package setup in apps:
@@ -192,6 +203,7 @@ npx ng build ngx-ui
 npx ng build ngx-form
 npx ng build ngx-map
 npx ng build ngx-ui-app --configuration development
+npm run test:ui
 ```
 
 On Windows, prefer `npm.cmd` / `npx.cmd` when invoking commands directly from PowerShell.

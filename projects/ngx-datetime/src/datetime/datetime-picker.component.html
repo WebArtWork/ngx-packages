@@ -1,14 +1,18 @@
 <div class="ngx-datetime-picker">
 	@if (label()) {
-		<label class="picker-label">{{ label() }}</label>
+		<label class="picker-label" [attr.for]="triggerId">{{ label() }}</label>
 	}
 
 	<div class="input-row">
 		<button
+			#trigger
 			type="button"
 			class="picker-trigger"
+			[id]="triggerId"
 			[disabled]="isDisabled()"
+			aria-haspopup="dialog"
 			[attr.aria-expanded]="isOpen()"
+			[attr.aria-controls]="isOpen() ? panelId : null"
 			(click)="toggle()"
 		>
 			<span [class.placeholder]="!displayValue()">
@@ -27,7 +31,14 @@
 	</div>
 
 	@if (isOpen()) {
-		<div class="picker-panel">
+		<div
+			#panel
+			class="picker-panel"
+			role="dialog"
+			[id]="panelId"
+			[attr.aria-label]="label() || 'Choose a date'"
+			(keydown)="onPanelKeydown($event)"
+		>
 			@if (includesDate()) {
 				<ngx-datetime-calendar
 					[selectionMode]="isRangeMode() ? 'range' : 'single'"

@@ -8,7 +8,9 @@
 	(mouseleave)="onHover(false)"
 >
 	<button
-		aria-label="Toggle menu"
+		[translate]="{ ariaLabel: resolvedAriaLabel() }"
+		[attr.aria-expanded]="expanded()"
+		[attr.aria-controls]="controls() || null"
 		class="burger__btn"
 		(click)="toggle()"
 		type="button"

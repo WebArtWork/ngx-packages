@@ -4,11 +4,12 @@
 	[class._activeClass]="activeClass()"
 	routerLinkActive="_activeLink"
 	[class.mi__iconOnly]="!_name"
+	[attr.aria-label]="!_name ? (ariaLabel() || _icon) : null"
 	[routerLink]="routerLink()"
 	class="mi"
 >
 	<span class="mi__iconWrap">
-		<span class="mi__icon material-icons">{{ _icon }}</span>
+		<span class="mi__icon material-icons" aria-hidden="true">{{ _icon }}</span>
 
 		@if (showCounter()) {
 		<span
@@ -36,7 +37,7 @@
 	(keydown)="onKeydown($event)"
 >
 	<span class="mi__iconWrap">
-		<span class="mi__icon material-icons">{{ _icon }}</span>
+		<span class="mi__icon material-icons" aria-hidden="true">{{ _icon }}</span>
 
 		@if (showCounter()) {
 		<span

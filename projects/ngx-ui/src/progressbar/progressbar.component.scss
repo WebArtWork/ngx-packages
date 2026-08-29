@@ -45,3 +45,21 @@
 		margin-left: 100%;
 	}
 }
+
+@media (prefers-reduced-motion: reduce) {
+	.wprogressbar--indeterminate .wprogressbar__bar {
+		margin-left: 0;
+		width: 100% !important;
+		animation: wprogressbar-pulse 1600ms ease-in-out infinite;
+	}
+
+	@keyframes wprogressbar-pulse {
+		0%,
+		100% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.4;
+		}
+	}
+}

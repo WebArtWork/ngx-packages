@@ -4,8 +4,11 @@
 	<button
 		type="button"
 		class="waccordion-panel__header"
+		[id]="headerId"
+		[attr.aria-controls]="bodyId"
 		[class._disabled]="disabled()"
 		[attr.aria-expanded]="_expanded ? 'true' : 'false'"
+		[disabled]="disabled()"
 		(click)="toggle()"
 	>
 		<span class="waccordion-panel__title" [translate]="header()"></span>
@@ -17,7 +20,12 @@
 	</button>
 
 	@if (_expanded) {
-	<div class="waccordion-panel__body">
+	<div
+		class="waccordion-panel__body"
+		role="region"
+		[id]="bodyId"
+		[attr.aria-labelledby]="headerId"
+	>
 		<ng-content></ng-content>
 	</div>
 	}

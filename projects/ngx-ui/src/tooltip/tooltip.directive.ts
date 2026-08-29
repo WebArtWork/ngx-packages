@@ -8,6 +8,7 @@ import {
 	inject,
 	input,
 } from '@angular/core';
+import { generateA11yId } from '@wawjs/ngx-core';
 
 export type TooltipPosition = 'top' | 'bottom' | 'left' | 'right';
 
@@ -18,6 +19,7 @@ export type TooltipPosition = 'top' | 'bottom' | 'left' | 'right';
 		'(mouseleave)': 'hide()',
 		'(focus)': 'show()',
 		'(blur)': 'hide()',
+		'(keydown.escape)': 'hide()',
 	},
 })
 export class TooltipDirective implements OnDestroy {
@@ -30,6 +32,7 @@ export class TooltipDirective implements OnDestroy {
 	private readonly _document = inject(DOCUMENT);
 	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
+	private readonly _id = generateA11yId('wtooltip');
 	private _tooltipEl?: HTMLElement;
 
 	show(): void {
@@ -38,6 +41,8 @@ export class TooltipDirective implements OnDestroy {
 		}
 
 		this._tooltipEl = this._renderer.createElement('div');
+		this._renderer.setAttribute(this._tooltipEl, 'id', this._id);
+		this._renderer.setAttribute(this._tooltipEl, 'role', 'tooltip');
 		this._renderer.addClass(this._tooltipEl, 'wtooltip');
 		this._renderer.addClass(
 			this._tooltipEl,
@@ -49,6 +54,11 @@ export class TooltipDirective implements OnDestroy {
 			this.wtooltip(),
 		);
 		this._renderer.appendChild(this._document.body, this._tooltipEl);
+		this._renderer.setAttribute(
+			this._elementRef.nativeElement,
+			'aria-describedby',
+			this._id,
+		);
 
 		this._position();
 	}
@@ -57,6 +67,10 @@ export class TooltipDirective implements OnDestroy {
 		if (this._tooltipEl) {
 			this._renderer.removeChild(this._document.body, this._tooltipEl);
 			this._tooltipEl = undefined;
+			this._renderer.removeAttribute(
+				this._elementRef.nativeElement,
+				'aria-describedby',
+			);
 		}
 	}
 

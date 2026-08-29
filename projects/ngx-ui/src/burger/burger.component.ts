@@ -5,6 +5,7 @@ import {
 	input,
 	output,
 } from '@angular/core';
+import { TranslateDirective } from '@wawjs/ngx-translate';
 
 export type BurgerState = 'three-lines' | 'two-lines' | 'one-line' | 'cross';
 
@@ -13,9 +14,16 @@ export type BurgerState = 'three-lines' | 'two-lines' | 'one-line' | 'cross';
 	templateUrl: './burger.component.html',
 	styleUrl: './burger.component.scss',
 	encapsulation: ViewEncapsulation.None,
+	imports: [TranslateDirective],
 })
 export class BurgerComponent {
 	readonly state = input<BurgerState>('three-lines');
+
+	/** Id of the element this toggle controls (e.g. a nav/drawer), for `aria-controls`. */
+	readonly controls = input<string>('');
+
+	/** Overrides the default accessible name. */
+	readonly ariaLabel = input<string>('');
 
 	/**
 	 * Legacy input (kept for compatibility).
@@ -50,6 +58,12 @@ export class BurgerComponent {
 
 	// legacy: if someone still binds [isOpen] but not state mapping, allow cross
 	readonly _legacyCross = computed(() => this.isOpen());
+
+	readonly expanded = computed(() => this._isCross() || this._legacyCross());
+
+	readonly resolvedAriaLabel = computed(
+		() => this.ariaLabel() || (this.expanded() ? 'Close menu' : 'Open menu'),
+	);
 
 	readonly _classes = computed(() => {
 		// Cross wins (cross) OR legacy open signal

@@ -16,6 +16,7 @@
 					<input
 						class="wtable__search-input"
 						type="text"
+						aria-label="Search"
 						placeholder="Search..."
 						[value]="searchingText()"
 						(input)="
@@ -77,7 +78,15 @@
 					@if (config().num) {
 					<th scope="col" class="wtable__th">No.</th>
 					} @for (column of columns(); track column) {
-					<th scope="col" class="wtable__th">
+					<th
+						scope="col"
+						class="wtable__th"
+						[attr.aria-sort]="
+							column.field === sort_type.title
+								? (sort_type.direction === 'desc' ? 'descending' : sort_type.direction === 'asc' ? 'ascending' : null)
+								: null
+						"
+					>
 						<div
 							class="wtable__th-inner"
 							[class.is-activeDown]="
@@ -88,14 +97,18 @@
 								sort_type.direction === 'asc' &&
 								column.field === sort_type.title
 							"
+							[attr.role]="sortable[column.field] ? 'button' : null"
+							[attr.tabindex]="sortable[column.field] ? 0 : null"
 							(click)="sort(column)"
+							(keydown.enter)="sort(column)"
+							(keydown.space)="$event.preventDefault(); sort(column)"
 						>
 							<span class="wtable__th-title"
 								>{{ column.title }}</span
 							>
 
 							@if (sortable[column.field]) {
-							<span class="material-icons wtable__sort-icon">
+							<span class="material-icons wtable__sort-icon" aria-hidden="true">
 								keyboard_backspace
 							</span>
 							}
@@ -145,22 +158,26 @@
 							@if (button) { @if (!button.ahref &&
 							!button.ahrefFunc && !button.href &&
 							!button.hrefFunc) {
-							<i
-								class="material-icons wtable__icon"
-								[title]="button.icon"
+							<button
+								type="button"
+								class="wtable__icon-btn"
+								[attr.aria-label]="button.icon"
 								(click)="button.click(row)"
 							>
-								{{ button.icon }}
-							</i>
+								<i class="material-icons wtable__icon" aria-hidden="true">
+									{{ button.icon }}
+								</i>
+							</button>
 							} @if (button.ahref) {
 							<a
 								[href]="button.ahref"
 								[target]="button.target || '_blank'"
 								class="wtable__link"
+								[attr.aria-label]="button.icon"
 							>
 								<i
 									class="material-icons wtable__icon"
-									[title]="button.icon"
+									aria-hidden="true"
 								>
 									{{ button.icon }}
 								</i>
@@ -170,19 +187,24 @@
 								[href]="button.ahrefFunc(row)"
 								[target]="button.target || '_blank'"
 								class="wtable__link"
+								[attr.aria-label]="button.icon"
 							>
 								<i
 									class="material-icons wtable__icon"
-									[title]="button.icon"
+									aria-hidden="true"
 								>
 									{{ button.icon }}
 								</i>
 							</a>
 							} @if (button.href) {
-							<a [routerLink]="button.href" class="wtable__link">
+							<a
+								[routerLink]="button.href"
+								class="wtable__link"
+								[attr.aria-label]="button.icon"
+							>
 								<i
 									class="material-icons wtable__icon"
-									[title]="button.icon"
+									aria-hidden="true"
 								>
 									{{ button.icon }}
 								</i>
@@ -191,30 +213,37 @@
 							<a
 								[routerLink]="button.hrefFunc(row)"
 								class="wtable__link"
+								[attr.aria-label]="button.icon"
 							>
 								<i
 									class="material-icons wtable__icon"
-									[title]="button.icon"
+									aria-hidden="true"
 								>
 									{{ button.icon }}
 								</i>
 							</a>
 							} } } @if (_cfg.update) {
-							<i
-								class="material-icons wtable__icon"
-								title="Edit"
+							<button
+								type="button"
+								class="wtable__icon-btn"
+								aria-label="Edit"
 								(click)="_cfg.update(row)"
 							>
-								edit
-							</i>
+								<i class="material-icons wtable__icon" aria-hidden="true">
+									edit
+								</i>
+							</button>
 							} @if (_cfg.delete) {
-							<i
-								class="material-icons wtable__icon"
-								title="Delete"
+							<button
+								type="button"
+								class="wtable__icon-btn"
+								aria-label="Delete"
 								(click)="_cfg.delete(row)"
 							>
-								delete_outline
-							</i>
+								<i class="material-icons wtable__icon" aria-hidden="true">
+									delete_outline
+								</i>
+							</button>
 							}
 						</div>
 					</td>
@@ -242,34 +271,51 @@
 								<div
 									class="wtable__select"
 									(clickOutside)="select_page_size = false"
+									(keydown.escape)="select_page_size = false; pageSizeTrigger.focus()"
 								>
-									<div
+									<button
+										type="button"
+										#pageSizeTrigger
 										class="wtable__select-btn"
+										aria-haspopup="listbox"
+										[attr.aria-expanded]="select_page_size"
+										[attr.aria-controls]="tableId + '-page-size-menu'"
 										(click)="select_page_size = !select_page_size"
 									>
 										{{ _cfg.perPage === -1 ? 'All' :
 										_cfg.perPage }}
-									</div>
+									</button>
 
 									@if (select_page_size) {
-									<div class="wtable__select-menu">
+									<div
+										class="wtable__select-menu"
+										role="listbox"
+										[id]="tableId + '-page-size-menu'"
+										[attr.aria-label]="'Items per page'"
+									>
 										@for (pageSize of _cfg.pageSizeOptions;
 										track pageSize) {
-										<div
+										<button
+											type="button"
+											role="option"
 											class="wtable__select-item"
+											[attr.aria-selected]="_cfg.perPage === pageSize"
 											[class.is-active]="_cfg.perPage === pageSize"
 											(click)="changePerPage(pageSize)"
 										>
 											{{ pageSize }}
-										</div>
+										</button>
 										} @if (_cfg.allDocs) {
-										<div
+										<button
+											type="button"
+											role="option"
 											class="wtable__select-item"
+											[attr.aria-selected]="_cfg.perPage === -1"
 											[class.is-active]="_cfg.perPage === -1"
 											(click)="changePerPage(-1)"
 										>
 											All
-										</div>
+										</button>
 										}
 									</div>
 									}

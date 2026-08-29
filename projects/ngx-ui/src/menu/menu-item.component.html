@@ -3,13 +3,18 @@
 @if (_item.separator) {
 <li class="wmenu__separator" role="separator"></li>
 } @else {
-<li class="wmenu__item" [class._has-children]="!!_item.items?.length">
+<li class="wmenu__item" role="none" [class._has-children]="!!_item.items?.length">
 	@if (_item.routerLink) {
 	<a
+		#itemLink
 		class="wmenu__link"
+		role="menuitem"
 		[class._disabled]="_item.disabled"
+		[attr.aria-disabled]="_item.disabled || null"
+		[attr.aria-haspopup]="_item.items?.length ? 'menu' : null"
 		[routerLink]="_item.routerLink"
 		(click)="onClick($event)"
+		(keydown)="onKeydown($event)"
 	>
 		@if (_item.icon) {
 		<span class="wmenu__icon material-icons" aria-hidden="true">{{
@@ -20,10 +25,15 @@
 	</a>
 	} @else if (_item.href) {
 	<a
+		#itemLink
 		class="wmenu__link"
+		role="menuitem"
 		[class._disabled]="_item.disabled"
+		[attr.aria-disabled]="_item.disabled || null"
+		[attr.aria-haspopup]="_item.items?.length ? 'menu' : null"
 		[href]="_item.href"
 		(click)="onClick($event)"
+		(keydown)="onKeydown($event)"
 	>
 		@if (_item.icon) {
 		<span class="wmenu__icon material-icons" aria-hidden="true">{{
@@ -34,10 +44,14 @@
 	</a>
 	} @else {
 	<button
+		#itemLink
 		type="button"
 		class="wmenu__link"
+		role="menuitem"
+		[attr.aria-haspopup]="_item.items?.length ? 'menu' : null"
 		[disabled]="_item.disabled"
 		(click)="onClick($event)"
+		(keydown)="onKeydown($event)"
 	>
 		@if (_item.icon) {
 		<span class="wmenu__icon material-icons" aria-hidden="true">{{
@@ -50,9 +64,9 @@
 	<span class="wmenu__caret material-icons" aria-hidden="true"
 		>chevron_right</span
 	>
-	<ul class="wmenu__submenu">
+	<ul class="wmenu__submenu" role="menu" [attr.aria-label]="_item.label">
 		@for (child of _item.items; track child) {
-		<wmenu-item [item]="child" (wSelect)="onChildSelect($event)" />
+		<wmenu-item [item]="child" (wSelect)="onChildSelect($event)" (wEscape)="onChildEscape()" />
 		}
 	</ul>
 	}

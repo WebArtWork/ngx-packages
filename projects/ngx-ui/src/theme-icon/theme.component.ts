@@ -75,6 +75,10 @@ export class ThemeComponent {
 			: 'Tight',
 	);
 
+	readonly ariaLabel = computed(
+		() => `Switch theme, currently ${this.resolvedMode()} mode`,
+	);
+
 	readonly radiusPath = computed(() => {
 		const r = this.resolvedRadius();
 		const d = this.resolvedDensity();
