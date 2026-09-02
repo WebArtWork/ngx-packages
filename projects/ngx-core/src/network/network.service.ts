@@ -176,6 +176,7 @@ export class NetworkService {
 				credentials: 'omit',
 				signal: ctrl.signal,
 				mode: noCors ? 'no-cors' : 'cors',
+				redirect: 'manual',
 			});
 
 			clearTimeout(timer);
