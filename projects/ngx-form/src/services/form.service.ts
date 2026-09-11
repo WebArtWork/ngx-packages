@@ -8,7 +8,7 @@ import {
 	WritableSignal,
 } from '@angular/core';
 import { form as buildSignalForm, required } from '@angular/forms/signals';
-import { StoreService } from '@wawjs/ngx-core';
+import { CoreService, StoreService } from '@wawjs/ngx-core';
 import { CrudConfig, CrudService } from '@wawjs/ngx-crud';
 import { NGX_FORM_CONFIG, NgxFormModal } from '../config.interface';
 import { FormComponentInterface } from '../interfaces/component.interface';
@@ -40,6 +40,7 @@ function formCrudConfig(): CrudConfig<Form> {
 export class FormService extends CrudService<Form> {
 	private readonly _ngxFormConfig = inject(NGX_FORM_CONFIG);
 	private readonly _formStoreService = inject(StoreService);
+	private readonly _coreService = inject(CoreService);
 	private readonly _formInjector = inject(Injector);
 
 	readonly appId = this._ngxFormConfig.appId ?? '';
@@ -146,7 +147,7 @@ export class FormService extends CrudService<Form> {
 			this._rememberFormId(form.formId);
 		}
 
-		const id = form.formId || this._createFormId();
+		const id = form.formId || globalThis.crypto?.randomUUID?.() || this._coreService.UUID();
 
 		form.formId = id;
 
@@ -474,20 +475,5 @@ export class FormService extends CrudService<Form> {
 		}
 
 		this._ngxFormConfig.modalService.show(modal);
-	}
-
-	private _createFormId(): string {
-		const randomUUID = globalThis.crypto?.randomUUID;
-
-		if (typeof randomUUID === 'function') {
-			return randomUUID.call(globalThis.crypto);
-		}
-
-		return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-			const r = (Math.random() * 16) | 0;
-			const v = c === 'x' ? r : (r & 0x3) | 0x8;
-
-			return v.toString(16);
-		});
 	}
 }

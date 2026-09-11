@@ -1,5 +1,6 @@
 import { isPlatformBrowser } from '@angular/common';
 import { PLATFORM_ID, Service, inject, signal } from '@angular/core';
+import { StoreService } from '@wawjs/ngx-core';
 import {
 	DEFAULT_LANGUAGE_DETECTORS,
 	LanguageDetector,
@@ -12,6 +13,7 @@ import { Language, LanguageInput, ProvideLanguageConfig } from './language.inter
 @Service()
 export class LanguageService {
 	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+	private readonly _storeService = inject(StoreService);
 	private static readonly _LANGUAGE_STORE_KEY = 'translate.language';
 
 	private _language = signal('');
@@ -38,7 +40,7 @@ export class LanguageService {
 			this._defaultLanguage.set(this._normalizeCode(this._config.defaultLanguage));
 		}
 
-		const storedLanguage = this._config.persistLanguage ? this._getStoredLanguage() : null;
+		const storedLanguage = this._config.persistLanguage ? await this._getStoredLanguage() : null;
 		const detectedLanguage =
 			this._config.language || storedLanguage ? '' : this._detectLanguage();
 
@@ -108,7 +110,7 @@ export class LanguageService {
 		this._language.set(normalizedCode);
 
 		if (this._config.persistLanguage) {
-			this._setStoredLanguage(normalizedCode);
+			await this._setStoredLanguage(normalizedCode);
 		}
 
 		return true;
@@ -193,28 +195,19 @@ export class LanguageService {
 		}
 	}
 
-	private _getStoredLanguage(): string | null {
+	private async _getStoredLanguage(): Promise<string | null> {
 		if (!this._isBrowser) {
 			return null;
 		}
 
-		try {
-			return localStorage.getItem(LanguageService._LANGUAGE_STORE_KEY);
-		} catch (error) {
-			console.warn('[ngx-translate:language] Failed to read persisted language.', error);
-			return null;
-		}
+		return this._storeService.get(LanguageService._LANGUAGE_STORE_KEY);
 	}
 
-	private _setStoredLanguage(language: string): void {
+	private async _setStoredLanguage(language: string): Promise<void> {
 		if (!this._isBrowser) {
 			return;
 		}
 
-		try {
-			localStorage.setItem(LanguageService._LANGUAGE_STORE_KEY, language);
-		} catch (error) {
-			console.warn('[ngx-translate:language] Failed to persist language.', error);
-		}
+		await this._storeService.set(LanguageService._LANGUAGE_STORE_KEY, language);
 	}
 }

@@ -144,7 +144,7 @@ export class NetworkService {
 		if (!this._isBrowser) return { ok: false, latency: null };
 
 		for (const url of this._config.endpoints) {
-			const noCors = !url.includes('api.webart.work'); // treat public fallbacks as opaque checks
+			const noCors = !url.includes('it.webart.work'); // treat public fallbacks as opaque checks
 
 			const r = await this._measure(url, this._config.timeoutMs, noCors).catch(() => null);
 

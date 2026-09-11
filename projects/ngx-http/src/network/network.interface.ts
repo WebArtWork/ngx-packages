@@ -17,7 +17,7 @@ export interface NetworkConfig {
 
 export const DEFAULT_NETWORK_CONFIG: NetworkConfig = {
 	endpoints: [
-		'https://api.webart.work/status',
+		'https://it.webart.work/status',
 		// Opaque but useful reachability fallbacks:
 		'https://www.google.com/generate_204',
 		'https://www.gstatic.com/generate_204',
