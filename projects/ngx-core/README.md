@@ -265,7 +265,7 @@ Always guard `value()` with `hasValue()` because Angular resources can throw whe
 
 - route-driven metadata via `data.meta`
 - automatic reset of managed tags between route changes
-- generated Open Graph, Twitter, and `itemprop` variants
+- generated Open Graph, Twitter, and `itemprop` variants; `image` sets `og:image`, `twitter:image` (the tag X/Twitter reads), legacy `twitter:image:src`, and `itemprop="image"`
 - optional defaults configured in `provideNgxCore({ meta: ... })`
 - explicit link management through `setLink(...)`
 
