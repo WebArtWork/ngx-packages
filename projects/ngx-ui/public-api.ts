@@ -51,11 +51,6 @@ export * from './src/burger/burger.component';
 export * from './src/card/card.component';
 
 /*
- * Chart
- */
-export * from './src/chart/chart.component';
-
-/*
  * Chip
  */
 export * from './src/chip/chip.component';

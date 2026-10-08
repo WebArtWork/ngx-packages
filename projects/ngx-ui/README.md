@@ -182,7 +182,6 @@ Public state:
 | `MeterGroupComponent` | `<wmetergroup>` | `.wmetergroup` |
 | `TimelineComponent` | `<wtimeline>` | `.wtimeline` |
 | `OrderListComponent` | `<worderlist>` | `.worderlist` |
-| `ChartComponent` | `<wchart>` | `.wchart` |
 | `EditorComponent` | `<weditor>` | `.weditor` |
 
 ### Buttons
@@ -427,23 +426,6 @@ Render `<wconfirm-popup-styles />` once in the app shell when using `[wconfirmPo
 ```html
 <worderlist [(items)]="priorityList" bindLabel="name" />
 ```
-
-### Chart
-
-`ChartComponent` is a thin wrapper around [Chart.js](https://www.chartjs.org/), an optional peer dependency — install `chart.js` yourself if you use `<wchart>`.
-
-```html
-<wchart
-	type="bar"
-	[data]="{
-		labels: ['Mon', 'Tue', 'Wed'],
-		datasets: [{ label: 'Visits', data: [12, 19, 7] }]
-	}"
-	description="Visits by day, Monday through Wednesday"
-/>
-```
-
-Canvas-rendered charts have no text content for screen readers, so `<wchart>` also renders a visually-hidden `<table>` built from the same `data`, and uses `description` as both the chart's `aria-label` and the table's `<caption>`. Always pass `description` with a short summary of what the chart shows.
 
 ### Editor
 

@@ -19,7 +19,6 @@
 | `ConfirmPopup` | Focus moves into the popup on open, <kbd>Escape</kbd> closes it, focus returns to the trigger |
 | `Alert` | `role="alert"`/`"status"` depending on severity, auto-dismiss pauses on keyboard focus as well as mouse hover |
 | `Burger` / `ThemeComponent` (theme toggle) | Real `<button>` elements, `aria-expanded`/`aria-controls` where applicable |
-| `Chart` | Visually-hidden data `<table>` fallback (with `<caption>`) alongside the canvas, plus `role="img"` + `aria-label` from the `description` input |
 | `ngx-datetime`'s `DatetimeCalendarComponent` / `DatetimePickerComponent` | WAI-ARIA APG grid pattern (roving-tabindex day grid), picker panel with focus management/Escape/label association |
 | Reduced motion | `Spinner` and `ProgressBar`'s continuous/looping animations respect `prefers-reduced-motion` (switch to a simple opacity pulse) |
 
@@ -58,7 +57,6 @@ A follow-up review of the changes above (comparing against `ngx-prime`'s indepen
 - **`ConfirmPopupDirective` stole focus on outside-click close**: `hide()` used to always refocus the trigger element, including when the popup was dismissed by clicking somewhere else entirely — yanking focus away from whatever the user had just clicked. Now focus is restored only when `hide()` is called from Accept/Reject/Escape, not from the outside-click listener.
 - **`Modal` focus-restore could target a detached element**: with nested modals, the captured "previously focused" element could belong to a modal that's already closed by the time this one closes. `ModalService` now checks `document.contains(...)` before calling `.focus()` on it, falling back to `document.body`.
 - **`ngx-datetime`'s `queueMicrotask`-based focus scheduling** (calendar grid arrow-key nav, picker panel focus-on-open) raced against Angular's own zoneless change-detection flush with no guaranteed ordering — the focus call could run before the DOM it targets exists. Replaced with `afterNextRender()`, which is guaranteed to run after Angular commits the render.
-- **`Chart`'s screen-reader table could crash** on duplicate dataset labels (`@for (dataset of data().datasets; track dataset.label)` throws `NG0955` if two datasets share a label). Changed to `track $index`.
 - **`Tabs` could become entirely keyboard-unreachable** if the currently-active tab later became `disabled` (the only `tabindex="0"` tab would also be natively `disabled`). `TabsComponent` now computes a `rovingIndex` that falls back to the first non-disabled tab when the active one is disabled.
 
 **Known residual limitation**: pressing Escape inside a nested `Menu`/`Menubar` submenu moves focus back to the parent trigger, but since submenus are shown via CSS `:focus-within` (not a JS-controlled visible state) and the parent trigger is still "within" the same list item, the submenu may not visually close until focus moves further away (e.g. Tab, or a second Escape once focus is no longer nested). This is a UX rough edge, not a keyboard trap.

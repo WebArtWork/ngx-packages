@@ -9,7 +9,6 @@ import {
 	BurgerComponent,
 	ButtonComponent,
 	CardComponent,
-	ChartComponent,
 	ChipComponent,
 	ConfirmPopupDirective,
 	ConfirmPopupStylesComponent,
@@ -59,7 +58,6 @@ interface UiRow {
 		BurgerComponent,
 		ButtonComponent,
 		CardComponent,
-		ChartComponent,
 		ChipComponent,
 		ConfirmPopupDirective,
 		ConfirmPopupStylesComponent,
@@ -150,11 +148,6 @@ export class LandingComponent {
 		{ label: 'New components added', date: 'Aug 20', icon: 'widgets' },
 		{ label: 'Docs updated', date: 'Aug 26', icon: 'check' },
 	];
-
-	protected readonly chartData = {
-		labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
-		datasets: [{ label: 'Visits', data: [12, 19, 7, 15, 22] }],
-	};
 
 	protected confirmDelete(): void {
 		this._confirmService.confirm({

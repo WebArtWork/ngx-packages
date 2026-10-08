@@ -464,59 +464,6 @@ export class ContactComponent {}`,
 </wcard>`,
 	},
 	{
-		slug: 'chart-component',
-		name: 'ChartComponent',
-		description: 'Thin Chart.js wrapper for rendering charts from declarative data and options.',
-		summary:
-			'ChartComponent renders a Chart.js chart inside a canvas, re-rendering when type, data, or options inputs change. chart.js is an optional peer dependency that must be installed by consuming apps.',
-		highlights: [
-			'type and data are required inputs.',
-			'Accepts the same ChartData/ChartOptions shapes as Chart.js.',
-			'Renders a visually-hidden data table alongside the canvas as a screen-reader fallback; pass description for its aria-label/caption.',
-		],
-		availableItems: ['chart.component.ts'],
-		properties: [
-			{
-				name: 'type',
-				signature: 'input.required<ChartType>()',
-				description: 'Chart.js chart type, e.g. bar, line, pie.',
-				category: 'Inputs',
-				docType: 'Component',
-				sourceFile: 'chart.component.ts',
-			},
-			{
-				name: 'data',
-				signature: 'input.required<ChartData>()',
-				description: 'Chart.js dataset configuration.',
-				category: 'Inputs',
-				docType: 'Component',
-				sourceFile: 'chart.component.ts',
-			},
-			{
-				name: 'options',
-				signature: 'input<ChartOptions>()',
-				description: 'Optional Chart.js options object.',
-				category: 'Inputs',
-				docType: 'Component',
-				sourceFile: 'chart.component.ts',
-			},
-		],
-		methods: [],
-		sections: [
-			{
-				title: 'Peer dependency',
-				items: ['Install chart.js in the consuming app before using <wchart>.'],
-			},
-		],
-		code: `<wchart
-	type="bar"
-	[data]="{
-		labels: ['Mon', 'Tue', 'Wed'],
-		datasets: [{ label: 'Visits', data: [12, 19, 7] }]
-	}"
-/>`,
-	},
-	{
 		slug: 'chip-component',
 		name: 'ChipComponent',
 		description: 'Compact, optionally removable token for tags, filters, or selections.',
