@@ -42,7 +42,7 @@ export const DEFAULT_THEME_STORAGE_KEYS: ThemeStorageKeys = {
 };
 
 export const DEFAULT_THEME_CONFIG: ThemeConfig = {
-	mode: 'dark',
+	mode: 'light',
 	modes: ['light', 'dark'],
 	density: 'comfortable',
 	densities: ['comfortable', 'compact'],

@@ -32,7 +32,7 @@ import { provideNgxUi } from '@wawjs/ngx-ui';
 export const appConfig = {
 	providers: [
 		provideNgxUi({
-			mode: 'dark',
+			mode: 'light',
 			modes: ['light', 'dark'],
 			density: 'comfortable',
 			radius: 'rounded',

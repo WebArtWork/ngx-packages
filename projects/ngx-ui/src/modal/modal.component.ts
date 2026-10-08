@@ -11,6 +11,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { PLATFORM_ID, inject } from '@angular/core';
 import { FocusTrap, FocusTrapFactory } from '@angular/cdk/a11y';
 import { pushEscapeHandler } from '@wawjs/ngx-core';
+import { ModalSizes } from './modal.interface';
 import { ButtonDirective } from '../button/button.directive';
 import { PlusIconComponent } from '../icons/plus/plus-icon.component';
 
@@ -26,12 +27,15 @@ export class ModalComponent implements OnInit, AfterViewInit, OnDestroy {
 	private readonly _focusTrapFactory = inject(FocusTrapFactory);
 
 	closable = true;
+	showClose = true;
+	closeOnEscape = true;
+	closeOnBackdrop = true;
 	close: () => void = () => {};
 	onOpen?: () => void;
 	onClickOutside?: () => void;
 
 	// used in template for size modifiers
-	size: 'small' | 'mid' | 'big' | 'full' = 'mid';
+	size: ModalSizes = 'mid';
 
 	// optional custom class applied to the content panel
 	panelClass = '';
@@ -43,6 +47,13 @@ export class ModalComponent implements OnInit, AfterViewInit, OnDestroy {
 	ariaDescribedBy?: string;
 
 	private readonly _content = viewChild<ElementRef<HTMLElement>>('content');
+
+	/** Element the modal content component is rendered into. */
+	readonly body = viewChild<ElementRef<HTMLElement>>('body');
+
+	get isFullscreen(): boolean {
+		return this.size === 'fullscreen';
+	}
 
 	get contentClasses(): string {
 		return [
@@ -59,10 +70,6 @@ export class ModalComponent implements OnInit, AfterViewInit, OnDestroy {
 	private readonly _popStateHandler = (e: PopStateEvent) => this.popStateListener(e);
 
 	ngOnInit(): void {
-		if (typeof this.onClickOutside !== 'function') {
-			this.onClickOutside = this.close;
-		}
-
 		if (typeof this.onOpen === 'function') {
 			this.onOpen();
 		}
@@ -70,7 +77,7 @@ export class ModalComponent implements OnInit, AfterViewInit, OnDestroy {
 		if (this._isBrowser) {
 			window.addEventListener('popstate', this._popStateHandler);
 			this._unregisterEscape = pushEscapeHandler(document, () => {
-				if (this.closable) {
+				if (this.closeOnEscape) {
 					this.close();
 				}
 			});
@@ -107,7 +114,11 @@ export class ModalComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	onBackdropClick(): void {
-		this.onClickOutside?.();
+		if (typeof this.onClickOutside === 'function') {
+			this.onClickOutside();
+		} else if (this.closeOnBackdrop) {
+			this.close();
+		}
 	}
 
 	private popStateListener(_: Event): void {

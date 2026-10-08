@@ -81,7 +81,7 @@ Version `22.0.0` was primarily a theme-state package with UI exports that still 
 
 | Property | Type | Default | Description |
 | --- | --- | --- | --- |
-| `mode` | `ThemeMode` | `'dark'` | Initial mode. |
+| `mode` | `ThemeMode` | `'light'` | Initial mode, used when nothing is persisted yet. A persisted choice (`persist: true`) wins on later visits. |
 | `modes` | `ThemeMode[]` | `['light', 'dark']` | Modes used by `nextTheme()`. |
 | `density` | `ThemeDensity` | `'comfortable'` | Initial density. |
 | `densities` | `ThemeDensity[]` | `['comfortable', 'compact']` | Densities used by `nextTheme()`. |
@@ -271,7 +271,7 @@ modal.show({
 });
 ```
 
-`ModalComponent` renders `role="dialog"` (or `role="alertdialog"` via `role: 'alertdialog'`), traps focus while open (`@angular/cdk/a11y` `FocusTrapFactory`), restores focus to whatever triggered it on close, and closes on <kbd>Escape</kbd> when `closable` is true. Pass `ariaLabel`, or preferably `ariaLabelledBy`/`ariaDescribedBy` pointing at an id inside your content component, to give the dialog an accessible name:
+`ModalComponent` renders `role="dialog"` (or `role="alertdialog"` via `role: 'alertdialog'`), traps focus while open (`@angular/cdk/a11y` `FocusTrapFactory`), restores focus to whatever triggered it on close, and closes on <kbd>Escape</kbd> when `closeOnEscape` is true. Pass `ariaLabel`, or preferably `ariaLabelledBy`/`ariaDescribedBy` pointing at an id inside your content component, to give the dialog an accessible name:
 
 ```ts
 modal.show({
@@ -279,6 +279,10 @@ modal.show({
 	ariaLabelledBy: 'details-modal-title',
 });
 ```
+
+Close behaviour is controlled separately: `showClose` (the x button), `closeOnEscape` and `closeOnBackdrop`. Each defaults to `closable` (itself `true`), so `closable: false` still disables all three at once, and e.g. `{ closable: true, closeOnBackdrop: false }` keeps the button and Escape but ignores backdrop clicks. `onOpen` and `onClose` are part of `ModalConfig`, so they can be passed straight to `show()`.
+
+`size` accepts `'small' | 'mid' | 'big' | 'full' | 'fullscreen'`. `'fullscreen'` fills the whole window (`100vw` x `100dvh`) with no outer gap, rounded corners or max-width; `'full'` is the large padded panel. `modal.fullscreen(opts)` is a shortcut.
 
 ### Alert
 

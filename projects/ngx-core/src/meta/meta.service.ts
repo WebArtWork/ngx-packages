@@ -32,7 +32,8 @@ import { TagAttr } from './meta.type';
  * - Image:
  *   - <meta itemprop="image" ...>
  *   - <meta property="og:image" ...>
- *   - <meta name="twitter:image:src" ...>
+ *   - <meta name="twitter:image" ...>
+ *   - <meta name="twitter:image:src" ...> (legacy)
  * - Robots:
  *   - <meta name="robots" ...> (derived from `robots` or `index`)
  */
@@ -306,7 +307,8 @@ export class MetaService {
 	 * Applies image to:
 	 * - itemprop="image"
 	 * - og:image
-	 * - twitter:image:src
+	 * - twitter:image
+	 * - twitter:image:src (legacy)
 	 */
 	private _setImageTriplet(image?: string): void {
 		if (!isDefined(image)) return;
@@ -314,7 +316,8 @@ export class MetaService {
 		const content = image as string;
 
 		this._updateTag('og:image', content, 'property');
-		this._updateTag('twitter:image:src', content, 'name');
+		this._updateTag('twitter:image', content, 'name');
+		this._updateTag('twitter:image:src', content, 'name'); // legacy, kept for old readers
 		this._updateTag('image', content, 'itemprop');
 	}
 

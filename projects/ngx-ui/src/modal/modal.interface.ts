@@ -1,6 +1,6 @@
 import { Signal, Type } from '@angular/core';
 
-export const MODAL_SIZES = ['small', 'mid', 'big', 'full'] as const;
+export const MODAL_SIZES = ['small', 'mid', 'big', 'full', 'fullscreen'] as const;
 export type ModalSizes = (typeof MODAL_SIZES)[number];
 
 export interface ModalButton {
@@ -27,7 +27,27 @@ export interface ModalConfig {
 	progress?: boolean;
 	timeout?: number;
 	close?: () => void;
+
+	/**
+	 * Master switch for the close behaviours. When `showClose`, `closeOnEscape`
+	 * or `closeOnBackdrop` is not set, it falls back to this value.
+	 */
 	closable?: boolean;
+
+	/** Show the close (x) button. Defaults to `closable`. */
+	showClose?: boolean;
+
+	/** Close on Escape. Defaults to `closable`. */
+	closeOnEscape?: boolean;
+
+	/** Close when the backdrop is clicked. Defaults to `closable`. */
+	closeOnBackdrop?: boolean;
+
+	/** Called after the modal has been closed. */
+	onClose?: () => void;
+
+	/** Called when the modal shell has been opened. */
+	onOpen?: () => void;
 
 	/**
 	 * ARIA role for the modal panel. Defaults to `dialog`; use `alertdialog`
@@ -54,8 +74,6 @@ export interface Modal extends ModalConfig {
 	id?: number;
 	progressPercentage?: Signal<number>;
 	onClickOutside?: () => void;
-	onClose?: () => void;
-	onOpen?: () => void;
 	[x: string]: unknown;
 }
 

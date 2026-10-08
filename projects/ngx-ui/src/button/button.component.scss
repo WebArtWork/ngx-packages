@@ -61,7 +61,7 @@
 
 .wbutton--primary {
 	background: var(--c-primary);
-	color: var(--c-text-secondary);
+	color: var(--c-on-primary);
 
 	&:hover {
 		background: var(--c-primary-hover);
@@ -70,7 +70,7 @@
 
 .wbutton--secondary {
 	background: var(--c-secondary);
-	color: var(--c-text-secondary);
+	color: var(--c-on-primary);
 
 	&:hover {
 		background: var(--c-secondary-hover);
@@ -80,7 +80,7 @@
 /* If you later add dedicated status tokens, swap these mappings accordingly */
 .wbutton--success {
 	background: var(--c-primary);
-	color: var(--c-text-secondary);
+	color: var(--c-on-primary);
 
 	&:hover {
 		background: var(--c-primary-hover);
@@ -89,7 +89,7 @@
 
 .wbutton--danger {
 	background: var(--c-secondary);
-	color: var(--c-text-secondary);
+	color: var(--c-on-primary);
 
 	&:hover {
 		background: var(--c-secondary-hover);
@@ -99,7 +99,7 @@
 .wbutton--warning,
 .wbutton--info {
 	background: var(--c-bg-tertiary);
-	color: var(--c-text-secondary);
+	color: var(--c-text-primary);
 	border-color: var(--c-border);
 
 	&:hover {
@@ -109,7 +109,7 @@
 
 .wbutton--light {
 	background: var(--c-bg-secondary);
-	color: var(--c-text-secondary);
+	color: var(--c-text-primary);
 	border-color: var(--c-border);
 
 	&:hover {
@@ -118,7 +118,7 @@
 }
 
 .wbutton--dark {
-	background: var(--c-text-secondary);
+	background: var(--c-text-primary);
 	color: var(--c-bg-secondary);
 
 	&:hover {
@@ -128,7 +128,7 @@
 
 .wbutton--link {
 	background: transparent;
-	color: var(--c-text-secondary);
+	color: var(--c-text-primary);
 	padding: 0;
 	border-color: transparent;
 	border-radius: 0;
@@ -218,7 +218,7 @@
 	font-size: 0.6875rem;
 	line-height: 1;
 	background: var(--c-secondary);
-	color: var(--c-text-secondary);
+	color: var(--c-on-primary);
 }
 
 .wbutton__badge--primary {

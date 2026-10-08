@@ -27,6 +27,10 @@ export class ModalService {
 
 		this._modals.push(config);
 
+		config.showClose ??= config.closable !== false;
+		config.closeOnEscape ??= config.closable !== false;
+		config.closeOnBackdrop ??= config.closable !== false;
+
 		config.class ||= '';
 		config.panelClass ||= config.class || '';
 		config.id ||= Math.floor(Math.random() * Date.now()) + Date.now();
@@ -74,7 +78,8 @@ export class ModalService {
 		shell = this._dom.appendComponent(ModalComponent, config)!;
 
 		// Content component injected into inner body div
-		const host = shell.nativeElement.children[0].children[0].children[0] as HTMLElement;
+		const host = (shell.componentRef.instance.body()?.nativeElement ??
+			shell.nativeElement.querySelector('.wawjs-modal__body')) as HTMLElement;
 
 		content = this._dom.appendComponent(
 			config.component,
@@ -103,6 +108,10 @@ export class ModalService {
 
 	full(opts: Modal): void {
 		this.show({ ...opts, size: 'full' });
+	}
+
+	fullscreen(opts: Modal): void {
+		this.show({ ...opts, size: 'fullscreen' });
 	}
 
 	destroy(): void {

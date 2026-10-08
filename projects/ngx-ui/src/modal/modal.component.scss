@@ -17,6 +17,14 @@
 	}
 }
 
+.wawjs-modal--fullscreen {
+	padding: 0;
+
+	@media (min-width: 768px) {
+		padding: 0;
+	}
+}
+
 .wawjs-modal__content {
 	position: relative;
 	display: flex;
@@ -39,6 +47,15 @@
 
 	&--big {
 		max-width: 72rem;
+	}
+
+	&--fullscreen {
+		inset: 0;
+		width: 100vw;
+		max-width: none;
+		height: 100dvh;
+		max-height: none;
+		border-radius: 0;
 	}
 
 	&--full {

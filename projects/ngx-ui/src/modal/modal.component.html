@@ -1,5 +1,6 @@
 <div
 	class="wawjs-modal"
+	[class.wawjs-modal--fullscreen]="isFullscreen"
 	(click)="onBackdropClick()"
 >
 	<div
@@ -13,11 +14,14 @@
 		tabindex="-1"
 		(click)="$event.stopPropagation()"
 	>
-		<div class="wawjs-modal__body">
+		<div
+			#body
+			class="wawjs-modal__body"
+		>
 			<!-- content host -->
 		</div>
 
-		@if (closable) {
+		@if (showClose) {
 		<button
 			wbutton
 			[disableSubmit]="true"

@@ -40,7 +40,15 @@ export const appConfig = {
 - Event outputs follow camelCase Angular bindings, for example `objectAdded` for Fabric's `object:added`.
 - Prefer `injectFabricCropModalService()` for new crop actions so the crop modal service and component load only when the user opens the crop workflow.
 - Pass `[ariaLabel]="'...'"` on `FabricComponent` to give the `<canvas>` an accessible name (rendered as `aria-label`/`role="img"` on the host canvas element).
-- `FabricCropModalComponent`'s crop stage is keyboard-reachable (`tabindex="0"`) and exposes `role="application"` with an `aria-label` plus `aria-describedby` pointing at the live status text; it still delegates dialog chrome (focus trap, Escape, `role="dialog"`) to `@wawjs/ngx-ui`'s `ModalService` via `FabricCropModalService`. Full keyboard-driven crop-frame resizing is out of scope for this pass — Fabric.js object manipulation remains pointer-driven.
+- `FabricCropModalComponent`'s crop stage is keyboard-reachable (`tabindex="0"`) and exposes `role="application"` with an `aria-label` plus `aria-describedby` pointing at the live status text; it still delegates dialog chrome (focus trap, Escape, `role="dialog"`) to `@wawjs/ngx-ui`'s `ModalService` via `FabricCropModalService`. Keyboard: arrow keys move the frame (Shift = 10px), `+`/`-` zoom, `Ctrl/Cmd+Z` undo, `Ctrl/Cmd+Shift+Z` or `Ctrl+Y` redo; resizing the frame is pointer-driven.
+
+### Crop editor model
+
+The canvas view is never transformed. Pan (drag the photo, wheel, pinch), zoom, rotate, flip and skew are applied to the photo, so the crop frame stays put and the photo moves under it. The frame can never leave the photo, and the photo can never be smaller than the frame. With `aspectRatio` set, only the corner handles show and the shape stays locked. Undo/redo (50 steps) stores plain numbers, not canvas JSON.
+
+The result is rendered from the canvas, so rotation, flip and skew are baked in at source resolution. PNG keeps transparency; JPEG gets a white background. `FabricCropResult.source` is deprecated and only present when the photo is not rotated or skewed.
+
+Extra options for `FabricCropModalService.open()`: `tools: { rotate, flip, skew, history }` (set a group to `false` to hide it), `labels` (translate every visible string, see `FabricCropLabels`), and `maxEdge` (scale the output down to a longest edge). If only one of `outputWidth` / `outputHeight` is set, the other follows the crop's ratio.
 
 ## AI Coding Agents
 
