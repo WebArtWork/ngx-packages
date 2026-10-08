@@ -11,14 +11,38 @@ import {
 	input,
 	viewChild,
 } from '@angular/core';
-import {
+import type {
 	Chart,
 	ChartConfiguration,
 	ChartData,
 	ChartOptions,
 	ChartType,
-	registerables,
 } from 'chart.js';
+
+type ChartModule = typeof import('chart.js');
+
+/**
+ * `chart.js` is an optional peer dependency, so it is loaded on first use
+ * instead of being imported statically. Apps that never render a `<wchart>`
+ * do not need it installed.
+ */
+let chartModule: Promise<ChartModule> | undefined;
+
+function loadChart(): Promise<ChartModule> {
+	// The `.catch()` right after `import()` lets bundlers treat a missing
+	// `chart.js` as a run-time failure instead of a build error.
+	chartModule ??= import('chart.js')
+		.catch(error => {
+			chartModule = undefined;
+			throw error;
+		})
+		.then(module => {
+			module.Chart.register(...module.registerables);
+			return module;
+		});
+
+	return chartModule;
+}
 
 @Component({
 	selector: 'wchart',
@@ -72,6 +96,8 @@ export class ChartComponent implements OnDestroy {
 
 	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 	private _chart?: Chart;
+	private _destroyed = false;
+	private _renderId = 0;
 
 	readonly tableRows = computed(() => {
 		const data = this.data();
@@ -84,8 +110,6 @@ export class ChartComponent implements OnDestroy {
 	});
 
 	constructor() {
-		Chart.register(...registerables);
-
 		effect(() => {
 			const config: ChartConfiguration = {
 				type: this.type(),
@@ -99,12 +123,33 @@ export class ChartComponent implements OnDestroy {
 				return;
 			}
 
-			this._chart?.destroy();
-			this._chart = new Chart(canvasEl.nativeElement, config);
+			void this._render(canvasEl.nativeElement, config);
 		});
 	}
 
 	ngOnDestroy(): void {
+		this._destroyed = true;
 		this._chart?.destroy();
+		this._chart = undefined;
+	}
+
+	private async _render(canvas: HTMLCanvasElement, config: ChartConfiguration): Promise<void> {
+		const renderId = ++this._renderId;
+
+		try {
+			const { Chart } = await loadChart();
+
+			// A newer render or destroy happened while chart.js was loading.
+			if (this._destroyed || renderId !== this._renderId) {
+				return;
+			}
+
+			this._chart?.destroy();
+			this._chart = new Chart(canvas, config);
+		} catch {
+			console.error(
+				'[ngx-ui] <wchart> needs the optional peer dependency "chart.js". Install it with: npm i chart.js',
+			);
+		}
 	}
 }

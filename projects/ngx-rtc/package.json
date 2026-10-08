@@ -1,6 +1,6 @@
 {
 	"name": "@wawjs/ngx-rtc",
-	"version": "22.0.7",
+	"version": "22.0.8",
 	"description": "Angular WebRTC helper package from Web Art Work.",
 	"license": "MIT",
 	"repository": "WebArtWork/ngx-rtc",
