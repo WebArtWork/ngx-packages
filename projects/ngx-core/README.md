@@ -66,6 +66,7 @@ export const appConfig = {
 | --- | --- |
 | `CoreService` | Shared utility helpers, platform detection, UUID/device helpers, locks, and signal helpers |
 | `UtilService` | Form state helpers, validation, CSS variable persistence, and sample data generators |
+| `OsService` / `detectOs` | SSR-aware operating system detection (Windows, macOS, Linux, ChromeOS, Android, iOS, iPadOS, Meta Quest, PICO, visionOS, TVs, consoles, ...) |
 | `DomService` | Dynamic component creation and DOM attachment helpers |
 | `EmitterService` | Lightweight event bus and task completion signaling |
 | `StoreService` | Async storage wrapper with JSON helpers and prefix support |
@@ -131,6 +132,74 @@ ngOnInit() {
 	}, 500);
 }
 ```
+
+## OS Service
+
+`OsService` detects the user's operating system so apps can offer the right download, store link, or install instructions.
+
+- Browser: reads `navigator.userAgent` immediately, then refines the result with User-Agent Client Hints when available (real Windows 11 and macOS versions, CPU architecture, device model).
+- Server: reads the `User-Agent` and `Sec-CH-UA-*` headers of the current request through Angular's `REQUEST` token, so SSR can render OS-specific content. Prerendered pages resolve to `unknown` and update in the browser.
+
+Detected `OsName` values: `windows`, `macos`, `linux`, `chromeos`, `bsd`, `android`, `ios`, `ipados`, `harmonyos`, `fireos`, `kaios`, `windows-phone`, `meta-quest`, `pico`, `visionos`, `tizen`, `webos`, `xbox`, `playstation`, `nintendo`, `unknown`.
+
+Each result is an `OsInfo`:
+
+```ts
+interface OsInfo {
+	name: OsName; // 'windows' | 'macos' | 'meta-quest' | ...
+	label: string; // 'Windows', 'macOS', 'Meta Horizon OS', ...
+	version: string; // '11', '14.4.1', '' when unknown
+	formFactor: 'desktop' | 'mobile' | 'tablet' | 'xr' | 'tv' | 'console' | 'unknown';
+	architecture: 'x64' | 'x86' | 'arm64' | 'arm' | 'unknown';
+	device: string; // 'Quest 3', 'iPhone', 'Pixel 8', ...
+	source: 'user-agent' | 'client-hints' | 'none';
+}
+```
+
+Signals: `os`, `name`, `label`, `version`, `formFactor`, `architecture`, `isWindows`, `isMacos`, `isLinux`, `isChromeos`, `isAndroid`, `isIos`, `isIpados`, `isMetaQuest`, `isApple`, `isDesktop`, `isMobile`, `isTablet`, `isXr`, `isTv`, `isConsole`. Call `refine()` to re-run client-hint detection.
+
+```ts
+import { Component, inject } from '@angular/core';
+import { OsService } from '@wawjs/ngx-core';
+
+@Component({
+	selector: 'app-download',
+	template: `
+		@switch (osService.name()) {
+			@case ('windows') {
+				<a href="/download/app.msix">Download for Windows</a>
+			}
+			@case ('macos') {
+				<a href="/download/app.dmg">Download for macOS</a>
+			}
+			@case ('meta-quest') {
+				<a href="https://www.meta.com/experiences/...">Get it on Meta Quest</a>
+			}
+			@default {
+				<a href="/download">All downloads</a>
+			}
+		}
+	`,
+})
+export class DownloadComponent {
+	protected readonly osService = inject(OsService);
+}
+```
+
+`detectOs(input)` is the pure, framework-free detector behind the service. Use it in server middleware or tests:
+
+```ts
+import { detectOs } from '@wawjs/ngx-core';
+
+detectOs({ userAgent: req.headers['user-agent'], platform: req.headers['sec-ch-ua-platform'] });
+```
+
+Notes:
+
+- User agents cannot tell Windows 10 from 11, report macOS as `10.15.7`, and report Intel even on Apple silicon. Client hints fix this in Chromium browsers; Safari and Firefox keep the user agent values.
+- For server-side high-entropy hints, the server must ask for them with `Accept-CH: Sec-CH-UA-Platform-Version, Sec-CH-UA-Arch, Sec-CH-UA-Bitness, Sec-CH-UA-Model`. Without it, SSR gets the platform only and the browser refines the rest.
+- iPadOS Safari in desktop mode is detected through `navigator.maxTouchPoints`, so it is identified only in the browser.
+- Detection is a hint for UX, not a security boundary: user agents can be changed by the user.
 
 ## Emitter Service
 

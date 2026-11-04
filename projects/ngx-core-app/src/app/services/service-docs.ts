@@ -31,6 +31,7 @@ export interface ServiceDoc {
 
 const _SERVICE_DOC_ORDER = [
 	'core-service',
+	'os-service',
 	'dom-service',
 	'emitter-service',
 	'store-service',
@@ -1635,6 +1636,104 @@ export class ProjectService extends CrudService<Project> {
 \tconstructor() {
 \t\tsuper({ name: 'project' });
 \t}
+}`,
+	},
+	{
+		slug: 'os-service',
+		name: 'OsService',
+		description:
+			'SSR-aware operating system detection for desktop, mobile, XR headsets, TVs, and consoles.',
+		summary:
+			'OsService tells apps which operating system the user runs so they can offer the right download, store link, or install steps. It reads request headers during SSR, the user agent in the browser, and refines the result with User-Agent Client Hints.',
+		highlights: [
+			'Detects Windows, macOS, Linux, ChromeOS, BSD, Android, iOS, iPadOS, HarmonyOS, Fire OS, KaiOS, Meta Quest, PICO, visionOS, Tizen, webOS, Xbox, PlayStation, and Nintendo.',
+			'Reports version, form factor (desktop, mobile, tablet, xr, tv, console), CPU architecture, and device model when available.',
+			'Uses Client Hints to tell Windows 11 from 10, read the real macOS version, and detect ARM machines.',
+			'detectOs() is a pure helper for server middleware and tests.',
+		],
+		availableItems: ['os.interface.ts', 'os.service.ts', 'os.util.ts'],
+		config: [
+			'No provideNgxCore() config is required.',
+			'For server-side high-entropy hints, send Accept-CH: Sec-CH-UA-Platform-Version, Sec-CH-UA-Arch, Sec-CH-UA-Bitness, Sec-CH-UA-Model.',
+		],
+		properties: [
+			{
+				name: 'OsInfo',
+				signature:
+					'interface OsInfo { name; label; version; formFactor; architecture; device; source }',
+				description: 'Detected operating system returned by detectOs() and OsService.os().',
+				category: 'Types',
+				docType: 'Interface',
+				sourceFile: 'os.interface.ts',
+			},
+			{
+				name: 'OsName',
+				signature:
+					"type OsName = 'windows' | 'macos' | 'linux' | 'android' | 'ios' | 'ipados' | 'meta-quest' | ... | 'unknown'",
+				description: 'Stable identifier to branch on in templates and code.',
+				category: 'Types',
+				docType: 'Type',
+				sourceFile: 'os.interface.ts',
+			},
+			{
+				name: 'os / name / formFactor / architecture',
+				signature:
+					'Signal<OsInfo> / Signal<OsName> / Signal<OsFormFactor> / Signal<OsArchitecture>',
+				description: 'Read-only signals with the current detection result.',
+				category: 'Signals',
+				docType: 'Service',
+				sourceFile: 'os.service.ts',
+			},
+			{
+				name: 'isWindows / isMacos / isLinux / isAndroid / isIos / isMetaQuest / ...',
+				signature: 'Signal<boolean>',
+				description:
+					'Shortcut signals per OS (isWindows, isMacos, isLinux, isChromeos, isAndroid, isIos, isIpados, isMetaQuest, isApple) and per form factor (isDesktop, isMobile, isTablet, isXr, isTv, isConsole).',
+				category: 'Signals',
+				docType: 'Service',
+				sourceFile: 'os.service.ts',
+			},
+		],
+		methods: [
+			{
+				name: 'refine',
+				signature: 'refine(): Promise<OsInfo>',
+				description:
+					'Re-runs detection with high-entropy User-Agent Client Hints. Called automatically in the browser.',
+				category: 'Detection',
+				sourceFile: 'os.service.ts',
+			},
+			{
+				name: 'detectOs',
+				signature: 'detectOs(input?: OsDetectInput): OsInfo',
+				description:
+					'Pure detector that accepts a user agent plus optional client hints. Safe in the browser, SSR, and Node middleware.',
+				category: 'Detection',
+				sourceFile: 'os.util.ts',
+				example: `import { detectOs } from 'ngx-core';
+
+detectOs({
+\tuserAgent: 'Mozilla/5.0 (X11; Linux x86_64; Quest 3) OculusBrowser/35.0 Chrome/128 VR Safari/537.36',
+});
+// { name: 'meta-quest', label: 'Meta Horizon OS', formFactor: 'xr', device: 'Quest 3', ... }`,
+			},
+		],
+		code: `import { Component, inject } from '@angular/core';
+import { OsService } from 'ngx-core';
+
+@Component({
+\tselector: 'app-download',
+\ttemplate: \`
+\t\t@switch (osService.name()) {
+\t\t\t@case ('windows') { <a href="/download/app.msix">Download for Windows</a> }
+\t\t\t@case ('macos') { <a href="/download/app.dmg">Download for macOS</a> }
+\t\t\t@case ('meta-quest') { <a href="/quest">Get it on Meta Quest</a> }
+\t\t\t@default { <a href="/download">All downloads</a> }
+\t\t}
+\t\`,
+})
+export class DownloadComponent {
+\tprotected readonly osService = inject(OsService);
 }`,
 	},
 	{

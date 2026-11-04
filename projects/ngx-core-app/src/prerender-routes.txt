@@ -1,5 +1,6 @@
 /
 /services/core-service
+/services/os-service
 /services/dom-service
 /services/store-service
 /services/meta-service

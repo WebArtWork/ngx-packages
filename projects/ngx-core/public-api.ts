@@ -25,6 +25,13 @@ export * from './src/dom/dom.interface';
 export * from './src/dom/dom.service';
 
 /*
+ *	OS
+ */
+export * from './src/os/os.interface';
+export * from './src/os/os.service';
+export * from './src/os/os.util';
+
+/*
  *	Emitter
  */
 export * from './src/emitter/emitter.service';
