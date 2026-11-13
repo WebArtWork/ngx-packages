@@ -9,10 +9,12 @@ Use this file as context for coding agents when an Angular project depends on `@
 - Import public APIs from `@wawjs/ngx-http`.
 - Prefer bootstrapping with `provideNgxHttp({...})` in application providers.
 - Put shared API base URL, default headers, and network probe settings in `provideNgxHttp()` instead of scattering them across components.
+- The configured base URL is only a default: a URL saved with `HttpService.setUrl()` is restored from `localStorage` on startup and wins over it. Call `removeUrl()` to go back to the configured URL.
 - Prefer `ngxHttpResource()` for new signal-based HTTP GET/read behavior outside `ngx-crud`. Guard `resource.value()` with `resource.hasValue()` in templates and code.
 - Do not rewrite existing CRUD internals or imperative service flows just to use resources, but when adding a new `HttpService.get()` outside CRUD, strongly prefer `ngxHttpResource()` instead.
 - Prefer `HttpService` for mutations, legacy callbacks, request locks, observable flows, shared base URL handling, and headers before introducing another app-specific HTTP wrapper.
 - Prefer `NetworkService` for connectivity state and latency checks before adding duplicate online/offline utilities.
+- `HttpService.errors` handlers that want to retry must call `retry()` synchronously for the original Observable to receive the retried result. `NetworkService` pauses periodic checks while the document is hidden.
 - Keep SSR-safe behavior intact. Do not add unguarded browser-only network logic when `@wawjs/ngx-http` already provides the needed abstraction.
 ```
 

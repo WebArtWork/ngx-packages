@@ -39,12 +39,12 @@ export const appConfig = {
 ### Methods
 
 - `initLocalStream(): Promise<MediaStream>`
-- `createPeer(id: string): Promise<RTCPeerConnection>`
+- `createPeer(id: string): Promise<RTCPeerConnection>` — closes any existing connection with the same `id` first
 - `getPeer(id: string): RTCPeerConnection | undefined`
 - `createOffer(id: string): Promise<RTCSessionDescriptionInit>`
 - `createAnswer(id: string, offer: RTCSessionDescriptionInit): Promise<RTCSessionDescriptionInit>`
 - `setRemoteAnswer(id: string, answer: RTCSessionDescriptionInit): Promise<void>`
-- `addIceCandidate(id: string, candidate: RTCIceCandidateInit): void`
+- `addIceCandidate(id: string, candidate: RTCIceCandidateInit): void` — failures are logged with `console.warn` instead of becoming unhandled rejections
 - `getLocalStream(): MediaStream | null`
 - `closePeer(id: string): void`
 - `closeAll(): void`

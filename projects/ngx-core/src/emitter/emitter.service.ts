@@ -1,14 +1,12 @@
 import { Service, WritableSignal, signal } from '@angular/core';
-import { toObservable } from '@angular/core/rxjs-interop';
 import {
+	BehaviorSubject,
 	Observable,
 	Subject,
 	combineLatest,
 	filter,
 	map,
 	merge,
-	share,
-	skip,
 	take,
 	takeUntil,
 	timeout,
@@ -18,76 +16,51 @@ type Any = unknown;
 
 @Service()
 export class EmitterService {
-	private _signals = new Map<string, WritableSignal<Any>>();
-	private _closers = new Map<string, Subject<void>>();
-	private _streams = new Map<string, Observable<Any>>();
+	/**
+	 * One hot Subject per event channel. Subjects (not signals) back `on()` so
+	 * every `emit()` is delivered synchronously, multiple emits in the same tick
+	 * are not collapsed, and subscribing does not require an injection context.
+	 */
+	private _channels = new Map<string, Subject<Any>>();
 
-	private _getSignal(id: string): WritableSignal<Any> {
-		let s = this._signals.get(id);
-		if (!s) {
-			// emit even if same payload repeats
-			s = signal<Any>(undefined, { equal: () => false });
-			this._signals.set(id, s);
+	private _getChannel(id: string): Subject<Any> {
+		let channel = this._channels.get(id);
+		if (!channel) {
+			channel = new Subject<Any>();
+			this._channels.set(id, channel);
 		}
-		return s;
-	}
-
-	private _getCloser(id: string): Subject<void> {
-		let c = this._closers.get(id);
-		if (!c) {
-			c = new Subject<void>();
-			this._closers.set(id, c);
-		}
-		return c;
-	}
-
-	private _getStream(id: string): Observable<Any> {
-		let obs$ = this._streams.get(id);
-		if (!obs$) {
-			const sig = this._getSignal(id);
-			const closed$ = this._getCloser(id);
-			obs$ = toObservable(sig).pipe(
-				// Subject-like: don't replay the current value on subscribe
-				skip(1),
-				takeUntil(closed$),
-				share(),
-			);
-			this._streams.set(id, obs$);
-		}
-		return obs$;
+		return channel;
 	}
 
 	/** Emit an event */
 	emit<T = Any>(id: string, data?: T): void {
-		this._getSignal(id).set(data as Any);
+		this._getChannel(id).next(data as Any);
 	}
 
 	/** Listen for events (hot, completes when off(id) is called) */
 	on<T = Any>(id: string): Observable<T> {
-		return this._getStream(id) as Observable<T>;
+		return this._getChannel(id).asObservable() as Observable<T>;
 	}
 
 	/** Complete and remove a channel */
 	off(id: string): void {
-		const closer = this._closers.get(id);
-		if (closer) {
-			closer.next();
-			closer.complete();
-			this._closers.delete(id);
+		const channel = this._channels.get(id);
+		if (channel) {
+			this._channels.delete(id);
+			channel.complete();
 		}
-		this._signals.delete(id);
-		this._streams.delete(id);
 	}
 
 	offAll(): void {
-		for (const id of Array.from(this._closers.keys())) this.off(id);
+		for (const id of Array.from(this._channels.keys())) this.off(id);
 	}
 
 	has(id: string): boolean {
-		return this._signals.has(id);
+		return this._channels.has(id);
 	}
 
 	private _done = new Map<string, WritableSignal<Any | undefined>>();
+	private _done$ = new Map<string, BehaviorSubject<Any | undefined>>();
 
 	private _getDoneSignal(id: string): WritableSignal<Any | undefined> {
 		let s = this._done.get(id);
@@ -98,15 +71,28 @@ export class EmitterService {
 		return s;
 	}
 
+	private _getDoneSubject(id: string): BehaviorSubject<Any | undefined> {
+		let s = this._done$.get(id);
+		if (!s) {
+			s = new BehaviorSubject<Any | undefined>(this._getDoneSignal(id)());
+			this._done$.set(id, s);
+		}
+		return s;
+	}
+
+	private _setDone(id: string, value: Any | undefined): void {
+		this._getDoneSignal(id).set(value);
+		this._done$.get(id)?.next(value);
+	}
+
 	/** Mark task as completed with a payload (default: true) */
 	complete<T = Any>(task: string, value: T = true as unknown as T): void {
-		this._getDoneSignal(task).set(value as Any);
+		this._setDone(task, value as Any);
 	}
 
 	/** Clear completion so it can be awaited again */
 	clearCompleted(task: string): void {
-		const s = this._done.get(task) ?? this._getDoneSignal(task);
-		s.set(undefined);
+		this._setDone(task, undefined);
 	}
 
 	/** Read current completion payload (undefined => not completed) */
@@ -128,7 +114,7 @@ export class EmitterService {
 	): Observable<Any | Any[]> {
 		const list = (Array.isArray(tasks) ? tasks : [tasks]).filter(Boolean);
 		const streams = list.map(id =>
-			toObservable(this._getDoneSignal(id)).pipe(
+			this._getDoneSubject(id).pipe(
 				filter((v): v is Any => v !== undefined),
 				map(v => v as Any),
 			),

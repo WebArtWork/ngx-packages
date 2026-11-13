@@ -1,6 +1,6 @@
 {
 	"name": "@wawjs/ngx-rtc",
-	"version": "22.0.11",
+	"version": "22.0.12",
 	"description": "Angular WebRTC helper package from Web Art Work.",
 	"license": "MIT",
 	"repository": "WebArtWork/ngx-rtc",
@@ -16,11 +16,7 @@
 	],
 	"peerDependencies": {
 		"@angular/core": ">=22.0.0",
-		"@angular/common": ">=22.0.0",
-		"@angular/forms": ">=22.0.0",
-		"@angular/platform-browser": ">=22.0.0",
-		"@angular/router": ">=22.0.0",
-		"rxjs": ">=7.5.0"
+		"@angular/common": ">=22.0.0"
 	},
 	"engines": {
 		"node": ">=24",

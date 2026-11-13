@@ -21,6 +21,8 @@ interface QueuedMutation<Document> {
 	operation: CrudOperation;
 	doc: Document;
 	name?: string;
+	/** Local document state before this optimistic change (`null` when it did not exist). */
+	previous?: Document | null;
 }
 
 /**
@@ -47,6 +49,7 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	private readonly _objectIdRandom = this._randomHex(10);
 	private _isFlushing = false;
 	private _queue: QueuedMutation<Document>[] = [];
+	private readonly _inFlight = new Set<string>();
 	private _documentSignals = new Map<string, WritableSignal<Document>>();
 
 	private readonly _documents = signal<Document[]>([]);
@@ -168,10 +171,10 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 			const docs = await this._request<Document[]>('get', undefined, options.name, params);
 			const nextDocs = docs || [];
 
-			if (!page) {
-				this._setDocuments(nextDocs);
+			if (!page || page <= 1) {
+				this._replaceFromServer(nextDocs);
 			} else {
-				this._setDocuments([...this.documents(), ...nextDocs]);
+				this._mergeDocuments(nextDocs);
 			}
 
 			options.callback?.(nextDocs);
@@ -261,13 +264,16 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 				doc.appId = this._config.appId;
 			}
 
+			const existing = this._findDocument(this._identity(doc));
+			const previous = existing ? { ...existing } : null;
+
 			if (operation === 'delete') {
 				this._remove(doc);
 			} else {
 				this._upsert(doc);
 			}
 
-			const queued = this._enqueue(operation, doc, options);
+			const queued = this._enqueue(operation, doc, options, previous);
 
 			if (this._networkService.isOnline()) {
 				await this._syncMutation(queued, options);
@@ -284,6 +290,12 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	): Promise<void> {
 		let resp: Document;
 
+		if (this._inFlight.has(mutation.id)) {
+			return;
+		}
+
+		this._inFlight.add(mutation.id);
+
 		try {
 			resp = await this._request<Document>(
 				mutation.operation,
@@ -293,9 +305,12 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 		} catch (error) {
 			if (!this._isRetryableMutationError(error)) {
 				this._removeQueued(mutation.id);
+				this._rollback(mutation);
 			}
 
 			throw error;
+		} finally {
+			this._inFlight.delete(mutation.id);
 		}
 
 		this._removeQueued(mutation.id);
@@ -319,7 +334,15 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 		this._isFlushing = true;
 
 		try {
-			for (const mutation of [...this._queue]) {
+			for (const { id } of [...this._queue]) {
+				// Use the latest queued version (ids may have been patched) and skip
+				// mutations already synced or currently being sent directly.
+				const mutation = this._queue.find(queued => queued.id === id);
+
+				if (!mutation || this._inFlight.has(id)) {
+					continue;
+				}
+
 				try {
 					await this._syncMutation(mutation);
 				} catch (error) {
@@ -337,12 +360,14 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 		operation: CrudOperation,
 		doc: Document,
 		options: CrudOptions<Document>,
+		previous: Document | null = null,
 	): QueuedMutation<Document> {
 		const mutation: QueuedMutation<Document> = {
 			id: this._nextMutationId(),
 			operation,
 			doc: { ...doc },
 			name: options.name,
+			previous,
 		};
 
 		this._queue = [...this._queue, mutation];
@@ -354,6 +379,79 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	private _removeQueued(id: string): void {
 		this._queue = this._queue.filter(mutation => mutation.id !== id);
 		void this._persist();
+	}
+
+	/**
+	 * Reverts the optimistic local change of a mutation the server rejected.
+	 * Skipped when a later queued mutation touches the same document, so newer
+	 * local edits are not discarded.
+	 */
+	private _rollback(mutation: QueuedMutation<Document>): void {
+		if (mutation.previous === undefined) {
+			return;
+		}
+
+		const key = this._documentKey(mutation.doc);
+
+		if (this._queue.some(queued => this._documentKey(queued.doc) === key)) {
+			return;
+		}
+
+		const docs = [...this.documents()];
+		const index = docs.findIndex(doc => this._documentKey(doc) === key);
+
+		if (mutation.previous) {
+			if (index === -1) {
+				docs.push(mutation.previous);
+			} else {
+				docs[index] = mutation.previous;
+			}
+		} else if (index !== -1) {
+			docs.splice(index, 1);
+		}
+
+		this._setDocuments(docs);
+	}
+
+	/**
+	 * Replaces local documents with a server result while keeping local
+	 * documents whose creation is still queued (not yet synced).
+	 */
+	private _replaceFromServer(docs: Document[]): void {
+		const pendingCreates = new Set(
+			this._queue
+				.filter(mutation => mutation.operation === 'create')
+				.map(mutation => this._documentKey(mutation.doc)),
+		);
+		const incoming = new Set(docs.map(doc => this._documentKey(this._normalize(doc))));
+		const pendingDocs = this.documents().filter(doc => {
+			const key = this._documentKey(doc);
+
+			return pendingCreates.has(key) && !incoming.has(key);
+		});
+
+		this._setDocuments([...docs, ...pendingDocs]);
+	}
+
+	/** Upserts documents by key, keeping existing order. */
+	private _mergeDocuments(docs: Document[]): void {
+		const merged = [...this.documents()];
+		const indexByKey = new Map(merged.map((doc, index) => [this._documentKey(doc), index]));
+
+		for (const doc of docs) {
+			const normalized = this._normalize(doc);
+			const key = this._documentKey(normalized);
+			const index = indexByKey.get(key);
+
+			if (index === undefined) {
+				indexByKey.set(key, merged.length);
+				merged.push(normalized);
+			} else {
+				merged[index] = { ...merged[index], ...normalized };
+			}
+		}
+
+		this._setDocuments(merged);
 	}
 
 	private _setDocuments(docs: Document[]): void {
@@ -510,8 +608,27 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 			this._storeService.getJson<QueuedMutation<Document>[]>(this._queueKey, { defaultValue: [] }),
 		]);
 
-		this._queue = queue || [];
-		this._setDocuments(docs || []);
+		// Merge instead of overwrite: mutations or reads that happened while the
+		// stored state was loading are newer than what was persisted.
+		const queueIds = new Set(this._queue.map(mutation => mutation.id));
+		this._queue = [
+			...(queue || []).filter(mutation => !queueIds.has(mutation.id)),
+			...this._queue,
+		];
+
+		const pendingDeletes = new Set(
+			this._queue
+				.filter(mutation => mutation.operation === 'delete')
+				.map(mutation => this._documentKey(mutation.doc)),
+		);
+		const memoryKeys = new Set(this.documents().map(doc => this._documentKey(doc)));
+		const storedOnly = (docs || []).filter(doc => {
+			const key = this._documentKey(this._normalize(doc));
+
+			return !memoryKeys.has(key) && !pendingDeletes.has(key);
+		});
+
+		this._setDocuments([...storedOnly, ...this.documents()]);
 		this.isLoaded.set(true);
 
 		void this.flushQueue();

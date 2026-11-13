@@ -1,5 +1,6 @@
 import {
 	ChangeDetectorRef,
+	DestroyRef,
 	effect,
 	EffectRef,
 	inject,
@@ -65,6 +66,9 @@ export abstract class CrudComponent<
 	/** Injector is used for signal effects created in methods. */
 	private __injector = inject(Injector);
 
+	/** Resolvers of `setDocuments()` calls waiting for the current debounced load. */
+	private __pendingLoads: Array<() => void> = [];
+
 	/** Internal reference to form service matching FormServiceInterface */
 	private __formService: FormServiceInterface<FormInterface>;
 
@@ -85,6 +89,24 @@ export abstract class CrudComponent<
 		this.crudService = crudService;
 
 		this._module = module;
+
+		inject(DestroyRef).onDestroy(() => {
+			// CoreService.afterWhile stores the debounce timer on the host object.
+			clearTimeout((this as unknown as { __afterWhile?: number }).__afterWhile);
+
+			this.__resolvePendingLoads();
+		});
+	}
+
+	/** Resolves every `setDocuments()` promise waiting on the debounced load. */
+	private __resolvePendingLoads(): void {
+		const pending = this.__pendingLoads;
+
+		this.__pendingLoads = [];
+
+		for (const resolve of pending) {
+			resolve();
+		}
 	}
 
 	protected localDocumentsFilter: (doc: Document) => boolean = () => true;
@@ -109,9 +131,22 @@ export abstract class CrudComponent<
 			if (this.configType === 'server') {
 				this.page = page;
 
+				// Calls superseded by a newer debounced call resolve together with it.
+				this.__pendingLoads.push(resolve);
+
 				this.__core.afterWhile(
 					this,
 					() => {
+						const pending = this.__pendingLoads;
+
+						this.__pendingLoads = [];
+
+						const resolveAll = () => {
+							for (const done of pending) {
+								done();
+							}
+						};
+
 						this.crudService
 							.get({ page, query }, this.getOptions())
 							.subscribe({
@@ -120,13 +155,13 @@ export abstract class CrudComponent<
 										(docs || []).map(doc => this.crudService.getSignal(doc)),
 									);
 
-									resolve();
+									resolveAll();
 
 									this.__cdr.markForCheck();
 								},
 								error: (error: unknown) => {
 									this.handleCrudError(error);
-									resolve();
+									resolveAll();
 								},
 							});
 					},

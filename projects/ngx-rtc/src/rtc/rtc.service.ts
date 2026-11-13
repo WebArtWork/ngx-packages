@@ -32,6 +32,9 @@ export class RtcService {
 			throw new Error('RTC is not available during SSR.');
 		}
 
+		// Close a previous connection for the same id instead of leaking it.
+		this.closePeer(id);
+
 		const peer = new RTCPeerConnection();
 
 		this._localStream?.getTracks().forEach(track => peer.addTrack(track, this._localStream!));
@@ -108,7 +111,9 @@ export class RtcService {
 		const peer = this._peers.get(id);
 
 		if (peer) {
-			void peer.addIceCandidate(new RTCIceCandidate(candidate));
+			peer.addIceCandidate(new RTCIceCandidate(candidate)).catch(error => {
+				console.warn(`Failed to add ICE candidate for peer "${id}"`, error);
+			});
 		}
 	}
 

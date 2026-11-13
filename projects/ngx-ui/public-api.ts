@@ -141,6 +141,13 @@ export * from './src/select/select.interface';
 export * from './src/select/select.type';
 
 /*
+ * Startup screen
+ */
+export * from './src/startup/provide-startup';
+export * from './src/startup/startup.interface';
+export * from './src/startup/startup.service';
+
+/*
  * Spinner
  */
 export * from './src/spinner/spinner.component';

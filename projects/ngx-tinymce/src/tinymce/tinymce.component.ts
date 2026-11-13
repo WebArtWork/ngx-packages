@@ -75,6 +75,8 @@ export class TinymceComponent implements ControlValueAccessor {
 	private _onChange?: (value: string) => void;
 	private _onTouched?: () => void;
 	private _configRefreshVersion = 0;
+	private _initTimer: ReturnType<typeof setTimeout> | null = null;
+	private _destroyed = false;
 
 	protected readonly load = signal(true);
 	protected readonly _loading = signal<string | null>(null);
@@ -163,25 +165,43 @@ export class TinymceComponent implements ControlValueAccessor {
 	}
 
 	ngOnDestroy(): void {
+		this._destroyed = true;
+		this._clearInitTimer();
 		this._destroyEditor();
 	}
 
 	private async _ensureEditor(): Promise<void> {
 		await this._loadScript();
+
+		if (this._destroyed) {
+			return;
+		}
+
 		this._initEditorAfterDelay();
 	}
 
 	private _initEditorAfterDelay(): void {
-		if (!this._isBrowser()) {
+		if (!this._isBrowser() || this._destroyed) {
 			return;
 		}
 
 		const waitMs = Math.max(0, this.delay() || this._config?.delay || 0);
-		setTimeout(() => this._initEditor(), waitMs);
+		this._clearInitTimer();
+		this._initTimer = setTimeout(() => {
+			this._initTimer = null;
+			this._initEditor();
+		}, waitMs);
+	}
+
+	private _clearInitTimer(): void {
+		if (this._initTimer !== null) {
+			clearTimeout(this._initTimer);
+			this._initTimer = null;
+		}
 	}
 
 	private _initEditor(): void {
-		if (this._instance) {
+		if (this._instance || this._destroyed) {
 			return;
 		}
 
@@ -207,6 +227,10 @@ export class TinymceComponent implements ControlValueAccessor {
 			...(this._config?.config || {}),
 			...(this.config() || {}),
 			setup: editor => {
+				if (this._destroyed) {
+					return;
+				}
+
 				this._instance = editor;
 				editor.on('change keyup input undo redo', () => {
 					this._value = editor.getContent();
@@ -216,6 +240,16 @@ export class TinymceComponent implements ControlValueAccessor {
 				userOptions.setup?.(editor);
 			},
 			init_instance_callback: editor => {
+				if (this._destroyed) {
+					// The component was destroyed while TinyMCE was initializing.
+					editor.off();
+					editor.remove();
+					if (this._instance === editor) {
+						this._instance = null;
+					}
+					return;
+				}
+
 				if (this._value) {
 					editor.setContent(this._value);
 				}

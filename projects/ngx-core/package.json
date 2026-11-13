@@ -1,6 +1,6 @@
 {
 	"name": "@wawjs/ngx-core",
-	"version": "22.0.11",
+	"version": "22.0.12",
 	"description": "Angular common package with shared services, pipes, directives, and app-level configuration.",
 	"license": "MIT",
 	"repository": "WebArtWork/ngx-core",
@@ -17,7 +17,6 @@
 	"peerDependencies": {
 		"@angular/core": ">=22.0.0",
 		"@angular/common": ">=22.0.0",
-		"@angular/forms": ">=22.0.0",
 		"@angular/platform-browser": ">=22.0.0",
 		"@angular/router": ">=22.0.0",
 		"rxjs": ">=7.5.0"
@@ -29,7 +28,9 @@
 	"publishConfig": {
 		"access": "public"
 	},
-	"sideEffects": false,
+	"sideEffects": [
+		"./fesm2022/wawjs-ngx-core.mjs"
+	],
 	"keywords": [
 		"angular",
 		"angular-library",

@@ -60,8 +60,8 @@ For new HTTP GET/read behavior outside `ngx-crud`, prefer `ngxHttpResource()` ov
 
 ### Configuration and headers
 
-- `setUrl(url: string)`
-- `removeUrl()`
+- `setUrl(url: string)`: sets the base URL and saves it in `localStorage`. On the next startup the saved URL is restored and wins over `provideNgxHttp({ http: { url } })`, so requests made before the app calls `setUrl()` again already use it.
+- `removeUrl()`: forgets the saved URL and returns to the configured one.
 - `set(key: string, value: string | number | Array<string | number>)`
 - `header(key: string)`
 - `remove(key: string)`
@@ -73,6 +73,12 @@ For new HTTP GET/read behavior outside `ngx-crud`, prefer `ngxHttpResource()` ov
 - `patch(url, doc, callback?, opts?)`
 - `delete(url, callback?, opts?)`
 - `get(url, callback?, opts?)`
+
+Notes:
+
+- `opts.data` is a dot-separated path into the response (for example `'data.items'`) used by `opts.replace` and `opts.fields`. With `opts.fields`, array results are replaced by the field-filtered copies.
+- Error handlers registered in `httpService.errors` receive `(err, retry)`. Calling `retry()` synchronously inside the handler re-sends the request and the original Observable receives the retried result instead of the error. A `retry()` called later (asynchronously) still re-sends the request and runs the legacy callback, but Observable subscribers have already received the error.
+- Persisted headers that cannot be parsed are dropped from storage on startup.
 
 ### Lock helpers
 
@@ -157,6 +163,8 @@ Always guard `value()` with `hasValue()` because Angular resources can throw whe
 ### Methods
 
 - `recheckNow(): Promise<void>`
+
+Periodic checks run every `intervalMs` while the document is visible; they pause while the tab is hidden and re-check immediately when it becomes visible again. Configuration precedence is `DEFAULT_NETWORK_CONFIG` < the `NETWORK_CONFIG` injection token < `provideNgxHttp({ network })`.
 
 Example:
 

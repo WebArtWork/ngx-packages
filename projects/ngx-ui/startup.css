@@ -1,0 +1,137 @@
+/*
+ * @wawjs/ngx-ui startup screen. Include it in angular.json "styles" (render-blocking, so it applies
+ * before first paint). The screen is shown by the inline <head> script adding `wstartup-pending`
+ * to <html>, and released by StartupService (provideStartup()). See the ngx-ui README.
+ *
+ * The background covers the page at once, so content never visibly changes underneath it. The logo
+ * and spinner fade in only after 300ms, so a fast start shows no spinner flash.
+ *
+ * The screen is visible by default and hidden by html:not(.wstartup-pending). Do not invert this:
+ * Angular's critical-CSS inlining (beasties) drops selectors that do not match the static HTML, and
+ * the pending class only exists after the inline script runs, so a html.wstartup-pending rule would
+ * not apply until the full stylesheet loads.
+ */
+.wstartup {
+	position: fixed;
+	inset: 0;
+	z-index: 2147483000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--c-bg-primary, Canvas);
+	color: var(--c-text-primary, CanvasText);
+}
+
+html:not(.wstartup-pending) .wstartup {
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+	transition:
+		opacity 200ms ease,
+		visibility 0s linear 200ms;
+}
+
+html.wstartup-pending {
+	overflow: hidden;
+}
+
+.wstartup__content {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 24px;
+	opacity: 0;
+	animation: wstartup-reveal 200ms ease 300ms forwards;
+}
+
+.wstartup__logo {
+	display: block;
+	width: 64px;
+	height: 64px;
+	object-fit: contain;
+}
+
+.wstartup__spinner {
+	width: 40px;
+	height: 40px;
+	animation: wstartup-rotate 1400ms linear infinite;
+}
+
+.wstartup__track {
+	stroke: var(--c-border, rgba(127, 127, 127, 0.25));
+}
+
+.wstartup__arc {
+	stroke: var(--c-primary, currentColor);
+	stroke-linecap: round;
+	stroke-dasharray: 90, 150;
+	stroke-dashoffset: 0;
+	animation: wstartup-dash 1400ms ease-in-out infinite;
+}
+
+.wstartup__label {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+@keyframes wstartup-reveal {
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes wstartup-rotate {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+@keyframes wstartup-dash {
+	0% {
+		stroke-dasharray: 1, 150;
+		stroke-dashoffset: 0;
+	}
+	50% {
+		stroke-dasharray: 90, 150;
+		stroke-dashoffset: -35;
+	}
+	100% {
+		stroke-dasharray: 90, 150;
+		stroke-dashoffset: -124;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	html:not(.wstartup-pending) .wstartup {
+		transition: none;
+	}
+
+	.wstartup__content {
+		animation-duration: 0ms;
+	}
+
+	.wstartup__spinner {
+		animation: wstartup-pulse 1600ms ease-in-out infinite;
+	}
+
+	.wstartup__arc {
+		animation: none;
+	}
+
+	@keyframes wstartup-pulse {
+		0%,
+		100% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.4;
+		}
+	}
+}

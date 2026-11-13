@@ -63,7 +63,7 @@ A follow-up review of the changes above (comparing against `ngx-prime`'s indepen
 
 ## What's not (yet) covered
 
-- `@angular/aria`'s headless interaction-pattern directives (`accordion`/`combobox`/`grid`/`listbox`/`menu`/`tabs`/`toolbar`/`tree`) are a peer dependency but not yet adopted internally — the components above use hand-written keyboard/ARIA logic that follows the same APG patterns. Migrating to `@angular/aria` directives is a possible future simplification, not a correctness gap.
+- `@angular/aria`'s headless interaction-pattern directives (`accordion`/`combobox`/`grid`/`listbox`/`menu`/`tabs`/`toolbar`/`tree`) are not used internally and `@angular/aria` is not a peer dependency — the components above use hand-written keyboard/ARIA logic that follows the same APG patterns. Migrating to `@angular/aria` directives is a possible future simplification, not a correctness gap.
 - A full icon-only-button `ariaLabel` sweep has covered the confirmed gaps found during the initial audit (`OrderList`, `Table`, `MaterialComponent`); a from-scratch re-audit of every `icon`-only usage across consuming apps has not been repeated since.
 - Target-size (WCAG 2.5.8, 24×24 CSS px minimum) has not been audited component-by-component.
 - Drag-only interactions: none exist in `ngx-ui` (`OrderList` intentionally uses buttons, not drag-and-drop, to avoid this class of issue).

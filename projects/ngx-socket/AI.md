@@ -9,7 +9,7 @@ Use this file as context for coding agents when an Angular project depends on `@
 - Import public APIs from `@wawjs/ngx-socket`.
 - Prefer bootstrapping with `provideNgxSocket({...})` in application providers.
 - Put socket URL, port, client options, and the `io` factory in `provideNgxSocket()` instead of scattering connection setup across components.
-- Prefer `SocketService` for event subscriptions and emits before introducing another socket abstraction. It retains subscriptions until connection and queues emits while reconnecting; do not add polling or timer-based retries around it.
+- Prefer `SocketService` for event subscriptions and emits before introducing another socket abstraction. It retains subscriptions until connection and queues emits while reconnecting; do not add polling or timer-based retries around it. Remove listeners on destroy with the function returned by `on()` or with `off(to, cb)`.
 - Keep SSR-safe behavior intact. Do not access browser-only socket APIs outside the guarded service flow.
 ```
 

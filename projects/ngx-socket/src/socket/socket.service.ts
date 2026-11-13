@@ -103,9 +103,13 @@ export class SocketService {
 		this._pendingEmits = [];
 	}
 
-	on(to: string, cb: SocketListener = () => {}): void {
+	/**
+	 * Registers a listener for an event. Returns a function that removes this
+	 * listener (equivalent to `off(to, cb)`).
+	 */
+	on(to: string, cb: SocketListener = () => {}): () => void {
 		if (!this._config.socket) {
-			return;
+			return () => {};
 		}
 
 		const listeners = this._listeners.get(to) || new Set<SocketListener>();
@@ -114,6 +118,35 @@ export class SocketService {
 
 		if (this._connected) {
 			this._bindListener(to, cb);
+		}
+
+		return () => this.off(to, cb);
+	}
+
+	/**
+	 * Removes a listener registered with `on()`. Without `cb`, removes every
+	 * listener this service registered for the event.
+	 */
+	off(to: string, cb?: SocketListener): void {
+		const listeners = this._listeners.get(to);
+		const bound = this._boundListeners.get(to);
+		const targets = cb ? [cb] : Array.from(listeners || []);
+
+		for (const listener of targets) {
+			listeners?.delete(listener);
+
+			if (bound?.has(listener)) {
+				bound.delete(listener);
+				this._io?.off?.(to, listener);
+			}
+		}
+
+		if (listeners && listeners.size === 0) {
+			this._listeners.delete(to);
+		}
+
+		if (bound && bound.size === 0) {
+			this._boundListeners.delete(to);
 		}
 	}
 

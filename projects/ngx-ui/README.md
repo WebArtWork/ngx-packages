@@ -144,6 +144,79 @@ Public state:
 | `nextTheme()` | Cycles through mode, density, and radius combinations. |
 | `init()` | Restores persisted state and applies attributes/tokens. Called by the provider. |
 
+## Startup Screen
+
+A full-screen logo and spinner shown while the app finishes startup work, such as loading the saved language, the theme, or the signed-in user from an API. It hides once the first render is done and every registered task has settled.
+
+It has three parts:
+
+1. **Styles**: add `node_modules/@wawjs/ngx-ui/startup.css` to `angular.json` `styles`. It works without `styles.css` and falls back to system colors when the theme tokens are missing.
+2. **Markup and script in `index.html`**: the screen must exist before Angular starts. For example, `provideTranslate()` loads translations in an app initializer, and nothing renders until that finishes.
+
+```html
+<html lang="uk" data-startup-language="ua">
+	<head>
+		<script>
+			(function () {
+				var root = document.documentElement;
+				var show = root.getAttribute('data-startup') === 'always';
+				if (!show) {
+					try {
+						// ngx-translate saves the language through the ngx-core store, which prefixes keys
+						// with 'waStore' by default (provideNgxCore({ store: { prefix } })).
+						var language = localStorage.getItem('waStoretranslate.language');
+						var base = root.getAttribute('data-startup-language');
+						show = !!language && !!base && language !== base;
+					} catch (e) {}
+				}
+				if (show) {
+					root.classList.add('wstartup-pending');
+					// Safety net if the app bundle never starts.
+					setTimeout(function () {
+						root.classList.remove('wstartup-pending');
+					}, 15000);
+				}
+			})();
+		</script>
+	</head>
+	<body>
+		<div id="wstartup" class="wstartup" role="status" aria-live="polite">
+			<div class="wstartup__content">
+				<img class="wstartup__logo" src="logo.png" alt="" width="64" height="64" />
+				<svg class="wstartup__spinner" viewBox="0 0 50 50" aria-hidden="true">
+					<circle class="wstartup__track" cx="25" cy="25" r="20" fill="none" stroke-width="4"></circle>
+					<circle class="wstartup__arc" cx="25" cy="25" r="20" fill="none" stroke-width="4"></circle>
+				</svg>
+				<span class="wstartup__label">Loading</span>
+			</div>
+		</div>
+		<app-root></app-root>
+	</body>
+</html>
+```
+
+   - Browser-only apps (SPA) set `data-startup="always"` on `<html>`, so the screen covers the empty page until the app is ready.
+   - Prerendered sites set `data-startup-language` to the language code the pages are prerendered in. The screen then shows only when the saved language differs, the case where visitors would otherwise see the text switch. Apply the saved theme in the same early script (as the templates do) so the theme never causes a visible change.
+
+3. **Providers**:
+
+```ts
+import { provideStartup, provideStartupTask } from '@wawjs/ngx-ui';
+
+providers: [
+	provideStartup(), // { timeout: 10000 } by default
+	provideStartupTask('user', () => inject(UserService).whenLoaded()),
+];
+```
+
+- A task runs in an injection context and returns a Promise (or nothing). Convert Observables with `firstValueFrom()`.
+- Tasks can also be added from code with `inject(StartupService).register('name', promiseOrFn)`, before the first render finishes.
+- A task should handle its own errors. A rejection is logged with the task name and the app still opens. After `timeout` the app opens anyway, and the still-pending task names are logged.
+- `StartupService.ready()`, `pending()` and `whenReady()` expose the state.
+- While the screen shows, everything else in `<body>` is `inert`, so nothing underneath can take focus (an autofocused input would otherwise open the on-screen keyboard on mobile behind the spinner). After release, an `[autofocus]` element gets focus.
+- On the server the service does nothing.
+- The background covers the page at once, and the logo and spinner fade in after 300ms, so a fast start doesn't flash a spinner. With `prefers-reduced-motion` the spinner pulses instead of rotating.
+
 ## Components And Services
 
 | Export | Selector / usage | BEM root |
@@ -429,7 +502,7 @@ Render `<wconfirm-popup-styles />` once in the app shell when using `[wconfirmPo
 
 ### Editor
 
-Lightweight `contenteditable`-based rich text editor for basic bold/italic/list formatting. For a full-featured editor (tables, media embeds, plugins), use `@wawjs/ngx-tinymce` instead.
+Lightweight `contenteditable`-based rich text editor for basic bold/italic/list formatting. For a full-featured editor (tables, media embeds, plugins), use `@wawjs/ngx-tinymce` instead. HTML set through `wModel` is sanitized with Angular's `DomSanitizer` before rendering (scripts, event handlers, and unsafe URLs are removed).
 
 ```html
 <weditor [(wModel)]="bioHtml" placeholder="Write your bio..." />

@@ -52,7 +52,9 @@ Prefer the `documents` signal as the source of truth. Build local component and 
 
 ### Mutation retry behavior
 
-Create, update, unique, and delete mutations are persisted for offline recovery. Only requests that fail with a connectivity error (`HttpErrorResponse.status === 0`) stay queued for a later retry. Any API response error, including validation, authorization, conflict, not-found, and server errors, is removed from the queue and delivered through the operation Observable and `errCallback`. This prevents invalid mutations from being sent repeatedly after connectivity changes.
+Create, update, unique, and delete mutations are persisted for offline recovery. Only requests that fail with a connectivity error (`HttpErrorResponse.status === 0`) stay queued for a later retry. Any API response error, including validation, authorization, conflict, not-found, and server errors, is removed from the queue and delivered through the operation Observable and `errCallback`. This prevents invalid mutations from being sent repeatedly after connectivity changes. When the API rejects a mutation, its optimistic local change is rolled back (unless a later queued mutation touches the same document). Each queued mutation is sent at most once at a time, and restoring the persisted state merges with in-memory changes made while it was loading.
+
+`get()` without a page or with `page: 1` replaces the local documents (documents whose creation is still queued are kept); later pages are upserted by document id, so repeated pages do not create duplicates. In server-paginated `CrudComponent` lists, every `setDocuments()` promise resolves when the debounced load that superseded it finishes, and the pending debounce is cleared when the component is destroyed.
 
 ### Core document methods
 

@@ -41,7 +41,7 @@ provideNgxForm({
 |------|-------------|
 | `provideNgxForm()` | Environment provider for package setup |
 | `FormService` | Schema-driven form state and field lifecycle management |
-| `FormComponentService` | Form component instance registry |
+| `FormcomponentService` | Form component instance registry |
 | `FormComponent` | Standalone dynamic form renderer |
 | `FormComponentComponent` | Embeddable form component renderer |
 | `ModalFormComponent` | Default modal wrapper for form schemas |

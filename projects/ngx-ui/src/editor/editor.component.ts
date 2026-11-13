@@ -3,6 +3,7 @@ import {
 	Component,
 	ElementRef,
 	PLATFORM_ID,
+	SecurityContext,
 	ViewEncapsulation,
 	effect,
 	inject,
@@ -10,6 +11,7 @@ import {
 	model,
 	viewChild,
 } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
 
 export interface EditorCommand {
 	command: string;
@@ -45,6 +47,7 @@ export class EditorComponent {
 	private readonly _editorEl = viewChild<ElementRef<HTMLElement>>('editorEl');
 
 	private readonly _document = inject(DOCUMENT);
+	private readonly _sanitizer = inject(DomSanitizer);
 	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
 	constructor() {
@@ -53,7 +56,8 @@ export class EditorComponent {
 			const value = this.wModel();
 
 			if (el && el.innerHTML !== value) {
-				el.innerHTML = value;
+				// Model values can come from untrusted sources; strip scripts/handlers.
+				el.innerHTML = this._sanitizer.sanitize(SecurityContext.HTML, value ?? '') ?? '';
 			}
 		});
 	}

@@ -76,7 +76,7 @@ export const appConfig = {
 | `ClickOutsideDirective` | Standalone outside-click directive |
 | `generateA11yId` | Stable, hydration-safe id generator for wiring ARIA relationships (`aria-describedby`, `aria-controls`, ...) |
 | `pushEscapeHandler` | Shared Escape-to-close stack so stacked modals/popups close one at a time instead of all at once |
-| Pipes | `arr`, `mongodate`, `number`, `pagination`, `safe`, `search`, `splice`, `split` |
+| Pipes | `arr`, `mongodate`, `number`, `pagination`, `safe`, `search`, `splice`, `split` (`safe` trusts only `http(s):`, `blob:`, relative, and raster `data:image/*` URLs as resource URLs; other schemes such as `javascript:` or `data:text/html` resolve to an empty URL) |
 
 ## Core Service
 
@@ -205,6 +205,8 @@ Notes:
 
 `EmitterService` provides a lightweight event bus and completion signaling built on Angular Signals and RxJS.
 
+Each event channel is a hot RxJS `Subject`: every `emit()` is delivered synchronously to current subscribers (multiple emits in one tick are not collapsed), late subscribers do not receive earlier events, and `on()`/`onComplete()` can be called outside an Angular injection context. Completion state stays readable as signals through `completed()`/`isCompleted()`.
+
 ### Events
 
 - `emit(id: string, data?: any): void`
@@ -253,7 +255,7 @@ For persisted async reads in components and signal-first services, prefer `ngxRe
 - `setJson<T>(key: string, value: T, options?): Promise<boolean>`
 - `getJson<T>(key: string, options?): Promise<T | null>`
 - `remove(key: string, options?): Promise<boolean>`
-- `clear(options?): Promise<boolean>`
+- `clear(options?): Promise<boolean>` — with the default `localStorage` backend and a configured prefix (`store.prefix` and/or `setPrefix()`), removes only keys with that prefix; without a prefix it clears all of `localStorage`. A custom `store.clear` adapter is called as-is.
 
 Example:
 

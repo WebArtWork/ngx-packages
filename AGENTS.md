@@ -8,7 +8,6 @@ Projects under `projects/` fall into two groups:
 
 - `ngx-*` projects without the `-app` suffix are publishable node module packages.
 - `ngx-*-app` projects are websites, demos, and documentation apps for the matching package.
-- `ngx-app` is a combined workspace app that can compose multiple packages.
 - `wawjs.dev` is a site project, not a publishable package.
 
 Current library packages:
@@ -45,7 +44,7 @@ Application projects may import from local aliases such as `ngx-ui`, `ngx-core`,
 If a library imports from another `@wawjs/ngx-*` package, update that library's `package.json` with a matching `peerDependencies` entry. Internal WAW package versions should use the current workspace range style, for example:
 
 ```json
-"@wawjs/ngx-ui": ">=21.3.3"
+"@wawjs/ngx-ui": ">=22.0.11"
 ```
 
 Examples:
@@ -76,7 +75,7 @@ Avoid circular package dependencies. A lower-level package should not import a h
 
 ## Angular Style
 
-This workspace uses Angular 21 and standalone APIs.
+This workspace uses Angular 22 and standalone APIs.
 
 Use standalone components/directives/pipes. Do not add NgModules for new code unless maintaining an existing legacy surface. Do not set `standalone: true` in decorators because it is the default in modern Angular.
 
@@ -89,7 +88,7 @@ Prefer:
 - Native control flow in templates (`@if`, `@for`, `@switch`).
 - Angular 22 template spread and short arrow functions for local UI glue only, such as composing class arrays or toggling a signal. Keep filtering, sorting, async work, and workflow decisions in TypeScript.
 - Grouped `@case` blocks and `@default never;` when a template switches over a closed union type.
-- Reactive forms for new form-heavy behavior.
+- Angular Signal Forms (`@angular/forms/signals`) for all new form behavior, in libraries, demo apps and consumers. Do not add new Reactive or template-driven forms. `@angular/forms` imports remain only for control interop (`ControlValueAccessor` / `NG_VALUE_ACCESSOR`) so ngx-ui and other library controls also work with existing non-signal forms.
 
 Avoid:
 
@@ -157,13 +156,13 @@ Do not introduce global styles from a library unless that is the explicit purpos
 
 ## Accessibility
 
-An accessibility pass (WCAG 2.2 AA / EN 301 549 / WAI-ARIA APG) is applied across `ngx-ui` and, where relevant, other packages (`ngx-datetime`'s calendar/picker). This work is scoped to `ngx-packages` only, not the separate `ngx-prime` repo.
+An accessibility pass (WCAG 2.2 AA / EN 301 549 / WAI-ARIA APG) is applied across `ngx-ui` and, where relevant, other packages (`ngx-datetime`'s calendar/picker). This work is scoped to `ngx-packages` only.
 
 - Prefer native HTML semantics (`button`, `a`, `input`, `label for`, `fieldset`) over ARIA roles on generic elements. Only reach for ARIA when native semantics genuinely can't express the interaction (custom listbox/menu/grid widgets).
 - Every interactive element needs a real accessible name (visible text, `aria-label`, or `aria-labelledby`) — an icon-only button is not enough on its own.
 - Keyboard support is not optional: no control should be operable by pointer/mouse only. Escape must close overlays/popovers/menus without trapping focus; focus must move into a dialog/menu/popover on open and back to the triggering element on close.
-- `@angular/cdk` and `@angular/aria` are peer dependencies of `ngx-ui` for this reason — `@angular/cdk/a11y`'s `FocusTrapFactory` backs `ModalComponent`'s focus trap, and `@angular/aria`'s headless interaction-pattern directives (`accordion`/`combobox`/`grid`/`listbox`/`menu`/`tabs`/`toolbar`/`tree` — no `dialog` pattern exists as of `22.1.2`) are the preferred building block for any new composite widget, applied to internal template markup so a component's public selector/inputs/outputs don't change.
-- `ngx-ui` has a Vitest-based unit-test setup (`npm run test:ui`, or `ng test ngx-ui`) with `axe-core` wired in via `projects/ngx-ui/src/testing/axe.ts`'s `expectNoA11yViolations()` helper, plus a `projects/ngx-ui/src/testing/setup.ts` for jsdom environment gaps (`matchMedia`, `scrollIntoView`). Add a `.spec.ts` next to any interactive component you add or touch, covering at minimum: accessible name, relevant ARIA state, and keyboard operability — see `burger.component.spec.ts`, `modal.component.spec.ts`, `tabs.component.spec.ts`, and `select.component.spec.ts` for the established shape.
+- `@angular/cdk` is a peer dependency of `ngx-ui` (`@angular/cdk/a11y`'s `FocusTrapFactory` backs `ModalComponent`'s focus trap). `@angular/aria` is installed in the workspace but not used or declared by `ngx-ui`; if a component adopts it, add it to `ngx-ui` `peerDependencies`.
+- `ngx-ui` is the only package with tests (7 specs): a Vitest-based unit-test setup (`npm run test:ui`, or `ng test ngx-ui`) with `axe-core` wired in via `projects/ngx-ui/src/testing/axe.ts`'s `expectNoA11yViolations()` helper, plus a `projects/ngx-ui/src/testing/setup.ts` for jsdom environment gaps (`matchMedia`, `scrollIntoView`). Add a `.spec.ts` next to any interactive component you add or touch, covering at minimum: accessible name, relevant ARIA state, and keyboard operability — see `burger.component.spec.ts`, `modal.component.spec.ts`, `tabs.component.spec.ts`, and `select.component.spec.ts` for the established shape.
 - Do not claim that using `ngx-ui`/`ngx-datetime` makes a consuming application legally accessibility-compliant on its own — compliance also depends on the app's own content, structure, and usage.
 
 ## Configuration And Providers
@@ -191,9 +190,8 @@ For translations, register app translations with `provideTranslate(...)` and use
 Use the root scripts:
 
 ```bash
-npm run build:libs
+npm run build        # node scripts/build-libs.mjs
 npm run build:apps
-npm run publish:dry-run
 ```
 
 For focused checks:
@@ -206,6 +204,8 @@ npx ng build ngx-ui-app --configuration development
 npm run test:ui
 ```
 
+A focused `npx ng build <package>` needs its `@wawjs/*` dependencies already built into `dist/` (root `tsconfig.json` paths map `@wawjs/ngx-*` to `dist/`). Build order, per `scripts/build-libs.mjs`: ace, core, datetime, translate, http, ui, crud, socket, rtc, tinymce, form, map, fabric.
+
 On Windows, prefer `npm.cmd` / `npx.cmd` when invoking commands directly from PowerShell.
 
 Before finishing package-boundary work, verify:
@@ -214,12 +214,14 @@ Before finishing package-boundary work, verify:
 - Newly moved symbols are exported from the owning package's `public-api.ts`.
 - The owning package's `README.md` and `AI.md` describe any changed setup, public APIs, examples, dependencies, or agent guidance.
 - Matching `*-app` examples still import from the correct package.
-- `npm run build:libs` passes when package boundaries changed.
+- `npm run build` passes when package boundaries changed.
 - If app-facing behavior changed, build the matching `*-app`.
 
 ## Publishing Scripts
 
 The publish flow is controlled by `scripts/publish.mjs`. It builds libraries, publishes `dist/<package>`, and bumps versions unless `--dry-run` or `--no-bump` is used.
+
+Publish scripts are developer-only, including `npm run publish:dry-run` (it builds the libraries and runs `npm publish --dry-run`). Agents never run them, and never bump versions or publish unless the developer explicitly asks (workspace root `AGENTS.md`, Release Discipline).
 
 When adding a new package, update:
 
@@ -258,6 +260,6 @@ When changing package APIs:
 - Update the package `AI.md` with current coding-agent guidance, package boundaries, SSR notes, and preferred APIs.
 - Update demos/docs in the matching app.
 - Update peer dependencies.
-- Run focused builds first, then `npm run build:libs` when boundaries changed.
+- Run focused builds first, then `npm run build` when boundaries changed.
 
 When in doubt, prefer clear package ownership and explicit dependencies over hidden coupling.

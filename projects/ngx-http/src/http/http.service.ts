@@ -52,8 +52,11 @@ export class HttpService {
 			...(config?.http || {}),
 		};
 
+		// The configured URL is only the default. A URL saved by setUrl() is restored below and wins,
+		// so requests made before the app calls setUrl() again already use it. Writing the config
+		// URL to storage here would overwrite that saved URL on every startup.
 		if (typeof this._config.url === 'string') {
-			this.setUrl(this._config.url);
+			this.url = this._config.url;
 		}
 
 		if (this._isBrowser) {
@@ -62,10 +65,9 @@ export class HttpService {
 				localStorage.getItem(this._legacyUrlStorageKey) ||
 				this.url;
 
-			const raw =
-				localStorage.getItem(this._headersStorageKey) ||
-				localStorage.getItem(this._legacyHeadersStorageKey);
-			this._headers = raw ? JSON.parse(raw) : this._headers;
+			this._headers = this._readStoredHeaders(this._headersStorageKey) ||
+				this._readStoredHeaders(this._legacyHeadersStorageKey) ||
+				this._headers;
 			this._http_headers = new HttpHeaders(this._headers);
 		}
 
@@ -76,6 +78,29 @@ export class HttpService {
 
 			this._http_headers = new HttpHeaders(this._headers);
 		}
+	}
+
+	// Read persisted headers; a corrupt or non-object value is dropped from storage.
+	private _readStoredHeaders(key: string): { [name: string]: HttpHeaderType } | null {
+		const raw = localStorage.getItem(key);
+
+		if (!raw) {
+			return null;
+		}
+
+		try {
+			const parsed: unknown = JSON.parse(raw);
+
+			if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+				return parsed as { [name: string]: HttpHeaderType };
+			}
+		} catch {
+			// fall through and drop the corrupt value
+		}
+
+		localStorage.removeItem(key);
+
+		return null;
 	}
 
 	// Set a new base URL and save it in the store
@@ -270,11 +295,25 @@ export class HttpService {
 			.pipe(
 				first(),
 				catchError((error: HttpErrorResponse) => {
+					let retried = false;
+
 					this.handleError(opts.err, () => {
+						if (retried) {
+							return;
+						}
+
+						retried = true;
+
 						this._post(url, doc, callback, opts, method).subscribe(responseSubject);
 					})(error);
 
-					responseSubject.error(error);
+					// When an error handler called retry() synchronously, the retried request
+					// now feeds responseSubject, so it must not be errored here. A retry()
+					// called later (asynchronously) still re-sends the request and runs the
+					// legacy callback, but subscribers have already received this error.
+					if (!retried) {
+						responseSubject.error(error);
+					}
 
 					return EMPTY;
 				}),
@@ -308,11 +347,17 @@ export class HttpService {
 
 					if (Array.isArray(opts.fields)) {
 						if (Array.isArray(this._getObjectToReplace(resp, opts.data))) {
-							(this._getObjectToReplace(resp, opts.data) as Array<unknown>).map(
-								(item: unknown) => {
-									return this._newDoc(item, opts.fields);
-								},
-							);
+							const newDocs = (
+								this._getObjectToReplace(resp, opts.data) as Array<unknown>
+							).map((item: unknown) => {
+								return this._newDoc(item, opts.fields);
+							});
+
+							if (opts.data) {
+								this._setObjectToReplace(resp, opts.data, newDocs);
+							} else {
+								resp = newDocs;
+							}
 						} else if (this._getObjectToReplace(resp, opts.data)) {
 							const newDoc = this._newDoc(
 								this._getObjectToReplace(resp, opts.data),
@@ -456,9 +501,9 @@ export class HttpService {
 	 */
 	private _getObjectToReplace(resp: unknown, base = ''): unknown {
 		if (base.includes('.')) {
-			const newBase = base.split('');
+			const newBase = base.split('.');
 
-			const currentBase: string = newBase.pop() || '';
+			const currentBase: string = newBase.shift() || '';
 
 			return this._getObjectToReplace(
 				(resp as Record<string, unknown>)[currentBase] || {},
@@ -482,9 +527,9 @@ export class HttpService {
 	 */
 	private _setObjectToReplace(resp: unknown, base = '', doc: unknown): void {
 		while (base.includes('.')) {
-			const newBase = base.split('');
+			const newBase = base.split('.');
 
-			const currentBase: string = newBase.pop() || '';
+			const currentBase: string = newBase.shift() || '';
 
 			resp = (resp as Record<string, unknown>)[currentBase] || {};
 

@@ -1,9 +1,12 @@
+import { isPlatformBrowser } from '@angular/common';
 import {
 	AfterViewInit,
 	Component,
 	ElementRef,
 	OnDestroy,
+	PLATFORM_ID,
 	ViewEncapsulation,
+	inject,
 	viewChild,
 } from '@angular/core';
 import { ButtonDirective } from '../../../button/button.directive';
@@ -63,13 +66,14 @@ export class AlertComponent implements AfterViewInit, OnDestroy {
 	/** Optional action buttons rendered within the alert. */
 	buttons: AlertButton[] = [];
 
-	private _timer: number | null = null;
+	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+	private _timer: ReturnType<typeof setTimeout> | null = null;
 	private _start = 0;
 	private _remaining = 0;
 
 	private readonly _onEnter = () => {
 		if (this._timer) {
-			window.clearTimeout(this._timer);
+			clearTimeout(this._timer);
 			this._timer = null;
 		}
 		this._remaining -= Date.now() - this._start;
@@ -77,8 +81,8 @@ export class AlertComponent implements AfterViewInit, OnDestroy {
 
 	private readonly _onLeave = () => {
 		this._start = Date.now();
-		if (this._timer) window.clearTimeout(this._timer);
-		this._timer = window.setTimeout(() => this.remove(), this._remaining);
+		if (this._timer) clearTimeout(this._timer);
+		this._timer = setTimeout(() => this.remove(), this._remaining);
 	};
 
 	/**
@@ -87,11 +91,11 @@ export class AlertComponent implements AfterViewInit, OnDestroy {
 	 */
 	ngAfterViewInit(): void {
 		const elRef = this.alertRef();
-		if (!elRef || !this.timeout) return;
+		if (!this._isBrowser || !elRef || !this.timeout) return;
 
 		this._remaining = this.timeout;
 		this._start = Date.now();
-		this._timer = window.setTimeout(() => this.remove(), this._remaining);
+		this._timer = setTimeout(() => this.remove(), this._remaining);
 
 		const el = elRef.nativeElement;
 		el.addEventListener('mouseenter', this._onEnter, false);
@@ -103,7 +107,7 @@ export class AlertComponent implements AfterViewInit, OnDestroy {
 	ngOnDestroy(): void {
 		const elRef = this.alertRef();
 
-		if (this._timer) window.clearTimeout(this._timer);
+		if (this._timer) clearTimeout(this._timer);
 		this._timer = null;
 
 		if (elRef) {

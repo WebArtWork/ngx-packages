@@ -56,7 +56,8 @@ Subscriptions registered before the socket connects are attached on connection. 
 
 - `setUrl(url: string): void`
 - `disconnect(): void`
-- `on(to: string, cb?): void`
+- `on(to: string, cb?): () => void` — returns a function that removes this listener
+- `off(to: string, cb?): void` — removes one listener, or every listener registered through the service for `to` when `cb` is omitted
 - `emit(to: string, message: any, room?: any): void`
 
 Example:

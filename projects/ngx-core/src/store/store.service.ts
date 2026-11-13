@@ -157,7 +157,12 @@ export class StoreService {
 	}
 
 	/**
-	 * Clears all storage.
+	 * Clears storage.
+	 *
+	 * With the default `localStorage` backend and a configured prefix (config
+	 * `store.prefix` and/or `setPrefix()`), only keys with that prefix are removed.
+	 * Without any prefix the whole `localStorage` is cleared. A custom
+	 * `config.clear` adapter is called as-is.
 	 */
 	async clear(options?: StoreOptions): Promise<boolean> {
 		try {
@@ -169,7 +174,25 @@ export class StoreService {
 					return true;
 				}
 
-				localStorage.clear();
+				const prefix = this._applyPrefix('');
+
+				if (prefix) {
+					const keys: string[] = [];
+
+					for (let i = 0; i < localStorage.length; i++) {
+						const key = localStorage.key(i);
+
+						if (key !== null && key.startsWith(prefix)) {
+							keys.push(key);
+						}
+					}
+
+					for (const key of keys) {
+						localStorage.removeItem(key);
+					}
+				} else {
+					localStorage.clear();
+				}
 			}
 
 			options?.onSuccess?.();

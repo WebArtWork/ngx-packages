@@ -1,12 +1,18 @@
 // network.service.ts â€” Angular 20+ (zoneless) signal-based connectivity checker
 import { isPlatformBrowser } from '@angular/common';
-import { PLATFORM_ID, Service, inject, signal } from '@angular/core';
+import { DOCUMENT, DestroyRef, PLATFORM_ID, Service, inject, signal } from '@angular/core';
 import { EmitterService } from '@wawjs/ngx-core';
 import { CONFIG_TOKEN } from '../config.interface';
-import { DEFAULT_NETWORK_CONFIG, NetworkConfig, NetworkStatus } from './network.interface';
+import {
+	DEFAULT_NETWORK_CONFIG,
+	NETWORK_CONFIG,
+	NetworkConfig,
+	NetworkStatus,
+} from './network.interface';
 
 interface NetworkInformationLike {
 	addEventListener?: (type: 'change', listener: () => void) => void;
+	removeEventListener?: (type: 'change', listener: () => void) => void;
 }
 
 interface NavigatorWithConnection extends Navigator {
@@ -16,10 +22,17 @@ interface NavigatorWithConnection extends Navigator {
 @Service()
 export class NetworkService {
 	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
-	private readonly _config = {
+	private readonly _document = inject(DOCUMENT);
+	private readonly _destroyRef = inject(DestroyRef);
+	/** Precedence: defaults < `NETWORK_CONFIG` token < `provideNgxHttp({ network })`. */
+	private readonly _config: NetworkConfig = {
 		...DEFAULT_NETWORK_CONFIG,
-		...(inject(CONFIG_TOKEN, { optional: true })?.network || ({} as NetworkConfig)),
+		...(inject(NETWORK_CONFIG, { optional: true }) || ({} as Partial<NetworkConfig>)),
+		...(inject(CONFIG_TOKEN, { optional: true })?.network || ({} as Partial<NetworkConfig>)),
 	};
+
+	/** Periodic re-check timer (paused while the document is hidden). */
+	private _interval: ReturnType<typeof setInterval> | null = null;
 
 	/** Internal mutable signals. */
 	private _status = signal<NetworkStatus>(this._isBrowser && navigator.onLine ? 'poor' : 'none');
@@ -36,7 +49,8 @@ export class NetworkService {
 
 	/**
 	 * Creates the network monitor, binds browser/Capacitor events,
-	 * performs an immediate check, and starts periodic polling.
+	 * performs an immediate check, and starts periodic polling while the
+	 * document is visible. Timers and listeners are released on destroy.
 	 */
 	constructor() {
 		if (!this._isBrowser) return;
@@ -45,7 +59,11 @@ export class NetworkService {
 
 		this.recheckNow(); // fire once on start
 
-		window.setInterval(() => this.recheckNow(), this._config.intervalMs);
+		if (!this._document.hidden) {
+			this._startPolling();
+		}
+
+		this._destroyRef.onDestroy(() => this._stopPolling());
 	}
 
 	/**
@@ -76,7 +94,19 @@ export class NetworkService {
 		this._updateClassification();
 	}
 
-	// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ Internals â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+	private _startPolling(): void {
+		this._stopPolling();
+		this._interval = setInterval(() => this.recheckNow(), this._config.intervalMs);
+	}
+
+	private _stopPolling(): void {
+		if (this._interval !== null) {
+			clearInterval(this._interval);
+			this._interval = null;
+		}
+	}
+
+	//â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ Internals â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 	/**
 	 * Classifies current state into 'good' | 'poor' | 'none'.
@@ -113,27 +143,47 @@ export class NetworkService {
 	/**
 	 * Binds browser events that can affect connectivity:
 	 * - online/offline (OS connectivity)
-	 * - visibilitychange (recheck on focus)
+	 * - visibilitychange (pause polling while hidden, recheck on focus)
 	 * - NetworkInformation 'change' (if supported)
 	 */
 	private _bindEvents(): void {
 		if (!this._isBrowser) return;
 
-		window.addEventListener('online', () => {
+		const onOnline = () => {
 			this._isOnline.set(true);
 
 			this.recheckNow();
-		});
+		};
 
-		window.addEventListener('offline', () => {
+		const onOffline = () => {
 			this._isOnline.set(false);
 
 			this._updateClassification();
-		});
+		};
 
-		(navigator as NavigatorWithConnection).connection?.addEventListener?.('change', () =>
-			this.recheckNow(),
-		);
+		const onVisibilityChange = () => {
+			if (this._document.hidden) {
+				this._stopPolling();
+			} else {
+				this.recheckNow();
+				this._startPolling();
+			}
+		};
+
+		const onConnectionChange = () => this.recheckNow();
+		const connection = (navigator as NavigatorWithConnection).connection;
+
+		window.addEventListener('online', onOnline);
+		window.addEventListener('offline', onOffline);
+		this._document.addEventListener('visibilitychange', onVisibilityChange);
+		connection?.addEventListener?.('change', onConnectionChange);
+
+		this._destroyRef.onDestroy(() => {
+			window.removeEventListener('online', onOnline);
+			window.removeEventListener('offline', onOffline);
+			this._document.removeEventListener('visibilitychange', onVisibilityChange);
+			connection?.removeEventListener?.('change', onConnectionChange);
+		});
 	}
 
 	/**
