@@ -1,8 +1,15 @@
-import { DOCUMENT, inject } from '@angular/core';
+import { APP_BOOTSTRAP_LISTENER, DOCUMENT, inject } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { provideStartup, provideStartupTask } from './provide-startup';
 import { StartupService } from './startup.service';
+
+/** Runs what Angular runs after the root component's first render. */
+function bootstrap(): void {
+	for (const listener of TestBed.inject(APP_BOOTSTRAP_LISTENER)) {
+		listener(null as never);
+	}
+}
 
 function deferred(): { promise: Promise<void>; resolve: () => void } {
 	let resolve!: () => void;
@@ -16,6 +23,8 @@ describe('StartupService', () => {
 		const screen = document.createElement('div');
 		screen.id = 'wstartup';
 		document.body.appendChild(screen);
+		// The page "loaded" long ago, so the default minDuration adds no wait unless a test says so.
+		vi.spyOn(performance, 'now').mockReturnValue(60000);
 	});
 
 	afterEach(() => {
@@ -31,7 +40,7 @@ describe('StartupService', () => {
 		});
 
 		const startup = TestBed.inject(StartupService);
-		TestBed.tick();
+		bootstrap();
 		await Promise.resolve();
 
 		expect(startup.ready()).toBe(false);
@@ -44,6 +53,53 @@ describe('StartupService', () => {
 		expect(startup.ready()).toBe(true);
 		expect(startup.pending()).toEqual([]);
 		expect(document.documentElement.classList.contains('wstartup-pending')).toBe(false);
+	});
+
+	it('stays up through render passes that run before the app has bootstrapped', async () => {
+		// In a zoneless app change detection can run while app initializers (e.g. loading the
+		// saved language) are still pending; that must not release the screen.
+		TestBed.configureTestingModule({ providers: [provideStartup()] });
+
+		const startup = TestBed.inject(StartupService);
+		TestBed.tick();
+		await new Promise(resolve => setTimeout(resolve));
+
+		expect(startup.ready()).toBe(false);
+		expect(document.documentElement.classList.contains('wstartup-pending')).toBe(true);
+
+		bootstrap();
+		await startup.whenReady();
+
+		expect(startup.ready()).toBe(true);
+		expect(document.documentElement.classList.contains('wstartup-pending')).toBe(false);
+	});
+
+	it('keeps a shown screen up until minDuration has passed since the page started loading', async () => {
+		vi.spyOn(performance, 'now').mockReturnValue(0);
+		TestBed.configureTestingModule({ providers: [provideStartup({ minDuration: 60 })] });
+
+		const startup = TestBed.inject(StartupService);
+		bootstrap();
+		await new Promise(resolve => setTimeout(resolve, 20));
+
+		expect(startup.ready()).toBe(false);
+		expect(document.documentElement.classList.contains('wstartup-pending')).toBe(true);
+
+		await startup.whenReady();
+
+		expect(document.documentElement.classList.contains('wstartup-pending')).toBe(false);
+	});
+
+	it('does not wait for minDuration when the screen was not shown', async () => {
+		document.documentElement.classList.remove('wstartup-pending');
+		vi.spyOn(performance, 'now').mockReturnValue(0);
+		TestBed.configureTestingModule({ providers: [provideStartup({ minDuration: 10000 })] });
+
+		const startup = TestBed.inject(StartupService);
+		bootstrap();
+		await startup.whenReady();
+
+		expect(startup.ready()).toBe(true);
 	});
 
 	it('runs tasks in an injection context and awaits tasks registered later', async () => {
@@ -60,7 +116,7 @@ describe('StartupService', () => {
 
 		const startup = TestBed.inject(StartupService);
 		startup.register('language', late.promise);
-		TestBed.tick();
+		bootstrap();
 		await Promise.resolve();
 
 		expect(sawDocument).toBe(true);
@@ -84,7 +140,7 @@ describe('StartupService', () => {
 		});
 
 		const startup = TestBed.inject(StartupService);
-		TestBed.tick();
+		bootstrap();
 		await Promise.resolve();
 
 		expect(app.hasAttribute('inert')).toBe(true);
@@ -108,7 +164,7 @@ describe('StartupService', () => {
 		});
 
 		const startup = TestBed.inject(StartupService);
-		TestBed.tick();
+		bootstrap();
 		await startup.whenReady();
 
 		expect(startup.ready()).toBe(true);
@@ -125,7 +181,7 @@ describe('StartupService', () => {
 		});
 
 		const startup = TestBed.inject(StartupService);
-		TestBed.tick();
+		bootstrap();
 		await startup.whenReady();
 
 		expect(startup.ready()).toBe(true);

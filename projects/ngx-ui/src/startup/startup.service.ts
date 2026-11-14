@@ -1,10 +1,10 @@
 import { isPlatformBrowser } from '@angular/common';
 import {
+	ApplicationRef,
 	DOCUMENT,
 	EnvironmentInjector,
 	PLATFORM_ID,
 	Service,
-	afterNextRender,
 	inject,
 	runInInjectionContext,
 	signal,
@@ -31,11 +31,13 @@ export class StartupService {
 		...(inject(STARTUP_CONFIG, { optional: true }) || {}),
 	};
 	private readonly _document = inject(DOCUMENT);
+	private readonly _appRef = inject(ApplicationRef);
 	private readonly _isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 	private readonly _tasks = new Map<string, Promise<void>>();
 	private readonly _pending = signal<string[]>([]);
 	private readonly _ready = signal(false);
 	private _started = false;
+	private _settling = false;
 	private _inertElements: Element[] = [];
 	private _resolveReady!: () => void;
 	private readonly _readyPromise = new Promise<void>(resolve => (this._resolveReady = resolve));
@@ -105,10 +107,24 @@ export class StartupService {
 		}
 
 		this._lockPage();
+	}
 
-		// The first render happens after every APP_INITIALIZER (e.g. translations) has finished,
-		// and after components had their chance to register tasks in their constructors.
-		afterNextRender(() => void this._settle(), { injector });
+	/**
+	 * @internal Called by `provideStartup()` through `APP_BOOTSTRAP_LISTENER`, after the root
+	 * component's first render. Every app initializer (e.g. translations) has finished by then and
+	 * components have had their chance to register tasks in their constructors.
+	 *
+	 * Do not use `afterNextRender` from `start()` instead: in a zoneless app any change detection
+	 * that runs while app initializers are still pending also runs render hooks, which would
+	 * release the screen before the saved language is loaded.
+	 */
+	bootstrapped(): void {
+		if (!this._started || !this._isBrowser || this._settling || this._ready()) {
+			return;
+		}
+
+		this._settling = true;
+		void this._settle();
 	}
 
 	private async _settle(): Promise<void> {
@@ -121,11 +137,18 @@ export class StartupService {
 			}, this._config.timeout);
 		});
 
-		// Tasks may register more tasks while they run, so wait until the set stops growing.
+		// Tasks may register more tasks while they run, so wait until the set stops growing. Then
+		// wait for the app to be stable as well: work started by the first render (a directive
+		// that writes translated text in a follow-up render, HTTP requests) finishes before the
+		// page is revealed.
 		while (!timedOut) {
 			const count = this._tasks.size;
 
 			await Promise.race([Promise.all(this._tasks.values()), timeout]);
+
+			if (!timedOut) {
+				await Promise.race([this._appRef.whenStable(), timeout]);
+			}
 
 			if (this._tasks.size === count) {
 				break;
@@ -140,8 +163,21 @@ export class StartupService {
 			);
 		}
 
+		await this._waitMinDuration();
+
 		this._markReady();
 		this._hideScreen();
+	}
+
+	/** Keeps a shown screen up until `minDuration` has passed since the page started loading. */
+	private async _waitMinDuration(): Promise<void> {
+		const shown = this._document.documentElement.classList.contains(this._config.pendingClass);
+		const elapsed = this._document.defaultView?.performance?.now() ?? Infinity;
+		const remaining = this._config.minDuration - elapsed;
+
+		if (shown && remaining > 0) {
+			await new Promise(resolve => setTimeout(resolve, remaining));
+		}
 	}
 
 	private _markReady(): void {

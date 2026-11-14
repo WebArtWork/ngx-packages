@@ -48,9 +48,9 @@ export const appConfig = {
 - Use `provideStartup()` plus `provideStartupTask(name, task)` for any work the app must finish before users see it: language, theme, the signed-in user from an API, data from storage. Do not build app-local splash screens or loading flags for this.
 - The screen itself is static markup and a pre-paint script in `index.html` (see the README "Startup Screen" section) styled by `@wawjs/ngx-ui/startup.css`. It cannot be an Angular component, because app initializers such as `provideTranslate()` block the first render.
 - Browser-only apps set `data-startup="always"` on `<html>`. Prerendered sites set `data-startup-language="<prerendered language code>"` so the screen shows only when the saved language differs.
-- Tasks run in an injection context, return a Promise (use `firstValueFrom()` for Observables), and should catch their own errors. A rejection or the timeout (default 10s) never blocks the app; it is logged with the task name.
+- Tasks run in an injection context, return a Promise (use `firstValueFrom()` for Observables), and should catch their own errors. A rejection or the timeout (default 10s) never blocks the app; it is logged with the task name. Once shown, the screen stays at least `minDuration` ms (default 250) from page load; it never delays a start that did not show the screen.
 - While the screen shows, the rest of `<body>` is `inert` and focus calls are ignored; an `[autofocus]` element is focused after release. Do not work around this with timers.
-- Register tasks before the first render finishes. `StartupService.register()` calls made later still run but are not awaited.
+- Register tasks before the first render finishes. `StartupService.register()` calls made later still run but are not awaited. The screen is released from `APP_BOOTSTRAP_LISTENER` after the root component bootstraps, then waits for the tasks and `ApplicationRef.whenStable()`; never release it from `afterNextRender` in an initializer, because zoneless change detection can run while app initializers are still pending.
 
 ## Token Setup
 

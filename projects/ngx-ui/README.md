@@ -146,7 +146,7 @@ Public state:
 
 ## Startup Screen
 
-A full-screen logo and spinner shown while the app finishes startup work, such as loading the saved language, the theme, or the signed-in user from an API. It hides once the first render is done and every registered task has settled.
+A full-screen logo and spinner shown while the app finishes startup work, such as loading the saved language, the theme, or the signed-in user from an API. It hides once the root component has bootstrapped (every app initializer, such as `provideTranslate()`, has finished and the first render is done), every registered task has settled, and the app is stable (no pending HTTP requests or follow-up renders).
 
 It has three parts:
 
@@ -204,7 +204,7 @@ It has three parts:
 import { provideStartup, provideStartupTask } from '@wawjs/ngx-ui';
 
 providers: [
-	provideStartup(), // { timeout: 10000 } by default
+	provideStartup(), // { timeout: 10000, minDuration: 250 } by default
 	provideStartupTask('user', () => inject(UserService).whenLoaded()),
 ];
 ```
@@ -212,6 +212,7 @@ providers: [
 - A task runs in an injection context and returns a Promise (or nothing). Convert Observables with `firstValueFrom()`.
 - Tasks can also be added from code with `inject(StartupService).register('name', promiseOrFn)`, before the first render finishes.
 - A task should handle its own errors. A rejection is logged with the task name and the app still opens. After `timeout` the app opens anyway, and the still-pending task names are logged.
+- Once shown, the screen stays at least `minDuration` ms (default 250), counted from the start of the page load, so a fast start does not blink it in and out. It never delays a start that did not show the screen; pass `minDuration: 0` to turn it off.
 - `StartupService.ready()`, `pending()` and `whenReady()` expose the state.
 - While the screen shows, everything else in `<body>` is `inert`, so nothing underneath can take focus (an autofocused input would otherwise open the on-screen keyboard on mobile behind the spinner). After release, an `[autofocus]` element gets focus.
 - On the server the service does nothing.
