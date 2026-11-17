@@ -73,7 +73,7 @@ Version `22.0.0` was primarily a theme-state package with UI exports that still 
 
 - BEM SCSS for the UI components, with `ViewEncapsulation.None` so styles apply predictably in consuming apps.
 - `ThemeTokens`, `TOKEN_VAR_MAP`, and default token exports for colors, shadows, spacing, radius, motion, alerts, and burger geometry.
-- Runtime token application through `ThemeService`.
+- Runtime token application through `ThemeService`. The package defaults for the current mode, density and radius go into `<style id="wtheme-defaults">` under `:where(:root)` (zero specificity), so the app's own token stylesheet (for example `src/styles/_theme.scss`) and `styles.css` always win, and apps without either still get the defaults. Only tokens passed to `provideNgxUi({...})` are written inline on `<html>`, with the highest priority.
 - A packaged `styles.css` static token baseline for SSR and CSS-only setups.
 - `provideNgxUi()` as the package-level setup alias for `provideTheme()`.
 

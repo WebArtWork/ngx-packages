@@ -9,7 +9,7 @@ Use this file as context for coding agents when an Angular project depends on `@
 - Import public APIs from `@wawjs/ngx-ui`; do not import from package source paths, `dist`, or local aliases inside publishable libraries.
 - Bootstrap apps with `provideNgxUi(config)` or `provideTheme(config)` in application providers.
 - Use `ThemeService` for mode, density, radius, persistence, and theme cycling. Do not scatter `localStorage`, `document.documentElement.dataset`, or `style.setProperty` calls for theme handling.
-- `ThemeService` writes token custom properties such as `--c-primary`, `--sp-3`, and `--radius-btn` to `document.documentElement` during browser initialization and theme changes.
+- `ThemeService` writes token custom properties such as `--c-primary`, `--sp-3`, and `--radius-btn` during browser initialization and theme changes. The package defaults go into `<style id="wtheme-defaults">` under `:where(:root)`, which has zero specificity, so any app stylesheet overrides them; only tokens passed to `provideNgxUi({...})` are written inline on `document.documentElement`. Do not write the defaults inline again: that overrode apps' own `_theme.scss` after startup.
 - For SSR or CSS-only defaults, import `node_modules/@wawjs/ngx-ui/styles.css` in `angular.json` styles before app styles.
 - Keep `projects/ngx-ui/src/theme/theme.tokens.ts` and `projects/ngx-ui/styles.css` synchronized whenever token defaults or token keys change.
 - All styled components use BEM SCSS and `ViewEncapsulation.None`. Prefer CSS custom property overrides on app-owned ancestors over direct internal class overrides.
