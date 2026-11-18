@@ -8,7 +8,6 @@ Projects under `projects/` fall into two groups:
 
 - `ngx-*` projects without the `-app` suffix are publishable node module packages.
 - `ngx-*-app` projects are websites, demos, and documentation apps for the matching package.
-- `wawjs.dev` is a site project, not a publishable package.
 
 Current library packages:
 

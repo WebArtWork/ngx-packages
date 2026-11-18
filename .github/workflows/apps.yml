@@ -37,7 +37,6 @@ jobs:
                 apps=(
                   ngx-datetime-app
                   ngx-core-app
-                  wawjs.dev
                   ngx-ace-app
                   ngx-fabric-app
                   ngx-http-app
@@ -80,7 +79,6 @@ jobs:
                   apps=(
                     ngx-datetime-app
                     ngx-core-app
-                    wawjs.dev
                     ngx-ace-app
                     ngx-fabric-app
                     ngx-http-app
@@ -95,11 +93,7 @@ jobs:
                   )
 
                   for app in "${apps[@]}"; do
-                    if [ "$app" = "wawjs.dev" ]; then
-                      domain="wawjs.dev"
-                    else
-                      domain="${app%-app}.webart.work"
-                    fi
+                    domain="${app%-app}.webart.work"
 
                     pushd "dist/$app/browser"
                     git init

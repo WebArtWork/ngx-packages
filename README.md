@@ -12,7 +12,6 @@ The ecosystem is designed to:
 - scale across multiple apps
 - support plugin-based architecture
 - be portable to other frameworks (React, Vue)
-- serve as a foundation for wawjs.dev
 
 ---
 
@@ -20,7 +19,6 @@ The ecosystem is designed to:
 
 ### core platforms
 
-- **wawjs.dev** â†’ unified documentation (waw + ngx + react + vue)
 - **ngx.webart.work** â†’ main entry for all ngx packages
 - **ngx-default.webart.work** â†’ default Angular starter project
 

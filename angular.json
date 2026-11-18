@@ -132,69 +132,6 @@
 				}
 			}
 		},
-		"wawjs.dev": {
-			"projectType": "application",
-			"root": "projects/wawjs.dev",
-			"sourceRoot": "projects/wawjs.dev/src",
-			"prefix": "app",
-			"architect": {
-				"build": {
-					"builder": "@angular/build:application",
-					"options": {
-						"browser": "projects/wawjs.dev/src/main.ts",
-						"server": "projects/wawjs.dev/src/main.server.ts",
-						"index": "projects/wawjs.dev/src/index.html",
-						"tsConfig": "projects/wawjs.dev/tsconfig.app.json",
-						"prerender": {
-							"discoverRoutes": true,
-							"routesFile": "projects/wawjs.dev/src/prerender-routes.txt"
-						},
-						"assets": [
-							{
-								"glob": "**/*",
-								"input": "projects/wawjs.dev/src/assets"
-							}
-						],
-						"styles": ["projects/wawjs.dev/src/styles.scss"]
-					},
-					"configurations": {
-						"production": {
-							"budgets": [
-								{
-									"type": "initial",
-									"maximumWarning": "500kB",
-									"maximumError": "1MB"
-								},
-								{
-									"type": "anyComponentStyle",
-									"maximumWarning": "8kB",
-									"maximumError": "12kB"
-								}
-							],
-							"outputHashing": "all"
-						},
-						"development": {
-							"optimization": false,
-							"extractLicenses": false,
-							"sourceMap": true
-						}
-					},
-					"defaultConfiguration": "production"
-				},
-				"serve": {
-					"builder": "@angular/build:dev-server",
-					"configurations": {
-						"production": {
-							"buildTarget": "wawjs.dev:build:production"
-						},
-						"development": {
-							"buildTarget": "wawjs.dev:build:development"
-						}
-					},
-					"defaultConfiguration": "development"
-				}
-			}
-		},
 		"ngx-ace-app": {
 			"projectType": "application",
 			"root": "projects/ngx-ace-app",

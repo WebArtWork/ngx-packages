@@ -17,7 +17,6 @@
 		"projects/ngx-fabric"
 	],
 	"scripts": {
-		"start": "ng serve wawjs.dev",
 		"build": "node scripts/build-libs.mjs",
 		"build:apps": "node scripts/build-apps.mjs",
 		"publish": "node scripts/publish.mjs",
@@ -35,7 +34,6 @@
 		"start:ui": "ng serve ngx-ui-app",
 		"start:form": "ng serve ngx-form-app",
 		"start:map": "ng serve ngx-map-app",
-		"start:wiki": "ng serve wawjs.dev",
 		"test:ui": "ng test ngx-ui"
 	},
 	"dependencies": {
