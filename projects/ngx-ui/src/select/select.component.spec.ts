@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { describe, expect, it } from 'vitest';
@@ -57,5 +57,41 @@ describe('SelectComponent', () => {
 
 		const nextActiveId = combobox.getAttribute('aria-activedescendant');
 		expect(nextActiveId).not.toBe(activeId);
+	});
+});
+
+@Component({
+	imports: [SelectComponent],
+	template: `<wselect [items]="items" [formField]="field" [raw]="true" />`,
+})
+class FieldHostComponent {
+	readonly value = signal<string | null>(null);
+	readonly field = (() => ({ value: this.value })) as never;
+	readonly items = ['Dashboard', 'Settings'];
+}
+
+describe('SelectComponent signal form bridge', () => {
+	it('keeps the picked option and writes it to the field', async () => {
+		await TestBed.configureTestingModule({ imports: [FieldHostComponent] }).compileComponents();
+
+		const fixture = TestBed.createComponent(FieldHostComponent);
+		fixture.detectChanges();
+
+		const root: HTMLElement = fixture.nativeElement;
+
+		(root.querySelector('.wselect__header') as HTMLElement).click();
+		fixture.detectChanges();
+
+		const option = Array.from(root.querySelectorAll<HTMLElement>('.wselect__item')).find((item) =>
+			item.textContent?.includes('Settings'),
+		) as HTMLElement;
+
+		option.click();
+		fixture.detectChanges();
+		await fixture.whenStable();
+		fixture.detectChanges();
+
+		expect(fixture.componentInstance.value()).toBe('Settings');
+		expect(root.querySelector('.wselect__value')?.textContent).toContain('Settings');
 	});
 });

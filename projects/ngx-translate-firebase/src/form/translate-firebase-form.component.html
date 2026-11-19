@@ -1,0 +1,22 @@
+<div class="wtfb-form">
+	<h2 class="wtfb-form__title" translate>Translations</h2>
+
+	<wtranslate-key-select [(value)]="sourceText" (picked)="prefill($event)" />
+
+	@for (language of languages; track language.code) {
+	<winput
+		[label]="language.nativeName || language.name"
+		[placeholder]="language.nativeName || language.name"
+		[wModel]="texts()[language.code] ?? ''"
+		(wModelChange)="setText(language.code, $event)"
+	/>
+	}
+
+	@if (failed()) {
+	<p class="wtfb-form__error" role="alert" translate>Something went wrong</p>
+	}
+
+	<button wbutton [disableSubmit]="true" [disabled]="!canSave()" (wClick)="submit()">
+		<span translate>Save</span>
+	</button>
+</div>

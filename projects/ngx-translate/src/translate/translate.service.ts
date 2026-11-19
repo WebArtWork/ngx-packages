@@ -29,6 +29,8 @@ export class TranslateService {
 	};
 	private _translationsByLanguage = new Map<string, Translate[]>();
 	private _loadingByLanguage = new Map<string, Promise<Translate[]>>();
+	/** Texts that come from files and inline config only (never from setMany/setOne), by language. */
+	private _fileTranslationsByLanguage = new Map<string, Map<string, string>>();
 	private _extraTranslationsByLanguageAndUrl = new Map<string, Map<string, Translate[]>>();
 
 	/**
@@ -153,6 +155,8 @@ export class TranslateService {
 		);
 		const merged = this._mergeTranslations(baseTranslations, loaded);
 
+		this._rememberFileTranslations(language, loaded, options.replace === true);
+
 		this._translationsByLanguage.set(
 			language,
 			merged.map(translation => ({ ...translation })),
@@ -163,6 +167,37 @@ export class TranslateService {
 		}
 
 		return [...merged];
+	}
+
+	/**
+	 * Returns the texts that come from translation files (config folders, inline config and the
+	 * extra paths loaded so far, plus `options.extraPaths`), without anything set through
+	 * `setMany()` or `setOne()`. Use it to list the keys that exist and what the files say for them.
+	 */
+	async getFileTranslations(
+		language: string,
+		options: { extraPaths?: string[] } = {},
+	): Promise<Translate[]> {
+		const normalizedLanguage = (language || '').trim();
+
+		if (!normalizedLanguage) {
+			return [];
+		}
+
+		if (!this._fileTranslationsByLanguage.has(normalizedLanguage)) {
+			const base = await this._readLanguageFiles(normalizedLanguage);
+
+			// A load that finished meanwhile (loadTranslations / extra paths) already recorded its texts.
+			this._rememberFileTranslations(normalizedLanguage, base, false);
+		}
+
+		if (options.extraPaths?.length) {
+			await this.loadExtraTranslations(options.extraPaths, { language: normalizedLanguage });
+		}
+
+		return [...(this._fileTranslationsByLanguage.get(normalizedLanguage) ?? [])].map(
+			([sourceText, text]) => ({ sourceText, text }),
+		);
 	}
 
 	async loadExtraTranslation(
@@ -307,14 +342,37 @@ export class TranslateService {
 		}
 	}
 
-	private async _loadLanguageInternal(language: string): Promise<Translate[]> {
+	/** Reads the config files and inline texts of a language, without touching any cache. */
+	private async _readLanguageFiles(language: string): Promise<Translate[]> {
 		const inlineTranslations = this._mapInlineTranslations(language);
 		const fileUrls = this._createLanguageUrls(language);
 		const fileTranslations = this._isBrowser
 			? await this._loadTranslationsFromUrls(fileUrls, language)
 			: [];
 		const mergedWithFiles = this._mergeTranslations([], fileTranslations);
-		const merged = this._mergeTranslations(mergedWithFiles, inlineTranslations);
+
+		return this._mergeTranslations(mergedWithFiles, inlineTranslations);
+	}
+
+	private _rememberFileTranslations(
+		language: string,
+		translations: Translate[],
+		replace: boolean,
+	): void {
+		const current = replace ? new Map<string, string>() : this._fileTranslationsByLanguage.get(language);
+		const next = current ?? new Map<string, string>();
+
+		for (const translation of translations) {
+			next.set(translation.sourceText, translation.text);
+		}
+
+		this._fileTranslationsByLanguage.set(language, next);
+	}
+
+	private async _loadLanguageInternal(language: string): Promise<Translate[]> {
+		const merged = await this._readLanguageFiles(language);
+
+		this._rememberFileTranslations(language, merged, false);
 
 		this._translationsByLanguage.set(
 			language,

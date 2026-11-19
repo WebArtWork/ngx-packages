@@ -136,6 +136,7 @@ overrides an explicit `language` or a previously persisted selection.
 - `loadTranslations(language: string)`
 - `loadExtraTranslations(paths: string[], options?)`
 - `loadExtraTranslation(path: string, options?)`
+- `getFileTranslations(language: string, options?: { extraPaths?: string[] })`: the texts that come from files and inline config only (config folders plus extra paths loaded so far), never the ones set with `setMany()` / `setOne()`. Use it to list the keys that exist.
 - `translate(text: string)`
 - `interpolate(text: string, vars?)`
 - `setMany(translations: Translate[])`

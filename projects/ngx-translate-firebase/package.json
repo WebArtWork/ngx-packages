@@ -1,0 +1,50 @@
+{
+	"name": "@wawjs/ngx-translate-firebase",
+	"version": "22.0.16",
+	"exports": {
+		".": "./public-api.ts"
+	},
+	"description": "Custom translations stored in Firebase Firestore on top of @wawjs/ngx-translate: service, key selector and admin page.",
+	"license": "MIT",
+	"repository": "WebArtWork/ngx-translate-firebase",
+	"funding": [
+		{
+			"type": "website",
+			"url": "http://wawjs.dev/fund"
+		},
+		{
+			"type": "opencollective",
+			"url": "https://opencollective.com/wawjs"
+		}
+	],
+	"peerDependencies": {
+		"@angular/core": ">=22.0.0",
+		"@angular/common": ">=22.0.0",
+		"@angular/router": ">=22.0.0",
+		"@wawjs/ngx-core": ">=22.0.16",
+		"@wawjs/ngx-translate": ">=22.0.16",
+		"@wawjs/ngx-ui": ">=22.0.16",
+		"rxjs": ">=7.5.0"
+	},
+	"engines": {
+		"node": ">=24",
+		"npm": ">=11"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"sideEffects": false,
+	"keywords": [
+		"angular",
+		"angular-library",
+		"ngx",
+		"typescript",
+		"ngx-translate-firebase",
+		"translate",
+		"i18n",
+		"firebase",
+		"firestore",
+		"waw",
+		"web-art-work"
+	]
+}

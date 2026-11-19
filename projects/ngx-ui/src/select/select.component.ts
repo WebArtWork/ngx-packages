@@ -8,6 +8,7 @@ import {
 	computed,
 	contentChild,
 	effect,
+	untracked,
 	forwardRef,
 	inject,
 	input,
@@ -60,6 +61,8 @@ export class SelectComponent implements ControlValueAccessor {
 	readonly label = input(selectDefaults.label);
 	/** Accessible name used when no visible `label` is set (e.g. compact/toolbar usage). */
 	readonly ariaLabel = input<string>('');
+	/** Shows item labels as they are, without passing them through the translator. */
+	readonly raw = input(false);
 	readonly searchable = input(selectDefaults.searchable);
 	readonly searchableBy = input(selectDefaults.searchableBy);
 	readonly items = input<unknown[]>(selectDefaults.items);
@@ -178,7 +181,10 @@ export class SelectComponent implements ControlValueAccessor {
 				// Expect field to be a signal returning { value: Signal<T> }
 				const state = f();
 				const v = state?.value?.();
-				if (!this._equal(this.wModel(), v)) {
+				// Only the field value is tracked: if wModel were tracked too, picking an option would
+				// re-run this effect before the field is updated and put the old field value back.
+				const model = untracked(() => this.wModel());
+				if (!this._equal(model, v)) {
 					this.wModel.set(v as any);
 				}
 			} catch {
@@ -193,7 +199,9 @@ export class SelectComponent implements ControlValueAccessor {
 			try {
 				const state = f();
 				const value = this.wModel();
-				if (state?.value?.set && !this._equal(state.value(), value)) {
+				// Only wModel is tracked here (see the effect above).
+				const current = untracked(() => state?.value?.());
+				if (state?.value?.set && !this._equal(current, value)) {
 					state.value.set(value as any);
 				}
 			} catch {
@@ -270,8 +278,9 @@ export class SelectComponent implements ControlValueAccessor {
 				this._core.toSignalsArray<SelectItem>(normalized),
 			);
 
-			const ids = new Set(this.allItems().map((s) => s().id));
-			const val = this.wModel();
+			const ids = new Set(normalized.map((item) => item.id));
+			// Untracked: this effect rebuilds the items, it must not re-run on every selection.
+			const val = untracked(() => this.wModel());
 
 			if (this.isMulti()) {
 				const next = (Array.isArray(val) ? val : []).filter((id) =>
@@ -283,7 +292,7 @@ export class SelectComponent implements ControlValueAccessor {
 			} else {
 				if (
 					!val ||
-					(this.allItems().length && !ids.has(val as SelectId))
+					(normalized.length && !ids.has(val as SelectId))
 				) {
 					this.wModel.set(null);
 				}

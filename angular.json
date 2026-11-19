@@ -1077,6 +1077,93 @@
 				}
 			}
 		},
+		"ngx-translate-firebase": {
+			"projectType": "library",
+			"root": "projects/ngx-translate-firebase",
+			"sourceRoot": "projects/ngx-translate-firebase/src",
+			"prefix": "lib",
+			"architect": {
+				"build": {
+				"builder": "@angular/build:library",
+				"options": {
+					"tsConfig": "projects/ngx-translate-firebase/tsconfig.lib.json",
+					"outputPath": "dist/ngx-translate-firebase",
+					"assets": [
+						"projects/ngx-translate-firebase/AI.md"
+					]
+				},
+				"configurations": {
+					"production": {
+						"tsConfig": "projects/ngx-translate-firebase/tsconfig.lib.prod.json"
+					},
+					"development": {
+						"compilationMode": "full"
+					}
+				},
+				"defaultConfiguration": "production"
+			}
+			}
+		},
+		"ngx-translate-firebase-app": {
+			"projectType": "application",
+			"root": "projects/ngx-translate-firebase-app",
+			"sourceRoot": "projects/ngx-translate-firebase-app/src",
+			"prefix": "app",
+			"architect": {
+				"build": {
+					"builder": "@angular/build:application",
+					"options": {
+						"browser": "projects/ngx-translate-firebase-app/src/main.ts",
+						"index": "projects/ngx-translate-firebase-app/src/index.html",
+						"tsConfig": "projects/ngx-translate-firebase-app/tsconfig.app.json",
+						"assets": [
+							{
+								"glob": "**/*",
+								"input": "projects/ngx-translate-firebase-app/src/assets"
+							}
+						],
+						"styles": [
+							"projects/ngx-translate-firebase-app/src/styles.scss"
+						]
+					},
+					"configurations": {
+						"production": {
+							"budgets": [
+								{
+									"type": "initial",
+									"maximumWarning": "800kB",
+									"maximumError": "2MB"
+								},
+								{
+									"type": "anyComponentStyle",
+									"maximumWarning": "8kB",
+									"maximumError": "12kB"
+								}
+							],
+							"outputHashing": "all"
+						},
+						"development": {
+							"optimization": false,
+							"extractLicenses": false,
+							"sourceMap": true
+						}
+					},
+					"defaultConfiguration": "production"
+				},
+				"serve": {
+					"builder": "@angular/build:dev-server",
+					"configurations": {
+						"production": {
+							"buildTarget": "ngx-translate-firebase-app:build:production"
+						},
+						"development": {
+							"buildTarget": "ngx-translate-firebase-app:build:development"
+						}
+					},
+					"defaultConfiguration": "development"
+				}
+			}
+		},
 		"ngx-tinymce": {
 			"projectType": "library",
 			"root": "projects/ngx-tinymce",

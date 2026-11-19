@@ -13,6 +13,7 @@ Use this file as context for coding agents when an Angular project depends on `@
 - Use `[vars]="{ key: value }"` with `TranslateDirective` or `TranslateService.interpolate(...)` for `{{key}}` placeholder interpolation.
 - Prefer `LanguageService` for active language state, validation, defaults, registry management, and persistence before adding app-specific language utilities.
 - Keep SSR-safe behavior intact. Do not add unguarded direct access to browser storage for language persistence when the package already handles it.
+- Use `TranslateService.getFileTranslations(language, { extraPaths })` to list the texts that come from files (without custom texts set through `setMany()` / `setOne()`); `setMany()` resets every key that is not in the list you pass, so prefer `setOne()` to lay single custom texts over files.
 - Use `detectLanguage: true` (or an explicit `LanguageDetector[]`) on `provideTranslate`/`provideLanguage` instead of hand-rolling `navigator.language`/timezone detection; it only applies when there is no explicit `language` and no persisted language.
 ```
 

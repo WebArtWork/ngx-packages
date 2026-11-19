@@ -31,6 +31,7 @@ The ecosystem is designed to:
 - **ngx-core** â†’ Core, Dom, Emitter, Store, Meta
 - **ngx-ui** â†’ Theme
 - **ngx-translate** â†’ Translate, Language
+- **ngx-translate-firebase** → custom translations in Firestore: service, key selector, admin page
 - **ngx-http** â†’ Network, Http
 - **ngx-socket** â†’ Socket
 - **ngx-crud** â†’ Crud

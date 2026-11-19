@@ -20,6 +20,7 @@ const _libs = [
 	'ngx-rtc',
 	'ngx-tinymce',
 	'ngx-form',
+	'ngx-translate-firebase',
 	'ngx-map',
 	'ngx-fabric',
 ];

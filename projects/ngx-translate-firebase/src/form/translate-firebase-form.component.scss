@@ -1,0 +1,14 @@
+.wtfb-form {
+	display: flex;
+	flex-direction: column;
+	gap: var(--sp-3);
+
+	&__title {
+		margin: 0;
+	}
+
+	&__error {
+		margin: 0;
+		color: var(--c-danger, #d9534f);
+	}
+}

@@ -313,6 +313,8 @@ Set `href` to override generated targets. External links receive `rel="noopener 
 <wselect label="Tags" [items]="tags" [multiple]="true" [searchable]="true" [(wModel)]="tagIds" />
 ```
 
+`[raw]="true"` shows the option labels as they are instead of passing them through the translator (use it when the labels are translation keys). With `formField` (Signal Forms) the select keeps the field and `wModel` in sync in both directions.
+
 `<wselect>` implements the WAI-ARIA APG combobox/listbox pattern: `role="combobox"` with `aria-haspopup="listbox"`, `aria-expanded`, `aria-controls`, and `aria-activedescendant` tracking the arrow-key-highlighted option, plus `label` programmatically associated via `aria-labelledby`.
 
 ### Table

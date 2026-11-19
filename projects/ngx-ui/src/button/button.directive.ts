@@ -4,6 +4,7 @@ import {
 	Renderer2,
 	effect,
 	inject,
+	signal,
 	input,
 	output,
 } from '@angular/core';
@@ -61,7 +62,8 @@ export class ButtonDirective {
 
 	readonly wClick = output<void>();
 
-	private cooling = false;
+	/** A signal (not a plain field) so the host re-renders when the click lock ends. */
+	private readonly _cooling = signal(false);
 	private readonly _iconEl: HTMLElement;
 	private readonly _badgeEl: HTMLElement;
 
@@ -75,7 +77,7 @@ export class ButtonDirective {
 		return (
 			this.disabled() ||
 			this.loading() ||
-			(!this.isMultipleClicksAllowed() && this.cooling)
+			(!this.isMultipleClicksAllowed() && this._cooling())
 		);
 	}
 
@@ -141,8 +143,8 @@ export class ButtonDirective {
 		this.wClick.emit();
 
 		if (!this.isMultipleClicksAllowed()) {
-			this.cooling = true;
-			setTimeout(() => (this.cooling = false), 2000);
+			this._cooling.set(true);
+			setTimeout(() => this._cooling.set(false), 2000);
 		}
 	}
 

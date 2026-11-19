@@ -430,3 +430,27 @@
 		display: none;
 	}
 }
+
+/*
+ * The table's buttons are plain icon buttons. ngx-ui only loads the .wbutton--primary styles once a
+ * <wbutton> component renders somewhere (e.g. the first modal), which made them turn blue after that.
+ * Forced here for every state, so they look the same before and after.
+ */
+.wtable .wbutton,
+.wtable .wbutton:hover,
+.wtable .wbutton:focus,
+.wtable .wbutton:focus-visible,
+.wtable .wbutton:active {
+	background: transparent !important;
+	color: inherit !important;
+	box-shadow: none !important;
+	outline: none !important;
+}
+
+/* Header buttons keep the table's own size; the global .wbutton padding must not grow them. */
+.wtable .wtable__actions .wbutton {
+	height: 44px !important;
+	min-width: 44px !important;
+	padding: 0 var(--sp-2) !important;
+	border: 0 !important;
+}

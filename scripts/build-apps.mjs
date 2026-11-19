@@ -18,6 +18,7 @@ const _apps = [
 	'ngx-socket-app',
 	'ngx-rtc-app',
 	'ngx-translate-app',
+	'ngx-translate-firebase-app',
 	'ngx-tinymce-app',
 	'ngx-ui-app',
 	'ngx-form-app',

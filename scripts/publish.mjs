@@ -22,6 +22,7 @@ const _libraryNames = [
 	'ngx-tinymce',
 	'ngx-ui',
 	'ngx-form',
+	'ngx-translate-firebase',
 	'ngx-map',
 	'ngx-fabric'
 ];
