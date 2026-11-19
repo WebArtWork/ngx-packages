@@ -149,7 +149,7 @@ When adding a component that depends on browser-only libraries, ensure server re
 
 Keep component styles local and small. Use existing CSS variables and design tokens when available, especially from `ngx-ui` demos and theme styles.
 
-For publishable libraries, be careful with external stylesheet resolution. If ng-packagr has trouble resolving a component stylesheet on Windows, inline small component styles in the `styles` array rather than adding build workarounds.
+For publishable libraries, be careful with external stylesheet resolution. If the library builder has trouble resolving a component stylesheet on Windows, inline small component styles in the `styles` array rather than adding build workarounds.
 
 Do not introduce global styles from a library unless that is the explicit purpose of the package.
 
@@ -234,7 +234,7 @@ When adding a new package, update:
 - package `package.json`
 - package `README.md`
 - package `AI.md`
-- package `ng-package.json` assets if new publishable documentation files are added
+- the `assets` list of the library `build` target in `angular.json` if new publishable documentation files are added
 - matching `*-app` demo/docs project
 
 ## Working With Apps

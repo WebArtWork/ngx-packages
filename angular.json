@@ -828,20 +828,22 @@
 		"ngx-core": {
 			"projectType": "library",
 			"root": "projects/ngx-core",
-			"sourceRoot": "projects/ngx-core/src",
+			"sourceRoot": "projects/ngx-core",
 			"prefix": "lib",
 			"architect": {
 				"build": {
-					"builder": "@angular/build:ng-packagr",
+					"builder": "@angular/build:library",
 					"options": {
-						"project": "projects/ngx-core/ng-package.json"
+						"tsConfig": "projects/ngx-core/tsconfig.lib.json",
+						"outputPath": "dist/ngx-core",
+						"assets": ["projects/ngx-core/AI.md"]
 					},
 					"configurations": {
 						"production": {
 							"tsConfig": "projects/ngx-core/tsconfig.lib.prod.json"
 						},
 						"development": {
-							"tsConfig": "projects/ngx-core/tsconfig.lib.json"
+							"compilationMode": "full"
 						}
 					},
 					"defaultConfiguration": "production"
@@ -851,20 +853,23 @@
 		"ngx-ace": {
 			"projectType": "library",
 			"root": "projects/ngx-ace",
-			"sourceRoot": "projects/ngx-ace/src",
+			"sourceRoot": "projects/ngx-ace",
 			"prefix": "lib",
 			"architect": {
 				"build": {
-					"builder": "@angular/build:ng-packagr",
+					"builder": "@angular/build:library",
 					"options": {
-						"project": "projects/ngx-ace/ng-package.json"
+						"tsConfig": "projects/ngx-ace/tsconfig.lib.json",
+						"outputPath": "dist/ngx-ace",
+						"assets": ["projects/ngx-ace/AI.md"],
+						"allowedNonPeerDependencies": ["ace-builds"]
 					},
 					"configurations": {
 						"production": {
 							"tsConfig": "projects/ngx-ace/tsconfig.lib.prod.json"
 						},
 						"development": {
-							"tsConfig": "projects/ngx-ace/tsconfig.lib.json"
+							"compilationMode": "full"
 						}
 					},
 					"defaultConfiguration": "production"
@@ -874,20 +879,23 @@
 		"ngx-fabric": {
 			"projectType": "library",
 			"root": "projects/ngx-fabric",
-			"sourceRoot": "projects/ngx-fabric/src",
+			"sourceRoot": "projects/ngx-fabric",
 			"prefix": "lib",
 			"architect": {
 				"build": {
-					"builder": "@angular/build:ng-packagr",
+					"builder": "@angular/build:library",
 					"options": {
-						"project": "projects/ngx-fabric/ng-package.json"
+						"tsConfig": "projects/ngx-fabric/tsconfig.lib.json",
+						"outputPath": "dist/ngx-fabric",
+						"assets": ["projects/ngx-fabric/AI.md"],
+						"allowedNonPeerDependencies": ["fabric", "resize-observer-polyfill"]
 					},
 					"configurations": {
 						"production": {
 							"tsConfig": "projects/ngx-fabric/tsconfig.lib.prod.json"
 						},
 						"development": {
-							"tsConfig": "projects/ngx-fabric/tsconfig.lib.json"
+							"compilationMode": "full"
 						}
 					},
 					"defaultConfiguration": "production"
@@ -897,20 +905,22 @@
 		"ngx-datetime": {
 			"projectType": "library",
 			"root": "projects/ngx-datetime",
-			"sourceRoot": "projects/ngx-datetime/src",
+			"sourceRoot": "projects/ngx-datetime",
 			"prefix": "lib",
 			"architect": {
 				"build": {
-					"builder": "@angular/build:ng-packagr",
+					"builder": "@angular/build:library",
 					"options": {
-						"project": "projects/ngx-datetime/ng-package.json"
+						"tsConfig": "projects/ngx-datetime/tsconfig.lib.json",
+						"outputPath": "dist/ngx-datetime",
+						"assets": ["projects/ngx-datetime/AI.md"]
 					},
 					"configurations": {
 						"production": {
 							"tsConfig": "projects/ngx-datetime/tsconfig.lib.prod.json"
 						},
 						"development": {
-							"tsConfig": "projects/ngx-datetime/tsconfig.lib.json"
+							"compilationMode": "full"
 						}
 					},
 					"defaultConfiguration": "production"
@@ -920,20 +930,22 @@
 		"ngx-http": {
 			"projectType": "library",
 			"root": "projects/ngx-http",
-			"sourceRoot": "projects/ngx-http/src",
+			"sourceRoot": "projects/ngx-http",
 			"prefix": "lib",
 			"architect": {
 				"build": {
-					"builder": "@angular/build:ng-packagr",
+					"builder": "@angular/build:library",
 					"options": {
-						"project": "projects/ngx-http/ng-package.json"
+						"tsConfig": "projects/ngx-http/tsconfig.lib.json",
+						"outputPath": "dist/ngx-http",
+						"assets": ["projects/ngx-http/AI.md"]
 					},
 					"configurations": {
 						"production": {
 							"tsConfig": "projects/ngx-http/tsconfig.lib.prod.json"
 						},
 						"development": {
-							"tsConfig": "projects/ngx-http/tsconfig.lib.json"
+							"compilationMode": "full"
 						}
 					},
 					"defaultConfiguration": "production"
@@ -943,20 +955,22 @@
 		"ngx-map": {
 			"projectType": "library",
 			"root": "projects/ngx-map",
-			"sourceRoot": "projects/ngx-map/src",
+			"sourceRoot": "projects/ngx-map",
 			"prefix": "lib",
 			"architect": {
 				"build": {
-					"builder": "@angular/build:ng-packagr",
+					"builder": "@angular/build:library",
 					"options": {
-						"project": "projects/ngx-map/ng-package.json"
+						"tsConfig": "projects/ngx-map/tsconfig.lib.json",
+						"outputPath": "dist/ngx-map",
+						"assets": ["projects/ngx-map/AI.md"]
 					},
 					"configurations": {
 						"production": {
 							"tsConfig": "projects/ngx-map/tsconfig.lib.prod.json"
 						},
 						"development": {
-							"tsConfig": "projects/ngx-map/tsconfig.lib.json"
+							"compilationMode": "full"
 						}
 					},
 					"defaultConfiguration": "production"
@@ -966,20 +980,22 @@
 		"ngx-crud": {
 			"projectType": "library",
 			"root": "projects/ngx-crud",
-			"sourceRoot": "projects/ngx-crud/src",
+			"sourceRoot": "projects/ngx-crud",
 			"prefix": "lib",
 			"architect": {
 				"build": {
-					"builder": "@angular/build:ng-packagr",
+					"builder": "@angular/build:library",
 					"options": {
-						"project": "projects/ngx-crud/ng-package.json"
+						"tsConfig": "projects/ngx-crud/tsconfig.lib.json",
+						"outputPath": "dist/ngx-crud",
+						"assets": ["projects/ngx-crud/AI.md"]
 					},
 					"configurations": {
 						"production": {
 							"tsConfig": "projects/ngx-crud/tsconfig.lib.prod.json"
 						},
 						"development": {
-							"tsConfig": "projects/ngx-crud/tsconfig.lib.json"
+							"compilationMode": "full"
 						}
 					},
 					"defaultConfiguration": "production"
@@ -989,20 +1005,22 @@
 		"ngx-socket": {
 			"projectType": "library",
 			"root": "projects/ngx-socket",
-			"sourceRoot": "projects/ngx-socket/src",
+			"sourceRoot": "projects/ngx-socket",
 			"prefix": "lib",
 			"architect": {
 				"build": {
-					"builder": "@angular/build:ng-packagr",
+					"builder": "@angular/build:library",
 					"options": {
-						"project": "projects/ngx-socket/ng-package.json"
+						"tsConfig": "projects/ngx-socket/tsconfig.lib.json",
+						"outputPath": "dist/ngx-socket",
+						"assets": ["projects/ngx-socket/AI.md"]
 					},
 					"configurations": {
 						"production": {
 							"tsConfig": "projects/ngx-socket/tsconfig.lib.prod.json"
 						},
 						"development": {
-							"tsConfig": "projects/ngx-socket/tsconfig.lib.json"
+							"compilationMode": "full"
 						}
 					},
 					"defaultConfiguration": "production"
@@ -1012,20 +1030,22 @@
 		"ngx-rtc": {
 			"projectType": "library",
 			"root": "projects/ngx-rtc",
-			"sourceRoot": "projects/ngx-rtc/src",
+			"sourceRoot": "projects/ngx-rtc",
 			"prefix": "lib",
 			"architect": {
 				"build": {
-					"builder": "@angular/build:ng-packagr",
+					"builder": "@angular/build:library",
 					"options": {
-						"project": "projects/ngx-rtc/ng-package.json"
+						"tsConfig": "projects/ngx-rtc/tsconfig.lib.json",
+						"outputPath": "dist/ngx-rtc",
+						"assets": ["projects/ngx-rtc/AI.md"]
 					},
 					"configurations": {
 						"production": {
 							"tsConfig": "projects/ngx-rtc/tsconfig.lib.prod.json"
 						},
 						"development": {
-							"tsConfig": "projects/ngx-rtc/tsconfig.lib.json"
+							"compilationMode": "full"
 						}
 					},
 					"defaultConfiguration": "production"
@@ -1035,20 +1055,22 @@
 		"ngx-translate": {
 			"projectType": "library",
 			"root": "projects/ngx-translate",
-			"sourceRoot": "projects/ngx-translate/src",
+			"sourceRoot": "projects/ngx-translate",
 			"prefix": "lib",
 			"architect": {
 				"build": {
-					"builder": "@angular/build:ng-packagr",
+					"builder": "@angular/build:library",
 					"options": {
-						"project": "projects/ngx-translate/ng-package.json"
+						"tsConfig": "projects/ngx-translate/tsconfig.lib.json",
+						"outputPath": "dist/ngx-translate",
+						"assets": ["projects/ngx-translate/AI.md"]
 					},
 					"configurations": {
 						"production": {
 							"tsConfig": "projects/ngx-translate/tsconfig.lib.prod.json"
 						},
 						"development": {
-							"tsConfig": "projects/ngx-translate/tsconfig.lib.json"
+							"compilationMode": "full"
 						}
 					},
 					"defaultConfiguration": "production"
@@ -1058,20 +1080,22 @@
 		"ngx-tinymce": {
 			"projectType": "library",
 			"root": "projects/ngx-tinymce",
-			"sourceRoot": "projects/ngx-tinymce/src",
+			"sourceRoot": "projects/ngx-tinymce",
 			"prefix": "lib",
 			"architect": {
 				"build": {
-					"builder": "@angular/build:ng-packagr",
+					"builder": "@angular/build:library",
 					"options": {
-						"project": "projects/ngx-tinymce/ng-package.json"
+						"tsConfig": "projects/ngx-tinymce/tsconfig.lib.json",
+						"outputPath": "dist/ngx-tinymce",
+						"assets": ["projects/ngx-tinymce/AI.md"]
 					},
 					"configurations": {
 						"production": {
 							"tsConfig": "projects/ngx-tinymce/tsconfig.lib.prod.json"
 						},
 						"development": {
-							"tsConfig": "projects/ngx-tinymce/tsconfig.lib.json"
+							"compilationMode": "full"
 						}
 					},
 					"defaultConfiguration": "production"
@@ -1081,20 +1105,22 @@
 		"ngx-form": {
 			"projectType": "library",
 			"root": "projects/ngx-form",
-			"sourceRoot": "projects/ngx-form/src",
+			"sourceRoot": "projects/ngx-form",
 			"prefix": "lib",
 			"architect": {
 				"build": {
-					"builder": "@angular/build:ng-packagr",
+					"builder": "@angular/build:library",
 					"options": {
-						"project": "projects/ngx-form/ng-package.json"
+						"tsConfig": "projects/ngx-form/tsconfig.lib.json",
+						"outputPath": "dist/ngx-form",
+						"assets": ["projects/ngx-form/AI.md"]
 					},
 					"configurations": {
 						"production": {
 							"tsConfig": "projects/ngx-form/tsconfig.lib.prod.json"
 						},
 						"development": {
-							"tsConfig": "projects/ngx-form/tsconfig.lib.json"
+							"compilationMode": "full"
 						}
 					},
 					"defaultConfiguration": "production"
@@ -1104,20 +1130,27 @@
 		"ngx-ui": {
 			"projectType": "library",
 			"root": "projects/ngx-ui",
-			"sourceRoot": "projects/ngx-ui/src",
+			"sourceRoot": "projects/ngx-ui",
 			"prefix": "lib",
 			"architect": {
 				"build": {
-					"builder": "@angular/build:ng-packagr",
+					"builder": "@angular/build:library",
 					"options": {
-						"project": "projects/ngx-ui/ng-package.json"
+						"tsConfig": "projects/ngx-ui/tsconfig.lib.json",
+						"outputPath": "dist/ngx-ui",
+						"assets": [
+							"projects/ngx-ui/AI.md",
+							"projects/ngx-ui/ACCESSIBILITY.md",
+							"projects/ngx-ui/styles.css",
+							"projects/ngx-ui/startup.css"
+						]
 					},
 					"configurations": {
 						"production": {
 							"tsConfig": "projects/ngx-ui/tsconfig.lib.prod.json"
 						},
 						"development": {
-							"tsConfig": "projects/ngx-ui/tsconfig.lib.json"
+							"compilationMode": "full"
 						}
 					},
 					"defaultConfiguration": "production"

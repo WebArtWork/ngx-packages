@@ -1,6 +1,9 @@
 {
 	"name": "@wawjs/ngx-translate",
-	"version": "22.0.15",
+	"version": "22.0.16",
+	"exports": {
+		".": "./public-api.ts"
+	},
 	"description": "Angular language and runtime translation package from Web Art Work.",
 	"license": "MIT",
 	"repository": "WebArtWork/ngx-translate",
@@ -20,7 +23,7 @@
 		"@angular/forms": ">=22.0.0",
 		"@angular/platform-browser": ">=22.0.0",
 		"@angular/router": ">=22.0.0",
-		"@wawjs/ngx-core": ">=22.0.15",
+		"@wawjs/ngx-core": ">=22.0.16",
 		"rxjs": ">=7.5.0"
 	},
 	"engines": {

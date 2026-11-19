@@ -1,6 +1,9 @@
 {
 	"name": "@wawjs/ngx-core",
-	"version": "22.0.15",
+	"version": "22.0.16",
+	"exports": {
+		".": "./public-api.ts"
+	},
 	"description": "Angular common package with shared services, pipes, directives, and app-level configuration.",
 	"license": "MIT",
 	"repository": "WebArtWork/ngx-core",
