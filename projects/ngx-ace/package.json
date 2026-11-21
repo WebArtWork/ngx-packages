@@ -1,6 +1,6 @@
 {
 	"name": "@wawjs/ngx-ace",
-	"version": "22.0.16",
+	"version": "22.0.17",
 	"description": "Angular Ace editor integration package from Web Art Work.",
 	"exports": {
 		".": "./public-api.ts"

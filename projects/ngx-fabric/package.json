@@ -1,6 +1,6 @@
 {
 	"name": "@wawjs/ngx-fabric",
-	"version": "22.0.16",
+	"version": "22.0.17",
 	"description": "Angular Fabric canvas integration package from Web Art Work.",
 	"exports": {
 		".": "./public-api.ts"
@@ -24,7 +24,7 @@
 	"peerDependencies": {
 		"@angular/common": ">=22.0.0",
 		"@angular/core": ">=22.0.0",
-		"@wawjs/ngx-ui": ">=22.0.16"
+		"@wawjs/ngx-ui": ">=22.0.17"
 	},
 	"engines": {
 		"node": ">=24",

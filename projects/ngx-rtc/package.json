@@ -1,6 +1,6 @@
 {
 	"name": "@wawjs/ngx-rtc",
-	"version": "22.0.16",
+	"version": "22.0.17",
 	"exports": {
 		".": "./public-api.ts"
 	},

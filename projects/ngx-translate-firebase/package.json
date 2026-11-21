@@ -1,6 +1,6 @@
 {
 	"name": "@wawjs/ngx-translate-firebase",
-	"version": "22.0.16",
+	"version": "22.0.17",
 	"exports": {
 		".": "./public-api.ts"
 	},
@@ -21,9 +21,9 @@
 		"@angular/core": ">=22.0.0",
 		"@angular/common": ">=22.0.0",
 		"@angular/router": ">=22.0.0",
-		"@wawjs/ngx-core": ">=22.0.16",
-		"@wawjs/ngx-translate": ">=22.0.16",
-		"@wawjs/ngx-ui": ">=22.0.16",
+		"@wawjs/ngx-core": ">=22.0.17",
+		"@wawjs/ngx-translate": ">=22.0.17",
+		"@wawjs/ngx-ui": ">=22.0.17",
 		"rxjs": ">=7.5.0"
 	},
 	"engines": {
