@@ -38,7 +38,7 @@ export class ThemeService {
 			this._doc.documentElement.dataset['mode'] = mode;
 
 			if (this._config.persist) {
-				localStorage.setItem(this._config.storageKeys.mode, mode);
+				this._writeStorage(this._config.storageKeys.mode, mode);
 			}
 		}
 		this.mode.set(mode);
@@ -52,7 +52,7 @@ export class ThemeService {
 			this._doc.documentElement.dataset['density'] = density;
 
 			if (this._config.persist) {
-				localStorage.setItem(this._config.storageKeys.density, density);
+				this._writeStorage(this._config.storageKeys.density, density);
 			}
 		}
 		this.density.set(density);
@@ -66,7 +66,7 @@ export class ThemeService {
 			this._doc.documentElement.dataset['radius'] = radius;
 
 			if (this._config.persist) {
-				localStorage.setItem(this._config.storageKeys.radius, radius);
+				this._writeStorage(this._config.storageKeys.radius, radius);
 			}
 		}
 		this.radius.set(radius);
@@ -96,24 +96,24 @@ export class ThemeService {
 		this.setRadius(this.radiuses()[radiusIndex] as ThemeRadius);
 
 		if (this._isBrowser && this._config.persist) {
-			localStorage.setItem(this._config.storageKeys.index, String(nextIndex));
+			this._writeStorage(this._config.storageKeys.index, String(nextIndex));
 		}
 	}
 
 	init() {
 		const mode =
 			this._isBrowser && this._config.persist
-				? (localStorage.getItem(this._config.storageKeys.mode) as ThemeMode) ||
+				? (this._readStorage(this._config.storageKeys.mode) as ThemeMode) ||
 					this._config.mode
 				: this._config.mode;
 		const density =
 			this._isBrowser && this._config.persist
-				? (localStorage.getItem(this._config.storageKeys.density) as ThemeDensity) ||
+				? (this._readStorage(this._config.storageKeys.density) as ThemeDensity) ||
 					this._config.density
 				: this._config.density;
 		const radius =
 			this._isBrowser && this._config.persist
-				? (localStorage.getItem(this._config.storageKeys.radius) as ThemeRadius) ||
+				? (this._readStorage(this._config.storageKeys.radius) as ThemeRadius) ||
 					this._config.radius
 				: this._config.radius;
 
@@ -123,7 +123,7 @@ export class ThemeService {
 
 		this.themeIndex.set(
 			this._isBrowser && this._config.persist
-				? Number(localStorage.getItem(this._config.storageKeys.index)) || 0
+				? Number(this._readStorage(this._config.storageKeys.index)) || 0
 				: 0,
 		);
 
@@ -241,5 +241,21 @@ export class ThemeService {
 				...(config?.storageKeys || {}),
 			},
 		} as Required<ThemeConfig> & { storageKeys: ThemeStorageKeys };
+	}
+
+	private _readStorage(key: string): string | null {
+		try {
+			return localStorage.getItem(key);
+		} catch {
+			return null;
+		}
+	}
+
+	private _writeStorage(key: string, value: string): void {
+		try {
+			localStorage.setItem(key, value);
+		} catch {
+			// Storage is blocked or full; the choice only lasts for this page view.
+		}
 	}
 }

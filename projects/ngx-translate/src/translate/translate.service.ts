@@ -129,13 +129,25 @@ export class TranslateService {
 			return [];
 		}
 
-		const baseTranslations = options.replace
-			? []
-			: (this._translationsByLanguage.get(language) || []).map(translation => ({
-					...translation,
-				}));
+		// Right after a switch to a language that was not loaded yet, the cached list is still empty
+		// (the main /i18n/<lang>.json is downloading). Copying it before this download made the
+		// result hold page text only, so the topbar, footer and buttons fell back to the source
+		// language. Wait for the main set first, and read the cache only after the last await (see
+		// `readBase`), so two page loads running at the same time also keep each other's texts.
+		if (!options.replace && !this._translationsByLanguage.has(language)) {
+			await this.loadTranslations(language);
+		}
+
+		const readBase = (): Translate[] =>
+			options.replace
+				? []
+				: (this._translationsByLanguage.get(language) || []).map(translation => ({
+						...translation,
+					}));
 
 		if (!this._isBrowser || !Array.isArray(paths) || !paths.length) {
+			const baseTranslations = readBase();
+
 			this._translationsByLanguage.set(language, [...baseTranslations]);
 
 			if (this._languageService.language() === language) {
@@ -153,7 +165,7 @@ export class TranslateService {
 			language,
 			options.forceReload === true,
 		);
-		const merged = this._mergeTranslations(baseTranslations, loaded);
+		const merged = this._mergeTranslations(readBase(), loaded);
 
 		this._rememberFileTranslations(language, loaded, options.replace === true);
 
@@ -370,9 +382,16 @@ export class TranslateService {
 	}
 
 	private async _loadLanguageInternal(language: string): Promise<Translate[]> {
-		const merged = await this._readLanguageFiles(language);
+		const fromFiles = await this._readLanguageFiles(language);
 
-		this._rememberFileTranslations(language, merged, false);
+		this._rememberFileTranslations(language, fromFiles, false);
+
+		// Keep the page files already loaded for this language. They used to be dropped when the
+		// main file finished last, which reset the page content to the source language.
+		const cachedExtras = [
+			...(this._extraTranslationsByLanguageAndUrl.get(language)?.values() ?? []),
+		].flat();
+		const merged = this._mergeTranslations(fromFiles, cachedExtras);
 
 		this._translationsByLanguage.set(
 			language,

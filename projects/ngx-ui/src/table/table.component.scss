@@ -434,13 +434,19 @@
 /*
  * The table's buttons are plain icon buttons. ngx-ui only loads the .wbutton--primary styles once a
  * <wbutton> component renders somewhere (e.g. the first modal), which made them turn blue after that.
- * Forced here for every state, so they look the same before and after.
+ * Forced here for every state, so they look the same before and after. Scoped to the toolbar and the
+ * pager, so buttons an app puts in its own cell or header templates keep their look.
  */
-.wtable .wbutton,
-.wtable .wbutton:hover,
-.wtable .wbutton:focus,
-.wtable .wbutton:focus-visible,
-.wtable .wbutton:active {
+.wtable .wtable__actions .wbutton,
+.wtable .wtable__actions .wbutton:hover,
+.wtable .wtable__actions .wbutton:focus,
+.wtable .wtable__actions .wbutton:focus-visible,
+.wtable .wtable__actions .wbutton:active,
+.wtable .wtable__pager .wbutton,
+.wtable .wtable__pager .wbutton:hover,
+.wtable .wtable__pager .wbutton:focus,
+.wtable .wtable__pager .wbutton:focus-visible,
+.wtable .wtable__pager .wbutton:active {
 	background: transparent !important;
 	color: inherit !important;
 	box-shadow: none !important;

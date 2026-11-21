@@ -182,11 +182,9 @@ It has three parts:
 	<body>
 		<div id="wstartup" class="wstartup" role="status" aria-live="polite">
 			<div class="wstartup__content">
-				<img class="wstartup__logo" src="logo.png" alt="" width="64" height="64" />
-				<svg class="wstartup__spinner" viewBox="0 0 50 50" aria-hidden="true">
-					<circle class="wstartup__track" cx="25" cy="25" r="20" fill="none" stroke-width="4"></circle>
-					<circle class="wstartup__arc" cx="25" cy="25" r="20" fill="none" stroke-width="4"></circle>
-				</svg>
+				<div class="wstartup__halo">
+					<img class="wstartup__logo" src="logo.png" alt="" width="128" height="128" />
+				</div>
 				<span class="wstartup__label">Loading</span>
 			</div>
 		</div>
@@ -195,6 +193,7 @@ It has three parts:
 </html>
 ```
 
+   - The logo pulses inside a spinning ring (`wstartup__halo`). The earlier markup (a 64px logo next to an svg `wstartup__spinner` with `wstartup__track` and `wstartup__arc` circles) is still styled, so existing apps keep working.
    - Browser-only apps (SPA) set `data-startup="always"` on `<html>`, so the screen covers the empty page until the app is ready.
    - Prerendered sites set `data-startup-language` to the language code the pages are prerendered in. The screen then shows only when the saved language differs, the case where visitors would otherwise see the text switch. Apply the saved theme in the same early script (as the templates do) so the theme never causes a visible change.
 

@@ -3,13 +3,24 @@
  * before first paint). The screen is shown by the inline <head> script adding `wstartup-pending`
  * to <html>, and released by StartupService (provideStartup()). See the ngx-ui README.
  *
+ * The look: the logo pulses softly inside a ring that spins (`wstartup__halo`).
+ *
  * The background covers the page at once, so content never visibly changes underneath it. The logo
- * and spinner fade in only after 300ms, so a fast start shows no spinner flash.
+ * and ring fade in only after 300ms, so a fast start shows no spinner flash.
  *
  * The screen is visible by default and hidden by html:not(.wstartup-pending). Do not invert this:
  * Angular's critical-CSS inlining (beasties) drops selectors that do not match the static HTML, and
  * the pending class only exists after the inline script runs, so a html.wstartup-pending rule would
  * not apply until the full stylesheet loads.
+ *
+ * Markup:
+ *   <div class="wstartup__content">
+ *     <div class="wstartup__halo"><img class="wstartup__logo" ... /></div>
+ *     <span class="wstartup__label">Loading</span>
+ *   </div>
+ *
+ * The earlier markup (a 64px `wstartup__logo` next to an svg `wstartup__spinner` with
+ * `wstartup__track` and `wstartup__arc` circles) is still styled, so existing apps keep working.
  */
 .wstartup {
 	position: fixed;
@@ -39,9 +50,29 @@ html.wstartup-pending {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	/* Spaces the earlier logo + spinner markup; the halo markup has a single in-flow child. */
 	gap: 24px;
 	opacity: 0;
 	animation: wstartup-reveal 200ms ease 300ms forwards;
+}
+
+.wstartup__halo {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 220px;
+	height: 220px;
+}
+
+.wstartup__halo::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	border-radius: 50%;
+	border: 4px solid color-mix(in srgb, var(--c-primary, currentColor) 16%, transparent);
+	border-top-color: var(--c-primary, currentColor);
+	animation: wstartup-spin 1100ms linear infinite;
 }
 
 .wstartup__logo {
@@ -51,10 +82,18 @@ html.wstartup-pending {
 	object-fit: contain;
 }
 
+.wstartup__halo .wstartup__logo {
+	width: 128px;
+	height: 128px;
+	filter: drop-shadow(0 0 24px color-mix(in srgb, var(--c-primary, currentColor) 45%, transparent));
+	animation: wstartup-pulse 1800ms ease-in-out infinite;
+}
+
+/* Earlier markup: svg spinner next to the logo. */
 .wstartup__spinner {
 	width: 40px;
 	height: 40px;
-	animation: wstartup-rotate 1400ms linear infinite;
+	animation: wstartup-spin 1400ms linear infinite;
 }
 
 .wstartup__track {
@@ -87,9 +126,21 @@ html.wstartup-pending {
 	}
 }
 
-@keyframes wstartup-rotate {
+@keyframes wstartup-spin {
 	to {
 		transform: rotate(360deg);
+	}
+}
+
+@keyframes wstartup-pulse {
+	0%,
+	100% {
+		transform: scale(1);
+		opacity: 0.92;
+	}
+	50% {
+		transform: scale(1.05);
+		opacity: 1;
 	}
 }
 
@@ -117,15 +168,21 @@ html.wstartup-pending {
 		animation-duration: 0ms;
 	}
 
+	/* No rotation or scaling: the ring stays still and the logo only fades gently. */
+	.wstartup__halo::before {
+		animation: none;
+	}
+
+	.wstartup__halo .wstartup__logo,
 	.wstartup__spinner {
-		animation: wstartup-pulse 1600ms ease-in-out infinite;
+		animation: wstartup-fade 1600ms ease-in-out infinite;
 	}
 
 	.wstartup__arc {
 		animation: none;
 	}
 
-	@keyframes wstartup-pulse {
+	@keyframes wstartup-fade {
 		0%,
 		100% {
 			opacity: 1;

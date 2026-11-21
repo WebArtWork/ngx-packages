@@ -223,6 +223,7 @@ Notes:
 - Existing translations are kept by default and then overridden by later files.
 - Array extra payloads are paired with the matching default-language array from the same URL pattern.
 - Extra translation URLs are cached per language and are not fetched again on repeat calls.
+- Unless `replace: true`, extra files first wait for the language's main files, so a page that loads its texts right after a language switch keeps the shared texts (topbar, footer, buttons). A later main-file load keeps the extra files already loaded for that language.
 - Pass `replace: true` to replace cached translations for that language with only the loaded files.
 - Pass `forceReload: true` to refetch URLs that were already cached.
 
