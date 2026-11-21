@@ -283,15 +283,18 @@ export class SelectComponent implements ControlValueAccessor {
 			const val = untracked(() => this.wModel());
 
 			if (this.isMulti()) {
-				const next = (Array.isArray(val) ? val : []).filter((id) =>
-					ids.has(id as SelectId),
-				) as SelectId[];
-				if (JSON.stringify(next) !== JSON.stringify(val)) {
-					this.wModel.set(next);
+				// Do not prune while items are still empty (async load), or the value is wiped.
+				if (normalized.length) {
+					const next = (Array.isArray(val) ? val : []).filter((id) =>
+						ids.has(id as SelectId),
+					) as SelectId[];
+					if (JSON.stringify(next) !== JSON.stringify(val)) {
+						this.wModel.set(next);
+					}
 				}
 			} else {
 				if (
-					!val ||
+					val == null ||
 					(normalized.length && !ids.has(val as SelectId))
 				) {
 					this.wModel.set(null);
@@ -333,6 +336,7 @@ export class SelectComponent implements ControlValueAccessor {
 			queueMicrotask(() => this._scrollActiveIntoView());
 		} else {
 			this.activeIndex.set(-1);
+			this.search.set('');
 		}
 	}
 
@@ -345,6 +349,7 @@ export class SelectComponent implements ControlValueAccessor {
 			this.wModel.set(item.id);
 			this.showOptions.set(false);
 			this.activeIndex.set(-1);
+			this.search.set('');
 		}
 		this._onTouched();
 	}
@@ -371,6 +376,29 @@ export class SelectComponent implements ControlValueAccessor {
 		if (this.isDisabled()) return;
 
 		const key = ev.key;
+
+		// Keydown is bound on the whole wrapper: leave native keys to text fields and inner
+		// buttons (search input, clear, chip remove, extra actions, options). Arrows, Escape and
+		// Tab still drive the list from there; Enter in a text field still picks the active option.
+		const target = ev.target as HTMLElement | null;
+		const tag = target?.tagName;
+		const inText =
+			!!target &&
+			(tag === 'INPUT' ||
+				tag === 'TEXTAREA' ||
+				tag === 'SELECT' ||
+				target.isContentEditable);
+		const onButton = !inText && tag === 'BUTTON';
+		if (
+			(inText && (key === ' ' || key === 'Home' || key === 'End')) ||
+			(onButton &&
+				(key === ' ' ||
+					key === 'Enter' ||
+					key === 'Home' ||
+					key === 'End'))
+		) {
+			return;
+		}
 
 		// open from closed state
 		if (!this.showOptions()) {

@@ -74,6 +74,8 @@ Create, update, unique, and delete mutations are persisted for offline recovery.
 - `getFieldSignals(field)`
 - `isLoaded`
 
+`getSignal()` runs untracked and only writes the cached document signal when the merged fields actually change, so it is safe to call from `computed()` and `effect()`. `documentSignals`, `getSignals()` and `getFieldSignals()` rely on this.
+
 ### Remote operations
 
 - `get(config?, options?)`

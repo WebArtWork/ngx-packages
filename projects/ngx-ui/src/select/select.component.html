@@ -1,6 +1,7 @@
 @let _show = showOptions(); @let _ph = placeholder(); @let _label = label();
 @let _isMulti = isMulti(); @let _ids = selectedIds(); @let _id = selectedId();
 @let _searchable = searchable(); @let _all = filteredItems();
+@let _hasId = _id != null && (_id !== '' || allItem[_id] != null);
 
 <div
 	(clickOutside)="toggleOptions(false)"
@@ -63,8 +64,8 @@
 					</div>
 					} @else {
 					<div class="wselect__value">
-						@if (_id) {
-						@if (raw()) { <span>{{ allItem[_id] }}</span> } @else { <span [translate]="allItem[_id]"></span> }
+						@if (_hasId) {
+						@if (raw()) { <span>{{ allItem[_id!] }}</span> } @else { <span [translate]="allItem[_id!]"></span> }
 						} @else {
 						<span class="wselect__placeholder" [translate]="_ph"></span>
 						}
@@ -75,7 +76,7 @@
 		</div>
 
 		<!-- clear -->
-		@if (clearable() && (_isMulti ? _ids.length : _id)) {
+		@if (clearable() && (_isMulti ? _ids.length : _hasId)) {
 		<button
 			type="button"
 			class="wselect__icon-btn material-icons"
@@ -168,8 +169,8 @@
 					<span class="wselect__item-icon material-icons">{{ isSelected ? 'check' : '' }}</span>
 					<div class="wselect__item-label">
 						<div class="wselect__item-text">
-							@if (item()[bindLabel()]) {
-							@if (raw()) { <span>{{ item()[bindLabel()] }}</span> } @else { <span [translate]="item()[bindLabel()]"></span> }
+							@if (item().name) {
+							@if (raw()) { <span>{{ item().name }}</span> } @else { <span [translate]="item().name"></span> }
 							} @else {
 							<span translate>Unknown item</span>
 							}

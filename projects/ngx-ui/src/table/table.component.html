@@ -10,7 +10,7 @@
 					[ngTemplateOutlet]="headerTpl()?.template"
 				></ng-container>
 			</div>
-			} @if (config().searchable) {
+			} @if (cfg().searchable) {
 			<div class="wtable__search">
 				<div class="wtable__search-wrap">
 					<input
@@ -40,8 +40,8 @@
 
 			<!-- Header actions -->
 			<div class="wtable__actions">
-				@if (config().headerButtons) { @for (button of
-				config().headerButtons; track button) { @if (button) {
+				@if (cfg().headerButtons) { @for (button of
+				cfg().headerButtons; track button) { @if (button) {
 				<button wbutton
 					[disableSubmit]="true"
 					[extraClass]="
@@ -57,11 +57,11 @@
 					<span class="wtable__action-text">{{ button.text }}</span>
 					}
 				</button>
-				} } } @if (config().create) {
+				} } } @if (cfg().create) {
 				<button wbutton
 					[disableSubmit]="true"
 					[extraClass]="'wtable__action-btn'"
-					(wClick)="config().create()"
+					(wClick)="cfg().create()"
 				>
 					<i class="material-icons" title="Add"> add </i>
 				</button>
@@ -75,7 +75,7 @@
 		<table class="wtable__table" cellpadding="0" cellspacing="0">
 			<thead class="wtable__thead">
 				<tr>
-					@if (config().num) {
+					@if (cfg().num) {
 					<th scope="col" class="wtable__th">No.</th>
 					} @for (column of columns(); track column) {
 					<th
@@ -114,8 +114,8 @@
 							}
 						</div>
 					</th>
-					} @if (config().delete || config().update ||
-					config().buttons?.length) {
+					} @if (cfg().delete || cfg().update ||
+					cfg().buttons?.length) {
 					<th scope="col" class="wtable__th">
 						@if (action) {
 						<ng-container
@@ -128,7 +128,7 @@
 			</thead>
 
 			<tbody class="wtable__tbody">
-				@let _cfg = config(); @for (row of _cfg.allDocs ?
+				@let _cfg = cfg(); @for (row of _cfg.allDocs ?
 				paginatedRows() : normalizedRows(); track row[bindValue()]) {
 				<tr class="wtable__tr">
 					@if (_cfg.num) {
@@ -258,8 +258,8 @@
 					<td
 						[attr.colspan]="
 							columns().length +
-							(config().delete || config().update || config().buttons?.length ? 1 : 0) +
-							(config().num ? 1 : 0)
+							(cfg().delete || cfg().update || cfg().buttons?.length ? 1 : 0) +
+							(cfg().num ? 1 : 0)
 						"
 						class="wtable__footer-cell"
 					>
@@ -370,7 +370,7 @@
 								<button wbutton
 									[extraClass]="'wtable__pager-btn'"
 									[isMultipleClicksAllowed]="true"
-									[disabled]="_cfg.page * _cfg.perPage > totalCount()"
+									[disabled]="_cfg.page * _cfg.perPage >= totalCount()"
 									(wClick)="next()"
 								>
 									<span class="material-icons"

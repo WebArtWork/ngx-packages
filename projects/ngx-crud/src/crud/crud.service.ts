@@ -7,6 +7,7 @@ import {
 	PLATFORM_ID,
 	signal,
 	Signal,
+	untracked,
 	WritableSignal,
 } from '@angular/core';
 import { Observable, ReplaySubject } from 'rxjs';
@@ -55,7 +56,11 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 	private readonly _documents = signal<Document[]>([]);
 
 	readonly documents = this._documents.asReadonly();
-	readonly documentSignals = computed(() => this.documents().map(doc => this.getSignal(doc)));
+	readonly documentSignals = computed(() => {
+		const docs = this.documents();
+
+		return untracked(() => docs.map(doc => this.getSignal(doc)));
+	});
 	readonly isLoaded = signal(false);
 
 	constructor(private readonly _config: CrudConfig<Document>) {
@@ -76,40 +81,58 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 		);
 	}
 
+	/**
+	 * Returns the cached writable signal for a document, merging the given fields into it.
+	 *
+	 * Runs untracked: it writes the cached signal, which Angular forbids inside a `computed()`
+	 * (NG0600), and reading it inside an effect would make that effect re-run on its own write.
+	 * The write is skipped when the merged document is unchanged.
+	 */
 	getSignal(docOrId: string | Document): WritableSignal<Document> {
-		const doc = typeof docOrId === 'string' ? this._findDocument(docOrId) : this._ensureId(docOrId);
-		const id = typeof docOrId === 'string' ? docOrId : this._identity(docOrId);
-		const key = id || this._createId();
-		const current = doc || ({ [this._idField()]: key } as unknown as Document);
-		let docSignal = this._documentSignals.get(key);
+		return untracked(() => {
+			const doc = typeof docOrId === 'string' ? this._findDocument(docOrId) : this._ensureId(docOrId);
+			const id = typeof docOrId === 'string' ? docOrId : this._identity(docOrId);
+			const key = id || this._createId();
+			const current = doc || ({ [this._idField()]: key } as unknown as Document);
+			let docSignal = this._documentSignals.get(key);
 
-		if (!docSignal) {
-			docSignal = signal({ ...current });
-			this._documentSignals.set(key, docSignal);
-		} else {
-			docSignal.set({ ...docSignal(), ...current });
-		}
+			if (!docSignal) {
+				docSignal = signal({ ...current });
+				this._documentSignals.set(key, docSignal);
+			} else {
+				const previous = docSignal();
 
-		return docSignal;
+				if (!this._hasChanges(previous, current)) {
+					return docSignal;
+				}
+
+				docSignal.set({ ...previous, ...current });
+			}
+
+			return docSignal;
+		});
 	}
 
 	getSignals(field: string, value: unknown): Signal<WritableSignal<Document>[]> {
-		return computed(() =>
-			this.documents()
-				.filter(doc => doc[field as keyof Document] === value)
-				.map(doc => this.getSignal(doc)),
-		);
+		return computed(() => {
+			const docs = this.documents().filter(doc => doc[field as keyof Document] === value);
+
+			return untracked(() => docs.map(doc => this.getSignal(doc)));
+		});
 	}
 
 	getFieldSignals(field: string): Signal<Record<string, WritableSignal<Document>[]>> {
 		return computed(() => {
 			const byField: Record<string, WritableSignal<Document>[]> = {};
+			const docs = this.documents();
 
-			for (const doc of this.documents()) {
-				const key = String(doc[field as keyof Document]);
-				byField[key] ||= [];
-				byField[key].push(this.getSignal(doc));
-			}
+			untracked(() => {
+				for (const doc of docs) {
+					const key = String(doc[field as keyof Document]);
+					byField[key] ||= [];
+					byField[key].push(this.getSignal(doc));
+				}
+			});
 
 			return byField;
 		});
@@ -524,6 +547,20 @@ export abstract class CrudService<Document extends CrudDocument<Document>> {
 				this._documentSignals.delete(key);
 			}
 		}
+	}
+
+	/** True when merging `next` into `previous` would add a key or change a value (shallow). */
+	private _hasChanges(previous: Document, next: Document): boolean {
+		const prev = previous as unknown as Record<string, unknown>;
+		const patch = next as unknown as Record<string, unknown>;
+
+		for (const key of Object.keys(patch)) {
+			if (!(key in prev) || prev[key] !== patch[key]) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	private _findDocument(id: string): Document | undefined {

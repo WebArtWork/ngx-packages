@@ -7,6 +7,7 @@ import {
 	Injector,
 	Signal,
 	signal,
+	untracked,
 	WritableSignal,
 } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
@@ -151,9 +152,7 @@ export abstract class CrudComponent<
 							.get({ page, query }, this.getOptions())
 							.subscribe({
 								next: (docs: Document[]) => {
-									this.documents.update(() =>
-										(docs || []).map(doc => this.crudService.getSignal(doc)),
-									);
+									this.documents.set(this.__toSignals(docs || []));
 
 									resolveAll();
 
@@ -168,12 +167,7 @@ export abstract class CrudComponent<
 					250,
 				);
 			} else {
-				this.documents.update(() =>
-					this.crudService
-						.documents()
-						.filter(this.localDocumentsFilter)
-						.map(doc => this.crudService.getSignal(doc)),
-				);
+				this.documents.set(this.__localDocumentSignals());
 
 				if (this.crudService.isLoaded()) {
 					resolve();
@@ -192,12 +186,7 @@ export abstract class CrudComponent<
 						}
 
 						loadEffect?.destroy();
-						this.documents.update(() =>
-							this.crudService
-								.documents()
-								.filter(this.localDocumentsFilter)
-								.map(doc => this.crudService.getSignal(doc)),
-						);
+						this.documents.set(this.__localDocumentSignals());
 						resolve();
 						this.__cdr.markForCheck();
 					},
@@ -205,6 +194,24 @@ export abstract class CrudComponent<
 				);
 			}
 		});
+	}
+
+	/**
+	 * Maps documents to their service signals without tracking.
+	 *
+	 * `getSignal()` reads and writes the cached document signal. `setDocuments()` is often called
+	 * from consumer effects, and tracking that signal would make the effect re-run on its own write.
+	 */
+	private __toSignals(docs: Document[]): Signal<Document>[] {
+		return untracked(() => docs.map(doc => this.crudService.getSignal(doc)));
+	}
+
+	/**
+	 * Local-mode documents that pass `localDocumentsFilter`, mapped to signals. The service
+	 * `documents()` read stays tracked; only the `getSignal()` mapping is untracked.
+	 */
+	private __localDocumentSignals(): Signal<Document>[] {
+		return this.__toSignals(this.crudService.documents().filter(this.localDocumentsFilter));
 	}
 
 	/** Fields considered when performing bulk updates. */

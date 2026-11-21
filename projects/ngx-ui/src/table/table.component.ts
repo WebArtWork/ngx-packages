@@ -2,6 +2,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import {
 	AfterContentInit,
 	Component,
+	DestroyRef,
 	OnInit,
 	Signal,
 	ViewEncapsulation,
@@ -17,7 +18,7 @@ import {
 	signal,
 } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { StoreService } from '@wawjs/ngx-core';
+import { ClickOutsideDirective, StoreService } from '@wawjs/ngx-core';
 import { ButtonDirective } from '../button/button.directive';
 import {
 	ActionsDirective,
@@ -32,7 +33,7 @@ import {
 	templateUrl: './table.component.html',
 	styleUrl: './table.component.scss',
 	encapsulation: ViewEncapsulation.None,
-	imports: [ButtonDirective, NgTemplateOutlet, RouterLink],
+	imports: [ButtonDirective, NgTemplateOutlet, RouterLink, ClickOutsideDirective],
 })
 export class TableComponent implements OnInit, AfterContentInit {
 	private readonly _router = inject(Router);
@@ -42,6 +43,13 @@ export class TableComponent implements OnInit, AfterContentInit {
 	readonly bindValue = input<string>('_id');
 	readonly rows = input<unknown[]>([]);
 	readonly config = input<any>({});
+
+	/** config() with defaults applied, re-applied whenever a new config object arrives */
+	readonly cfg = computed<any>(() => {
+		const cfg = this.config() || {};
+		this.default_config(cfg);
+		return cfg;
+	});
 	readonly columns = model<any[]>([]);
 	readonly value = input<string>('_id');
 	readonly title = input<string>('');
@@ -82,7 +90,7 @@ export class TableComponent implements OnInit, AfterContentInit {
 	readonly filteredRows = computed<any[]>(() => {
 		this._refreshToken(); // track manual refreshes
 
-		const cfg = this.config();
+		const cfg = this.cfg();
 		const rows = this.normalizedRows();
 
 		// server mode or global search handled outside
@@ -107,16 +115,16 @@ export class TableComponent implements OnInit, AfterContentInit {
 	readonly paginatedRows = computed<any[]>(() => {
 		this._refreshToken();
 
-		const cfg = this.config();
+		const cfg = this.cfg();
 		const rows = this.filteredRows();
 
 		if (!Array.isArray(rows)) return [];
 
-		let copy = rows.map((it, i) => ({ ...it, num: i + 1 }));
+		let copy = rows.slice();
 
 		const sort = this.sort_type;
 		if (sort?.direction) {
-			copy = copy.slice().sort((a: any, b: any) => {
+			copy = copy.sort((a: any, b: any) => {
 				if (a[sort.title] < b[sort.title]) {
 					return sort.direction === 'desc' ? 1 : -1;
 				}
@@ -126,6 +134,9 @@ export class TableComponent implements OnInit, AfterContentInit {
 				return 0;
 			});
 		}
+
+		// number rows after sorting so "No." follows the visible order
+		copy = copy.map((it, i) => ({ ...it, num: i + 1 }));
 
 		// no pagination in client mode
 		if (cfg.perPage === -1 || !cfg.perPage || !cfg.allDocs) {
@@ -151,8 +162,14 @@ export class TableComponent implements OnInit, AfterContentInit {
 			.join('/');
 
 	private _search_timeout: any;
+	private _apply_timeout: any;
 
 	constructor() {
+		inject(DestroyRef).onDestroy(() => {
+			clearTimeout(this._search_timeout);
+			clearTimeout(this._apply_timeout);
+		});
+
 		// react to rows() changes and unwrap signals
 		effect(() => {
 			const raw = this.rows() || [];
@@ -166,7 +183,7 @@ export class TableComponent implements OnInit, AfterContentInit {
 	}
 
 	async ngOnInit() {
-		this.default_config();
+		this.cfg();
 
 		// normalize string columns => { title, field }
 		const cols = this.columns();
@@ -182,9 +199,7 @@ export class TableComponent implements OnInit, AfterContentInit {
 		if (perPage) this.changePerPage(Number(perPage));
 	}
 
-	default_config() {
-		const cfg = this.config();
-
+	default_config(cfg: any = this.config()) {
 		if (!cfg.pageSizeOptions) cfg.pageSizeOptions = [1, 10, 20, 50];
 		if (cfg.perPage === undefined) cfg.perPage = -1;
 		if (!cfg.page) cfg.page = 1;
@@ -215,40 +230,46 @@ export class TableComponent implements OnInit, AfterContentInit {
 		return (event.target as HTMLInputElement | null)?.value || '';
 	}
 
+	/** Applies the typed text as the local filter and goes back to page 1 when it changed. */
+	private _applyFilter() {
+		const cfg = this.cfg();
+		if (cfg.globalSearch) return;
+
+		const term = this.searchingText();
+		if (term !== this.filterFilter()) {
+			this.filterFilter.set(term);
+			if (cfg.allDocs) cfg.page = 1;
+		}
+		this.refresh();
+	}
+
+	/** Debounced local filter while typing. */
 	searching() {
-		setTimeout(() => {
-			if (!this.config().globalSearch) {
-				this.filterFilter.set(this.searchingText());
-				this.refresh();
-			}
-		}, 100);
+		const cfg = this.cfg();
+		// filteredRows already reads searchingText, so the visible rows change now: reset the page now too
+		if (cfg.allDocs && !cfg.globalSearch) cfg.page = 1;
 
 		clearTimeout(this._search_timeout);
-		this._search_timeout = setTimeout(this.searching.bind(this), 2000);
+		this._search_timeout = setTimeout(() => this._applyFilter(), 300);
 	}
 
 	search() {
 		clearTimeout(this._search_timeout);
+		clearTimeout(this._apply_timeout);
 
-		setTimeout(() => {
-			if (!this.config().globalSearch) {
-				this.filterFilter.set(this.searchingText());
-				this.refresh();
-			}
-		}, 100);
+		this._apply_timeout = setTimeout(() => this._applyFilter(), 100);
 
 		this.onSearch.emit(this.searchingText());
 	}
 
 	next() {
-		const cfg = this.config();
-		const rows = this.normalizedRows();
+		const cfg = this.cfg();
 
 		if (cfg.perPage === -1) return;
 
-		// client mode – we have all docs in memory
+		// client mode: we have all docs in memory
 		if (cfg.allDocs || typeof cfg.paginate !== 'function') {
-			if (rows && cfg.page * cfg.perPage < rows.length) {
+			if (cfg.page * cfg.perPage < this.totalCount()) {
 				cfg.page += 1;
 				this.refresh();
 			}
@@ -262,7 +283,7 @@ export class TableComponent implements OnInit, AfterContentInit {
 	}
 
 	previous() {
-		const cfg = this.config();
+		const cfg = this.cfg();
 
 		if (cfg.page <= 1) return;
 
@@ -277,7 +298,7 @@ export class TableComponent implements OnInit, AfterContentInit {
 	}
 
 	changePerPage(row: number) {
-		const cfg = this.config();
+		const cfg = this.cfg();
 
 		cfg.perPage = row;
 		cfg.page = 1;
@@ -294,11 +315,9 @@ export class TableComponent implements OnInit, AfterContentInit {
 
 		this._storeService.set(this.tableId + 'perPage', row.toString());
 
-		const rows = this.normalizedRows();
 		if (
-			rows &&
 			cfg.perPage > 0 &&
-			(cfg.page - 1) * cfg.perPage > rows.length
+			(cfg.page - 1) * cfg.perPage > this.totalCount()
 		) {
 			this.lastPage();
 		}
@@ -308,7 +327,7 @@ export class TableComponent implements OnInit, AfterContentInit {
 	}
 
 	firstPage() {
-		const cfg = this.config();
+		const cfg = this.cfg();
 		const rows = this.normalizedRows();
 
 		if (!rows || !rows.length || cfg.perPage <= 0) return;
@@ -318,27 +337,29 @@ export class TableComponent implements OnInit, AfterContentInit {
 	}
 
 	lastPage() {
-		const cfg = this.config();
-		const rows = this.normalizedRows();
+		const cfg = this.cfg();
+		const count = this.totalCount();
 
-		if (!rows || !rows.length || cfg.perPage <= 0) return;
+		if (!count || cfg.perPage <= 0) return;
 
-		cfg.page = Math.ceil(rows.length / cfg.perPage);
+		cfg.page = Math.ceil(count / cfg.perPage);
 		this.refresh();
 	}
 
 	isLast(): boolean {
-		const cfg = this.config();
-		const rows = this.normalizedRows();
+		const cfg = this.cfg();
+		const count = this.totalCount();
 
-		if (!rows || !rows.length || cfg.perPage <= 0 || !cfg.allDocs) {
+		if (!count || cfg.perPage <= 0 || !cfg.allDocs) {
 			return false;
 		}
 
-		return cfg.page >= Math.ceil(rows.length / cfg.perPage);
+		return cfg.page >= Math.ceil(count / cfg.perPage);
 	}
 
 	sort(column: any) {
+		const prev = this.sort_type;
+
 		if (this.sort_type.title !== column.field) this.sort_type = {};
 
 		if (this.sortable[column.field]) {
@@ -349,7 +370,8 @@ export class TableComponent implements OnInit, AfterContentInit {
 					(this.sort_type.direction === 'asc' && 'desc') ||
 					undefined,
 			};
-			this.refresh();
 		}
+
+		if (this.sort_type !== prev) this.refresh();
 	}
 }
